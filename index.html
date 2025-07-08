@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Título da Aba -->
+    <title>Kaio Felipe</title>
+
+    <!-- Favicon (ícone da aba) -->
+    <link rel="icon" href="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/briefcase.svg" type="image/svg+xml">
+
+    <!-- Google Fonts: Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome (para ícones) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" xintegrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <!-- Conexão com o arquivo CSS -->
+    <link rel="stylesheet" href="style.css">
+
+    <!-- EmailJS SDK -->
+    <script
+  type="text/javascript"
+  src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js">
+</script>
+
+</head>
+<body>
+
+    <!-- CABEÇALHO E NAVEGAÇÃO -->
+    <header class="header">
+        <a href="#home" class="logo">Kaio Felipe</a>
+        <nav class="navbar">
+            <a href="#home" class="active">Home</a>
+            <a href="#skills">Habilidades</a>
+            <a href="#projects">Projetos</a>
+            <a href="#contact">Contato</a>
+        </nav>
+        <div class="hamburger-menu" id="hamburger-menu">
+            <i class="fa-solid fa-bars"></i>
+        </div>
+    </header>
+
+    <main>
+        <!-- SEÇÃO HOME -->
+        <section id="home" class="section">
+            <div class="home-content">
+                <img src="foto.png" alt="Foto de perfil de Kaio Felipe" class="profile-pic">
+                <h1>Kaio Felipe</h1>
+                <p class="bio">Desenvolvedor com paixão por tecnologia, aprendizado contínuo e inovação.</p>
+                <div class="social-icons">
+                    <a href="https://www.linkedin.com/in/kaio-homem-bb118335b/" target="_blank" aria-label="LinkedIn de Kaio Felipe"><i class="fa-brands fa-linkedin-in"></i></a>
+                    <a href="https://github.com/KaioHomem" target="_blank" aria-label="GitHub de Kaio Felipe"><i class="fa-brands fa-github"></i></a>
+                    <a href="https://www.instagram.com/kaiofkk" target="_blank" aria-label="Instagram de Kaio Felipe"><i class="fa-brands fa-instagram"></i></a>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEÇÃO HABILIDADES -->
+        <section id="skills" class="section">
+            <h2>Minhas Habilidades</h2>
+            <div class="skills-container">
+                <div class="skills-card">
+                    <h3>Competências Técnicas</h3>
+                    <ul>
+                        <li><i class="fa-brands fa-html5"></i> HTML</li>
+                        <li><i class="fa-brands fa-css3-alt"></i> CSS</li>
+                        <li><i class="fa-brands fa-js"></i> JavaScript</li>
+                        <li><i class="fa-brands fa-java"></i> Java</li>
+                        <li><i class="fa-solid fa-brain"></i> Lógica de Programação</li>
+                    </ul>
+                </div>
+                <div class="skills-card">
+                    <h3>Competências Pessoais</h3>
+                    <ul>
+                        <li><i class="fa-solid fa-rocket"></i> Proatividade</li>
+                        <li><i class="fa-solid fa-lightbulb"></i> Aprendizado Constante</li>
+                        <li><i class="fa-solid fa-users"></i> Trabalho em Equipe</li>
+                        <li><i class="fa-solid fa-comment-dots"></i> Comunicação</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEÇÃO PROJETOS -->
+        <section id="projects" class="section">
+            <h2>Meus Projetos</h2>
+            <div class="projects-gallery">
+                <div class="project-card">
+                    <img src="EmBreve.png" alt="Imagem do Projeto 1">
+                    <h3>Projeto Em Breve</h3>
+                    <p>Em desenvolvimento e pesquisa.</p>
+                    <a href="#" target="_blank">Ver no GitHub <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+                </div>
+                <div class="project-card">
+                    <img src="EmBreve.png" alt="Imagem do Projeto 2">
+                    <h3>Projeto Em Breve</h3>
+                    <p>Em desenvolvimento e pesquisa.</p>
+                    <a href="#" target="_blank">Ver no GitHub <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+                </div>
+                <div class="project-card">
+                    <img src="EmBreve.png" alt="Imagem do Projeto 3">
+                    <h3>Projeto Em Breve</h3>
+                    <p>Em desenvolvimento e pesquisa.</p>
+                    <a href="#" target="_blank">Ver no GitHub <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEÇÃO CONTATO -->
+        <section id="contact" class="section">
+            <h2>Entre em Contato</h2>
+            <form id="contact-form" class="contact-form">
+                <div class="form-group">
+                    <input type="text" id="from_name" name="from_name" placeholder="Seu Nome" required>
+                    <span class="error-message" id="name-error"></span>
+                </div>
+                <div class="form-group">
+                    <input type="email" id="from_email" name="from_email" placeholder="Seu E-mail" required>
+                    <span class="error-message" id="email-error"></span>
+                </div>
+                <div class="form-group">
+                    <textarea id="message" name="message" rows="5" placeholder="Sua Mensagem" required></textarea>
+                    <span class="error-message" id="message-error"></span>
+                </div>
+                <button type="submit" class="btn-submit">Enviar Mensagem</button>
+                <p class="form-status" id="form-status"></p>
+            </form>
+        </section>
+    </main>
+
+    <!-- RODAPÉ -->
+    <footer class="footer">
+        <p>&copy; 2024 Kaio Felipe. Todos os direitos reservados.</p>
+    </footer>
+
+    <!-- Conexão com o arquivo JavaScript -->
+    <script src="script.js"></script>
+</body>
+</html>
