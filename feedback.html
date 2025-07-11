@@ -3,28 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Página de Feedback</title>
+    <title>Feedback - Kaio Fellipe</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-
     <div class="container">
-        <h1>Deixe seu Feedback</h1>
-        <p>Adoraríamos ouvir sua opinião. Por favor, preencha o formulário abaixo.</p>
+        <header>
+            <div class="logo">
+                <h1>Kaio Fellipe</h1>
+            </div>
+            <nav>
+                <a href="index.html">Início</a>
+                <a href="feedback.html" class="active">Feedback</a>
+            </nav>
+        </header>
 
-        <form action="https://formspree.io/f/{seu_email}" method="POST">
-            <label for="name">Nome:</label>
-            <input type="text" id="name" name="name" required>
+        <main>
+            <div class="form-container">
+                <h2>feedback</h2>
+                <hr>
+                <p class="subtitle">DEIXE SEU FEEDBACK</p>
 
-            <label for="email">Email:</label>
-            <input type="email" id="email" name="email" required>
+                <form action="https://formspree.io/f/{seu_email_aqui}" method="POST">
+                    <div class="input-group">
+                        <label for="nome">Nome Completo</label>
+                        <input type="text" id="nome" name="nome" required>
+                    </div>
 
-            <label for="message">Sua mensagem:</label>
-            <textarea id="message" name="message" rows="6" required></textarea>
+                    <div class="input-group">
+                        <label for="email">E-mail</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
 
-            <button type="submit">Enviar Feedback</button>
-        </form>
+                    <div class="input-group">
+                        <label for="mensagem">Deixe sua mensagem</label>
+                        <textarea id="mensagem" name="mensagem" rows="5" required></textarea>
+                    </div>
+
+                    <button type="submit">ENVIAR</button>
+                </form>
+            </div>
+        </main>
     </div>
-
 </body>
 </html>
