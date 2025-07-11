@@ -46,7 +46,7 @@ header nav a.active {
     font-size: 1.5em;
     color: #ffffff;
     margin: 0;
-    text-transform: lowercase;
+    text-transform: capitalize;
 }
 
 .form-container hr {
