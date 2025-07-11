@@ -1,4 +1,4 @@
-/* Importação da fonte e reset básico */
+/* Font import and basic reset */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
 
 * {
@@ -9,15 +9,15 @@
     list-style: none;
 }
 
-/* Variáveis de Cor para fácil customização */
+/* Color Variables for easy customization */
 :root {
-    --bg-color: #121212; /* Fundo principal escuro */
-    --surface-color: #1e1e1e; /* Cor para 'cartões' e superfícies */
-    --primary-color: #007BFF; /* Azul royal para detalhes e destaques */
-    --text-color: #f0f0f0; /* Cor principal do texto */
-    --text-secondary-color: #a0a0a0; /* Cor secundária para textos menos importantes */
-    --error-color: #ff4d4d; /* Cor para mensagens de erro */
-    --success-color: #4dff88; /* Cor para mensagens de sucesso */
+    --bg-color: #121212; /* Main dark background */
+    --surface-color: #1e1e1e; /* Color for 'cards' and surfaces */
+    --primary-color: #007BFF; /* Royal blue for details and highlights */
+    --text-color: #f0f0f0; /* Main text color */
+    --text-secondary-color: #a0a0a0; /* Secondary color for less important text */
+    --error-color: #ff4d4d; /* Color for error messages */
+    --success-color: #4dff88; /* Color for success messages */
 }
 
 html {
@@ -31,7 +31,7 @@ body {
     line-height: 1.6;
 }
 
-/* Cabeçalho Fixo */
+/* Fixed Header */
 .header {
     position: fixed;
     top: 0;
@@ -66,7 +66,7 @@ body {
     color: var(--primary-color);
 }
 
-/* Menu Hambúrguer (Mobile) */
+/* Hamburger Menu (Mobile) */
 .hamburger-menu {
     display: none;
     cursor: pointer;
@@ -74,7 +74,7 @@ body {
     color: var(--text-color);
 }
 
-/* Estilos gerais das seções */
+/* General section styles */
 .section {
     min-height: 100vh;
     padding: 8rem 8% 2rem;
@@ -99,7 +99,7 @@ body {
     color: var(--primary-color);
 }
 
-/* Seção Home */
+/* Home Section */
 #home {
     justify-content: center;
 }
@@ -149,7 +149,7 @@ body {
     box-shadow: 0 0 15px var(--primary-color);
 }
 
-/* Seção Habilidades */
+/* Skills Section */
 .skills-container {
     display: flex;
     justify-content: center;
@@ -192,10 +192,10 @@ body {
 .skills-card ul li i {
     color: var(--primary-color);
     margin-right: 0.8rem;
-    width: 20px; /* Alinha os ícones */
+    width: 20px; /* Aligns the icons */
 }
 
-/* Seção Projetos */
+/* Projects Section */
 .projects-gallery {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -252,7 +252,7 @@ body {
     letter-spacing: 1px;
 }
 
-/* Seção Contato */
+/* Contact Section */
 .contact-form {
     width: 100%;
     max-width: 600px;
@@ -328,7 +328,7 @@ body {
     color: var(--error-color);
 }
 
-/* Rodapé */
+/* Footer */
 .footer {
     padding: 2rem 8%;
     background-color: var(--surface-color);
@@ -336,7 +336,7 @@ body {
     color: var(--text-secondary-color);
 }
 
-/* Responsividade */
+/* Responsiveness */
 @media (max-width: 768px) {
     .header {
         padding: 1.5rem 5%;
@@ -380,4 +380,3 @@ body {
         font-size: 2.5rem;
     }
 }
-

@@ -1,8 +1,8 @@
-/* Estilos Gerais (você provavelmente já tem algo parecido) */
+/* General Styles (you probably already have something similar) */
 body {
-    background-color: #121212; /* Fundo preto/cinza escuro */
+    background-color: #121212; /* Dark gray/black background */
     color: #ffffff;
-    font-family: 'Arial', sans-serif; /* Use a mesma fonte do seu site */
+    font-family: 'Arial', sans-serif; /* Use the same font as your site */
     margin: 0;
     padding: 20px;
 }
@@ -12,7 +12,7 @@ body {
     margin: 0 auto;
 }
 
-/* Header (Cabeçalho) */
+/* Header */
 header {
     display: flex;
     justify-content: space-between;
@@ -33,11 +33,11 @@ header nav a {
 }
 
 header nav a.active {
-    color: #0d6efd; /* Azul do botão */
+    color: #0d6efd; /* Button blue */
 }
 
 
-/* Estilos do Formulário de Feedback */
+/* Feedback Form Styles */
 .form-container {
     width: 100%;
 }
@@ -52,7 +52,7 @@ header nav a.active {
 .form-container hr {
     border: 0;
     height: 2px;
-    background-color: #0d6efd; /* Linha azul */
+    background-color: #0d6efd; /* Blue line */
     margin: 10px 0 20px 0;
 }
 
@@ -78,22 +78,22 @@ header nav a.active {
 .input-group textarea {
     width: 100%;
     padding: 15px;
-    background-color: #f0f0f0; /* Fundo cinza claro para os campos */
+    background-color: #f0f0f0; /* Light gray background for fields */
     border: none;
     border-radius: 8px;
     font-size: 1em;
-    box-sizing: border-box; /* Garante que o padding não aumente a largura total */
+    box-sizing: border-box; /* Ensures padding doesn't increase total width */
     color: #333;
 }
 
 .input-group textarea {
-    resize: vertical; /* Permite que o usuário redimensione a altura */
+    resize: vertical; /* Allows the user to resize the height vertically */
 }
 
 button[type="submit"] {
     width: 100%;
     padding: 15px;
-    background-color: #0d6efd; /* Azul vibrante */
+    background-color: #0d6efd; /* Vibrant blue */
     color: #ffffff;
     border: none;
     border-radius: 8px;
@@ -105,5 +105,5 @@ button[type="submit"] {
 }
 
 button[type="submit"]:hover {
-    background-color: #0b5ed7; /* Azul um pouco mais escuro */
+    background-color: #0b5ed7; /* Slightly darker blue */
 }

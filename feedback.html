@@ -1,46 +1,52 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Feedback - Kaio Fellipe</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Feedback - Kaio Felipe</title>
+    <link rel="stylesheet" href="styles.css"> 
 </head>
 <body>
     <div class="container">
         <header>
             <div class="logo">
-                <h1>Kaio Fellipe</h1>
+                <h1>Kaio Felipe</h1>
             </div>
             <nav>
-                <a href="index.html">Início</a>
+                <a href="index.html">Home</a>
                 <a href="feedback.html" class="active">Feedback</a>
             </nav>
         </header>
 
         <main>
             <div class="form-container">
-                <h2>feedback</h2>
+                <h2>Feedback</h2>
                 <hr>
-                <p class="subtitle">DEIXE SEU FEEDBACK</p>
+                <p class="subtitle">LEAVE YOUR FEEDBACK</p>
 
-                <form action="https://formspree.io/f/{seu_email_aqui}" method="POST">
+                <form action="https://formspree.io/f/{your_email_here}" method="POST">
+                    
                     <div class="input-group">
-                        <label for="nome">Nome Completo</label>
-                        <input type="text" id="nome" name="nome" required>
+                        <label for="name">Full Name</label>
+                        <input type="text" id="name" name="name" required>
                     </div>
 
                     <div class="input-group">
-                        <label for="email">E-mail</label>
+                        <label for="email">Email</label>
                         <input type="email" id="email" name="email" required>
                     </div>
 
                     <div class="input-group">
-                        <label for="mensagem">Deixe sua mensagem</label>
-                        <textarea id="mensagem" name="mensagem" rows="5" required></textarea>
+                        <label for="rate">Rate my portfolio (1 to 5)</label>
+                        <input type="number" id="rate" name="rate" min="1" max="5" placeholder="e.g., 5" required>
                     </div>
 
-                    <button type="submit">ENVIAR</button>
+                    <div class="input-group">
+                        <label for="message">Your Message</label>
+                        <textarea id="message" name="message" rows="5" required></textarea>
+                    </div>
+
+                    <button type="submit">Send</button>
                 </form>
             </div>
         </main>
