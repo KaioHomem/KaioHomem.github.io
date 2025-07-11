@@ -1,17 +1,17 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     emailjs.init({
-  publicKey: 'P9ostrZVqVC9oI3Q1',
-});
-    // --- CONFIGURAÇÃO DO EMAILJS ---
-    // Substitua com suas chaves do EmailJS.
-    // Vá para o seu painel do EmailJS -> Account -> API Keys para encontrar sua Public Key.
-    // Service ID e Template ID estão nas seções de Email Services e Email Templates, respectivamente.
+      publicKey: 'P9ostrZVqVC9oI3Q1',
+    });
+    // --- EMAILJS SETUP ---
+    // Replace with your EmailJS keys.
+    // Go to your EmailJS dashboard -> Account -> API Keys to find your Public Key.
+    // Service ID and Template ID are in the Email Services and Email Templates sections, respectively.
     const EMAILJS_PUBLIC_KEY = 'P9ostrZVqVC9oI3Q1';
     const EMAILJS_SERVICE_ID = 'service_7wvjkaa';
     const EMAILJS_TEMPLATE_ID = 'template_3p626pb';
 
-    // --- MENU HAMBÚRGUER (MOBILE) ---
+    // --- HAMBURGER MENU (MOBILE) ---
     const hamburgerMenu = document.getElementById('hamburger-menu');
     const navbar = document.querySelector('.navbar');
 
@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
         navbar.classList.toggle('active');
     });
 
-    // Fecha o menu mobile ao clicar em um link
+    // Close the mobile menu when a link is clicked
     document.querySelectorAll('.navbar a').forEach(link => {
         link.addEventListener('click', () => {
             if (navbar.classList.contains('active')) {
@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // --- NAVEGAÇÃO ATIVA E SCROLL SUAVE ---
+    // --- ACTIVE NAVIGATION & SMOOTH SCROLL ---
     const sections = document.querySelectorAll('section');
     const navLinks = document.querySelectorAll('.navbar a');
 
@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let current = '';
         sections.forEach(section => {
             const sectionTop = section.offsetTop;
-            if (pageYOffset >= sectionTop - 150) { // O valor 150 é um offset para ajustar a ativação
+            if (pageYOffset >= sectionTop - 150) { // The value 150 is an offset to adjust activation
                 current = section.getAttribute('id');
             }
         });
@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // --- ANIMAÇÃO DE FADE-IN AO ROLAR A PÁGINA ---
+    // --- FADE-IN ANIMATION ON SCROLL ---
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
@@ -57,14 +57,14 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }, {
-        threshold: 0.1 // A seção se torna visível quando 10% dela está na tela
+        threshold: 0.1 // The section becomes visible when 10% of it is on screen
     });
 
     sections.forEach(section => {
         observer.observe(section);
     });
 
-    // --- VALIDAÇÃO E ENVIO DO FORMULÁRIO DE CONTATO ---
+    // --- CONTACT FORM VALIDATION & SUBMISSION ---
     const contactForm = document.getElementById('contact-form');
     const nameInput = document.getElementById('from_name');
     const emailInput = document.getElementById('from_email');
@@ -87,7 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function validateEmail() {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(emailInput.value.trim())) {
-            emailError.textContent = 'Por favor, insira um e-mail válido.';
+            emailError.textContent = 'Please enter a valid email address.';
             return false;
         }
         emailError.textContent = '';
@@ -95,34 +95,34 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     contactForm.addEventListener('submit', function(event) {
-        event.preventDefault(); // Impede o envio padrão do formulário
+        event.preventDefault(); // Prevents the default form submission
 
-        // Limpa mensagens de status anteriores
+        // Clears previous status messages
         formStatus.textContent = '';
         formStatus.className = 'form-status';
 
-        // Executa a validação
-        const isNameValid = validateField(nameInput, nameError, 'O campo nome é obrigatório.');
+        // Runs validation
+        const isNameValid = validateField(nameInput, nameError, 'The name field is required.');
         const isEmailFormatValid = validateEmail();
-        const isMessageValid = validateField(messageInput, messageError, 'O campo mensagem é obrigatório.');
+        const isMessageValid = validateField(messageInput, messageError, 'The message field is required.');
 
         if (!isNameValid || !isEmailFormatValid || !isMessageValid) {
-            return; // Interrompe se a validação falhar
+            return; // Stops if validation fails
         }
 
-        // Se a validação passar, mostra status de envio e envia o e-mail
-        formStatus.textContent = 'Enviando...';
+        // If validation passes, show sending status and send the email
+        formStatus.textContent = 'Sending...';
         const submitButton = contactForm.querySelector('.btn-submit');
         submitButton.disabled = true;
 
         emailjs.sendForm(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, this)
             .then(() => {
-                formStatus.textContent = 'Mensagem enviada com sucesso!';
+                formStatus.textContent = 'Message sent successfully!';
                 formStatus.classList.add('success');
-                contactForm.reset(); // Limpa o formulário
+                contactForm.reset(); // Clears the form
                 submitButton.disabled = false;
             }, (error) => {
-                formStatus.textContent = 'Falha ao enviar. Tente novamente mais tarde.';
+                formStatus.textContent = 'Failed to send. Please try again later.';
                 formStatus.classList.add('error');
                 console.log('FAILED...', error);
                 submitButton.disabled = false;
