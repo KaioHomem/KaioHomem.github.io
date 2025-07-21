@@ -1,8 +1,8 @@
-/* General Styles (you probably already have something similar) */
+
 body {
-    background-color: #121212; /* Dark gray/black background */
+    background-color: #121212; 
     color: #ffffff;
-    font-family: 'Arial', sans-serif; /* Use the same font as your site */
+    font-family: 'Arial', sans-serif; 
     margin: 0;
     padding: 20px;
 }
@@ -12,7 +12,6 @@ body {
     margin: 0 auto;
 }
 
-/* Header */
 header {
     display: flex;
     justify-content: space-between;
@@ -33,11 +32,10 @@ header nav a {
 }
 
 header nav a.active {
-    color: #0d6efd; /* Button blue */
+    color: #0d6efd; 
 }
 
 
-/* Feedback Form Styles */
 .form-container {
     width: 100%;
 }
@@ -52,7 +50,7 @@ header nav a.active {
 .form-container hr {
     border: 0;
     height: 2px;
-    background-color: #0d6efd; /* Blue line */
+    background-color: #0d6efd; 
     margin: 10px 0 20px 0;
 }
 
@@ -78,22 +76,22 @@ header nav a.active {
 .input-group textarea {
     width: 100%;
     padding: 15px;
-    background-color: #f0f0f0; /* Light gray background for fields */
+    background-color: #f0f0f0; 
     border: none;
     border-radius: 8px;
     font-size: 1em;
-    box-sizing: border-box; /* Ensures padding doesn't increase total width */
+    box-sizing: border-box; 
     color: #333;
 }
 
 .input-group textarea {
-    resize: vertical; /* Allows the user to resize the height vertically */
+    resize: vertical; 
 }
 
 button[type="submit"] {
     width: 100%;
     padding: 15px;
-    background-color: #0d6efd; /* Vibrant blue */
+    background-color: #0d6efd; 
     color: #ffffff;
     border: none;
     border-radius: 8px;
@@ -105,5 +103,5 @@ button[type="submit"] {
 }
 
 button[type="submit"]:hover {
-    background-color: #0b5ed7; /* Slightly darker blue */
+    background-color: #0b5ed7; 
 }
