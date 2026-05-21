@@ -1,131 +1,360 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <title>Kaio Felipe</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Kaio Felipe — Estudante de Ciências da Computação no IFSC. Desenvolvedor web, inglês C1, apaixonado por tecnologia e aprendizado contínuo.">
+  <title>Kaio Felipe — Developer</title>
 
-    <link rel="icon" href="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/6.x/svgs/solid/briefcase.svg" type="image/svg+xml">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer">
 
-    <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css">
 
-    <script
-      type="text/javascript"
-      src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js">
-    </script>
-
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 </head>
 <body>
 
-    <header class="header">
-        <a href="#home" class="logo">Kaio Felipe</a>
-        <nav class="navbar">
-            <a href="#home" class="active">Home</a>
-            <a href="#skills">Skills</a>
-            <a href="#projects">Projects</a>
-            <a href="#contact">Contact</a>
-            <a href="feedback.html">Feedback</a>
-        </nav>
-        <div class="hamburger-menu" id="hamburger-menu">
-            <i class="fa-solid fa-bars"></i>
+  <!-- ========== HEADER ========== -->
+  <header class="header" id="header">
+    <a href="#home" class="logo">kf<span class="accent">.</span></a>
+    <nav class="navbar" id="navbar" aria-label="Navegação principal">
+      <a href="#about">Sobre</a>
+      <a href="#stack">Stack</a>
+      <a href="#projects">Projetos</a>
+      <a href="#experience">Experiência</a>
+      <a href="#contact">Contato</a>
+    </nav>
+    <button class="hamburger" id="hamburger" aria-label="Abrir menu" aria-expanded="false" aria-controls="navbar">
+      <span></span><span></span><span></span>
+    </button>
+  </header>
+
+  <main>
+
+    <!-- ========== HERO ========== -->
+    <section id="home" class="section hero-section">
+      <div class="hero-content">
+        <div class="hero-badge">
+          <span class="badge-dot"></span>
+          Disponível para estágio &amp; primeiro emprego
         </div>
-    </header>
+        <h1 class="hero-name">Kaio Felipe</h1>
+        <p class="hero-role"><span class="mono">dev</span> — Estudante de Ciências da Computação</p>
+        <p class="hero-description">
+          Desenvolvedor web em formação no IFSC. Inglês C1, disciplinado e movido por aprendizado real.
+          Construo coisas que funcionam e quero crescer junto com uma equipe.
+        </p>
+        <div class="hero-actions">
+          <a href="#contact" class="btn btn-primary">Entre em contato</a>
+          <a href="cv-kaio-felipe.pdf" download class="btn btn-outline">
+            <i class="fa-solid fa-download"></i> Download CV
+          </a>
+        </div>
+        <div class="social-links">
+          <a href="https://github.com/KaioHomem" target="_blank" rel="noopener noreferrer" aria-label="GitHub de Kaio Felipe">
+            <i class="fa-brands fa-github"></i>
+          </a>
+          <a href="https://www.linkedin.com/in/kaio-homem-bb118335b/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn de Kaio Felipe">
+            <i class="fa-brands fa-linkedin-in"></i>
+          </a>
+          <a href="mailto:kaiokateto@gmail.com" aria-label="Email de Kaio Felipe">
+            <i class="fa-solid fa-envelope"></i>
+          </a>
+        </div>
+      </div>
+      <div class="hero-visual" aria-hidden="true">
+        <div class="hero-card">
+          <div class="card-bar">
+            <span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
+          </div>
+          <pre class="code-snippet"><code><span class="kw">const</span> <span class="fn">dev</span> = {
+  nome: <span class="str">"Kaio Felipe"</span>,
+  formação: <span class="str">"CC — IFSC"</span>,
+  idiomas: [<span class="str">"Português"</span>, <span class="str">"English C1"</span>],
+  stack: [<span class="str">"Java"</span>, <span class="str">"HTML/CSS/JS"</span>, <span class="str">"Python"</span>],
+  status: <span class="str">"buscando oportunidade"</span>,
+  objetivo: <span class="str">"evoluir com propósito"</span>
+};</code></pre>
+        </div>
+      </div>
+    </section>
 
-    <main>
-        <section id="home" class="section">
-            <div class="home-content">
-                <img src="foto.png" alt="Profile picture of Kaio Felipe" class="profile-pic">
-                <h1>Kaio Felipe</h1>
-                <p class="bio">Developer and designer with a passion for technology, continuous learning, and innovation.</p>
-                <div class="social-icons">
-                    <a href="https://www.linkedin.com/in/kaio-homem-bb118335b/" target="_blank" aria-label="Kaio Felipe's LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
-                    <a href="https://github.com/KaioHomem" target="_blank" aria-label="Kaio Felipe's GitHub"><i class="fa-brands fa-github"></i></a>
-                    <a href="https://www.instagram.com/kaiofkk" target="_blank" aria-label="Kaio Felipe's Instagram"><i class="fa-brands fa-instagram"></i></a>
+    <!-- ========== ABOUT ========== -->
+    <section id="about" class="section about-section">
+      <div class="section-inner">
+        <div class="section-label"><span class="mono">01.</span> Sobre mim</div>
+        <h2 class="section-title">Quem sou eu</h2>
+        <div class="about-grid">
+          <div class="about-text">
+            <p>
+              Tenho 19 anos e curso <strong>Ciências da Computação no IFSC</strong> — uma das instituições técnicas mais respeitadas do sul do Brasil.
+              Sou movido pela vontade de entender como as coisas funcionam de verdade, não apenas copiar e colar soluções.
+            </p>
+            <p>
+              Falo e escrevo <strong>inglês em nível avançado (C1)</strong>, resultado de dez anos de estudo dedicado. Consigo ler documentação técnica, participar de conversas profissionais e acompanhar conteúdo em inglês sem dificuldade. Atualmente estudo alemão de forma autônoma.
+            </p>
+            <p>
+              Fora do teclado, sou <strong>faixa azul de Jiu-Jitsu</strong> e pratico musculação regularmente. Essas práticas me ensinaram que consistência supera talento — e levo esse princípio para os estudos e para o trabalho.
+            </p>
+            <div class="about-facts">
+              <div class="fact">
+                <span class="fact-icon"><i class="fa-solid fa-graduation-cap"></i></span>
+                <div>
+                  <span class="fact-title">Ciências da Computação</span>
+                  <span class="fact-sub">IFSC — 2024–presente</span>
                 </div>
+              </div>
+              <div class="fact">
+                <span class="fact-icon"><i class="fa-solid fa-language"></i></span>
+                <div>
+                  <span class="fact-title">Inglês C1 · Alemão básico</span>
+                  <span class="fact-sub">Comunicação técnica e profissional</span>
+                </div>
+              </div>
+              <div class="fact">
+                <span class="fact-icon"><i class="fa-solid fa-medal"></i></span>
+                <div>
+                  <span class="fact-title">3º lugar — OBA</span>
+                  <span class="fact-sub">Olimpíada Brasileira de Astronomia e Astronáutica</span>
+                </div>
+              </div>
             </div>
-        </section>
-
-        <section id="skills" class="section">
-            <h2>My Skills</h2>
-            <div class="skills-container">
-                <div class="skills-card">
-                    <h3>Technical Skills</h3>
-                    <ul>
-                        <li><i class="fa-brands fa-html5"></i> HTML</li>
-                        <li><i class="fa-brands fa-css3-alt"></i> CSS</li>
-                        <li><i class="fa-brands fa-js"></i> JavaScript</li>
-                        <li><i class="fa-brands fa-java"></i> Java</li>
-                        <li><i class="fa-solid fa-brain"></i> Programming Logic</li>
-                    </ul>
-                </div>
-                <div class="skills-card">
-                    <h3>Personal Skills</h3>
-                    <ul>
-                        <li><i class="fa-solid fa-rocket"></i> Proactivity</li>
-                        <li><i class="fa-solid fa-lightbulb"></i> Constant Learning</li>
-                        <li><i class="fa-solid fa-users"></i> Teamwork</li>
-                        <li><i class="fa-solid fa-comment-dots"></i> Communication</li>
-                    </ul>
-                </div>
+          </div>
+          <div class="about-image-wrap">
+            <div class="about-image">
+              <img src="foto.png" alt="Foto de Kaio Felipe" loading="lazy">
             </div>
-        </section>
+          </div>
+        </div>
+      </div>
+    </section>
 
-        <section id="projects" class="section">
-            <h2>My Projects</h2>
-            <div class="projects-gallery">
-                <div class="project-card">
-                    <img src="EmBreve.png" alt="Project Image 1">
-                    <h3>Project Coming Soon</h3>
-                    <p>In development and research.</p>
-                    <a href="#" target="_blank">View on GitHub <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
-                </div>
-                <div class="project-card">
-                    <img src="EmBreve.png" alt="Project Image 2">
-                    <h3>Project Coming Soon</h3>
-                    <p>In development and research.</p>
-                    <a href="#" target="_blank">View on GitHub <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
-                </div>
-                <div class="project-card">
-                    <img src="EmBreve.png" alt="Project Image 3">
-                    <h3>Project Coming Soon</h3>
-                    <p>In development and research.</p>
-                    <a href="#" target="_blank">View on GitHub <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
-                </div>
+    <!-- ========== STACK ========== -->
+    <section id="stack" class="section stack-section">
+      <div class="section-inner">
+        <div class="section-label"><span class="mono">02.</span> Tecnologias</div>
+        <h2 class="section-title">Stack &amp; Ferramentas</h2>
+        <p class="section-subtitle">Tecnologias que estudei e utilizei em projetos reais. Sigo aprendendo constantemente.</p>
+        <div class="stack-grid">
+          <div class="stack-group">
+            <h3 class="stack-group-title">Linguagens</h3>
+            <ul class="tag-list">
+              <li class="tag"><i class="fa-brands fa-java"></i> Java</li>
+              <li class="tag"><i class="fa-brands fa-python"></i> Python</li>
+              <li class="tag"><i class="fa-brands fa-html5"></i> HTML</li>
+              <li class="tag"><i class="fa-brands fa-css3-alt"></i> CSS</li>
+              <li class="tag"><i class="fa-brands fa-js"></i> JavaScript</li>
+              <li class="tag"><i class="fa-solid fa-microchip"></i> Assembly</li>
+            </ul>
+          </div>
+          <div class="stack-group">
+            <h3 class="stack-group-title">Frameworks &amp; Libs</h3>
+            <ul class="tag-list">
+              <li class="tag"><i class="fa-brands fa-bootstrap"></i> Bootstrap</li>
+              <li class="tag"><i class="fa-solid fa-database"></i> MySQL</li>
+            </ul>
+          </div>
+          <div class="stack-group">
+            <h3 class="stack-group-title">Ferramentas</h3>
+            <ul class="tag-list">
+              <li class="tag"><i class="fa-brands fa-git-alt"></i> Git</li>
+              <li class="tag"><i class="fa-brands fa-github"></i> GitHub</li>
+              <li class="tag"><i class="fa-solid fa-code"></i> VSCode</li>
+              <li class="tag"><i class="fa-solid fa-laptop-code"></i> IntelliJ IDEA</li>
+            </ul>
+          </div>
+          <div class="stack-group">
+            <h3 class="stack-group-title">Idiomas</h3>
+            <ul class="tag-list">
+              <li class="tag tag-highlight"><i class="fa-solid fa-flag"></i> Inglês — C1</li>
+              <li class="tag"><i class="fa-solid fa-flag"></i> Alemão — básico</li>
+              <li class="tag"><i class="fa-solid fa-flag"></i> Português — nativo</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== PROJECTS ========== -->
+    <section id="projects" class="section projects-section">
+      <div class="section-inner">
+        <div class="section-label"><span class="mono">03.</span> Projetos</div>
+        <h2 class="section-title">O que construí</h2>
+        <div class="projects-grid">
+
+          <article class="project-card">
+            <div class="project-header">
+              <div class="project-icon"><i class="fa-solid fa-globe"></i></div>
+              <div class="project-links">
+                <a href="https://kaioHomem.github.io" target="_blank" rel="noopener noreferrer" aria-label="Ver site ao vivo">
+                  <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                </a>
+                <a href="https://github.com/KaioHomem/KaioHomem.github.io" target="_blank" rel="noopener noreferrer" aria-label="Ver código no GitHub">
+                  <i class="fa-brands fa-github"></i>
+                </a>
+              </div>
             </div>
-        </section>
+            <h3 class="project-title">Portfólio Pessoal</h3>
+            <p class="project-description">
+              Site pessoal desenvolvido do zero, sem frameworks. Inclui formulário de contato com EmailJS,
+              animações com IntersectionObserver e design responsivo.
+            </p>
+            <ul class="project-tags">
+              <li>HTML</li><li>CSS</li><li>JavaScript</li><li>EmailJS</li>
+            </ul>
+          </article>
 
-        <section id="contact" class="section">
-            <h2>Get in Touch</h2>
-            <form id="contact-form" class="contact-form">
-                <div class="form-group">
-                    <input type="text" id="from_name" name="from_name" placeholder="Your Name" required>
-                    <span class="error-message" id="name-error"></span>
-                </div>
-                <div class="form-group">
-                    <input type="email" id="from_email" name="from_email" placeholder="Your E-mail" required>
-                    <span class="error-message" id="email-error"></span>
-                </div>
-                <div class="form-group">
-                    <textarea id="message" name="message" rows="5" placeholder="Your Message" required></textarea>
-                    <span class="error-message" id="message-error"></span>
-                </div>
-                <button type="submit" class="btn-submit">Send Message</button>
-                <p class="form-status" id="form-status"></p>
-            </form>
-        </section>
-    </main>
+          <article class="project-card">
+            <div class="project-header">
+              <div class="project-icon"><i class="fa-brands fa-python"></i></div>
+              <div class="project-links">
+                <a href="https://github.com/KaioHomem/ChatDeConversa" target="_blank" rel="noopener noreferrer" aria-label="Ver código no GitHub">
+                  <i class="fa-brands fa-github"></i>
+                </a>
+              </div>
+            </div>
+            <h3 class="project-title">ChatDeConversa</h3>
+            <p class="project-description">
+              Aplicação de chat multi-protocolo desenvolvida em Python. Organizada em módulos
+              (chat, FTP, IoT) com ponto de entrada central. Projeto do IFSC — Ciências da Computação.
+            </p>
+            <ul class="project-tags">
+              <li>Python</li><li>FTP</li><li>IoT</li><li>IFSC</li>
+            </ul>
+          </article>
 
-    <footer class="footer">
-        <p>&copy; 2024 Kaio Felipe. All rights reserved.</p>
-    </footer>
+          <article class="project-card project-card-cta">
+            <div class="project-cta-inner">
+              <i class="fa-solid fa-code-branch"></i>
+              <p>Mais projetos em desenvolvimento.</p>
+              <a href="https://github.com/KaioHomem" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-sm">
+                Ver GitHub <i class="fa-brands fa-github"></i>
+              </a>
+            </div>
+          </article>
 
-    <script src="script.js"></script>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== EXPERIENCE ========== -->
+    <section id="experience" class="section experience-section">
+      <div class="section-inner">
+        <div class="section-label"><span class="mono">04.</span> Experiência</div>
+        <h2 class="section-title">Trajetória</h2>
+        <div class="timeline">
+
+          <div class="timeline-item">
+            <div class="timeline-marker"></div>
+            <div class="timeline-content">
+              <div class="timeline-header">
+                <h3>Ciências da Computação</h3>
+                <span class="timeline-date">2024 — presente</span>
+              </div>
+              <span class="timeline-company"><i class="fa-solid fa-graduation-cap"></i> IFSC — Instituto Federal de Santa Catarina</span>
+              <p>Formação técnica em programação, lógica computacional, estruturas de dados, banco de dados e sistemas operacionais.</p>
+            </div>
+          </div>
+
+          <div class="timeline-item">
+            <div class="timeline-marker"></div>
+            <div class="timeline-content">
+              <div class="timeline-header">
+                <h3>Suporte Operacional</h3>
+                <span class="timeline-date">2023 — 2024</span>
+              </div>
+              <span class="timeline-company"><i class="fa-solid fa-building"></i> Gihdak</span>
+              <p>Gerenciamento de estoque, organização operacional, suporte administrativo e acompanhamento de processos internos.</p>
+            </div>
+          </div>
+
+          <div class="timeline-item">
+            <div class="timeline-marker"></div>
+            <div class="timeline-content">
+              <div class="timeline-header">
+                <h3>Suporte Administrativo</h3>
+                <span class="timeline-date">2022 — 2023</span>
+              </div>
+              <span class="timeline-company"><i class="fa-solid fa-building"></i> Espaço Dani K</span>
+              <p>Auxílio nas áreas administrativa, fiscal e financeira. Organização de documentos e suporte às operações do negócio.</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== CONTACT ========== -->
+    <section id="contact" class="section contact-section">
+      <div class="section-inner">
+        <div class="section-label"><span class="mono">05.</span> Contato</div>
+        <h2 class="section-title">Vamos conversar</h2>
+        <p class="section-subtitle">
+          Estou buscando minha primeira oportunidade em tecnologia. Se tiver uma vaga, um projeto ou só quiser trocar uma ideia — me manda uma mensagem.
+        </p>
+        <div class="contact-grid">
+          <div class="contact-info">
+            <a href="mailto:kaiokateto@gmail.com" class="contact-link">
+              <i class="fa-solid fa-envelope"></i>
+              <span>kaiokateto@gmail.com</span>
+            </a>
+            <a href="https://www.linkedin.com/in/kaio-homem-bb118335b/" target="_blank" rel="noopener noreferrer" class="contact-link">
+              <i class="fa-brands fa-linkedin-in"></i>
+              <span>linkedin.com/in/kaio-homem</span>
+            </a>
+            <a href="https://github.com/KaioHomem" target="_blank" rel="noopener noreferrer" class="contact-link">
+              <i class="fa-brands fa-github"></i>
+              <span>github.com/KaioHomem</span>
+            </a>
+            <a href="cv-kaio-felipe.pdf" download class="contact-link">
+              <i class="fa-solid fa-file-pdf"></i>
+              <span>Download CV (PDF)</span>
+            </a>
+          </div>
+          <form id="contact-form" class="contact-form" novalidate>
+            <div class="form-group">
+              <label for="from_name">Nome</label>
+              <input type="text" id="from_name" name="from_name" placeholder="Seu nome" required autocomplete="name">
+              <span class="error-msg" id="name-error" role="alert"></span>
+            </div>
+            <div class="form-group">
+              <label for="from_email">E-mail</label>
+              <input type="email" id="from_email" name="from_email" placeholder="seu@email.com" required autocomplete="email">
+              <span class="error-msg" id="email-error" role="alert"></span>
+            </div>
+            <div class="form-group">
+              <label for="message">Mensagem</label>
+              <textarea id="message" name="message" rows="4" placeholder="Olá Kaio..." required></textarea>
+              <span class="error-msg" id="message-error" role="alert"></span>
+            </div>
+            <button type="submit" class="btn btn-primary btn-full" id="submit-btn">
+              Enviar mensagem <i class="fa-solid fa-paper-plane"></i>
+            </button>
+            <p class="form-status" id="form-status" role="status" aria-live="polite"></p>
+          </form>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ========== FOOTER ========== -->
+  <footer class="footer">
+    <p>
+      <span class="mono">Kaio Felipe</span> — Desenvolvido com HTML, CSS &amp; JavaScript
+    </p>
+    <p class="footer-links">
+      <a href="https://github.com/KaioHomem" target="_blank" rel="noopener noreferrer">GitHub</a>
+      <a href="https://www.linkedin.com/in/kaio-homem-bb118335b/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+    </p>
+  </footer>
+
+  <script src="script.js"></script>
 </body>
 </html>

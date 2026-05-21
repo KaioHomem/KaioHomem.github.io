@@ -1,127 +1,162 @@
+/**
+ * Kaio Felipe — Portfolio
+ * script.js
+ */
+
 document.addEventListener('DOMContentLoaded', () => {
 
-    emailjs.init({
-      publicKey: 'P9ostrZVqVC9oI3Q1',
+  /* ===================================================
+     EMAIL JS
+     =================================================== */
+  emailjs.init({ publicKey: 'P9ostrZVqVC9oI3Q1' });
+
+  const EMAILJS_SERVICE_ID  = 'service_7wvjkaa';
+  const EMAILJS_TEMPLATE_ID = 'template_3p626pb';
+
+
+  /* ===================================================
+     HAMBURGER MENU
+     =================================================== */
+  const hamburger = document.getElementById('hamburger');
+  const navbar    = document.getElementById('navbar');
+
+  hamburger.addEventListener('click', () => {
+    const isOpen = navbar.classList.toggle('open');
+    hamburger.classList.toggle('open', isOpen);
+    hamburger.setAttribute('aria-expanded', String(isOpen));
+  });
+
+  // Close menu on nav link click
+  navbar.querySelectorAll('a').forEach(link => {
+    link.addEventListener('click', () => {
+      navbar.classList.remove('open');
+      hamburger.classList.remove('open');
+      hamburger.setAttribute('aria-expanded', 'false');
     });
+  });
 
-    const EMAILJS_PUBLIC_KEY = 'P9ostrZVqVC9oI3Q1';
-    const EMAILJS_SERVICE_ID = 'service_7wvjkaa';
-    const EMAILJS_TEMPLATE_ID = 'template_3p626pb';
 
-  
-    const hamburgerMenu = document.getElementById('hamburger-menu');
-    const navbar = document.querySelector('.navbar');
+  /* ===================================================
+     ACTIVE NAV LINK ON SCROLL
+     =================================================== */
+  const sections  = document.querySelectorAll('section[id]');
+  const navLinks  = navbar.querySelectorAll('a');
 
-    hamburgerMenu.addEventListener('click', () => {
-        navbar.classList.toggle('active');
-    });
-
-   
-    document.querySelectorAll('.navbar a').forEach(link => {
-        link.addEventListener('click', () => {
-            if (navbar.classList.contains('active')) {
-                navbar.classList.remove('active');
-            }
-        });
-    });
-
-    
-    const sections = document.querySelectorAll('section');
-    const navLinks = document.querySelectorAll('.navbar a');
-
-    window.addEventListener('scroll', () => {
-        let current = '';
-        sections.forEach(section => {
-            const sectionTop = section.offsetTop;
-            if (pageYOffset >= sectionTop - 150) { 
-                current = section.getAttribute('id');
-            }
-        });
-
-        navLinks.forEach(link => {
-            link.classList.remove('active');
-            if (link.getAttribute('href').includes(current)) {
-                link.classList.add('active');
-            }
-        });
-    });
-
-    
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('visible');
-            }
-        });
-    }, {
-        threshold: 0.1 
-    });
+  function updateActiveLink() {
+    const scrollY = window.scrollY;
 
     sections.forEach(section => {
-        observer.observe(section);
+      const top    = section.offsetTop - 80;
+      const bottom = top + section.offsetHeight;
+
+      if (scrollY >= top && scrollY < bottom) {
+        const id = section.getAttribute('id');
+        navLinks.forEach(link => {
+          link.classList.toggle('active', link.getAttribute('href') === `#${id}`);
+        });
+      }
     });
+  }
 
-    
-    const contactForm = document.getElementById('contact-form');
-    const nameInput = document.getElementById('from_name');
-    const emailInput = document.getElementById('from_email');
-    const messageInput = document.getElementById('message');
-    
-    const nameError = document.getElementById('name-error');
-    const emailError = document.getElementById('email-error');
-    const messageError = document.getElementById('message-error');
-    const formStatus = document.getElementById('form-status');
+  window.addEventListener('scroll', updateActiveLink, { passive: true });
 
-    function validateField(input, errorElement, message) {
-        if (input.value.trim() === '') {
-            errorElement.textContent = message;
-            return false;
+
+  /* ===================================================
+     SECTION REVEAL (IntersectionObserver)
+     =================================================== */
+  const observer = new IntersectionObserver(
+    entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target); // animate once
         }
-        errorElement.textContent = '';
-        return true;
+      });
+    },
+    { threshold: 0.08 }
+  );
+
+  document.querySelectorAll('.section').forEach(section => {
+    observer.observe(section);
+  });
+
+
+  /* ===================================================
+     CONTACT FORM
+     =================================================== */
+  const form         = document.getElementById('contact-form');
+  const nameInput    = document.getElementById('from_name');
+  const emailInput   = document.getElementById('from_email');
+  const messageInput = document.getElementById('message');
+  const nameError    = document.getElementById('name-error');
+  const emailError   = document.getElementById('email-error');
+  const msgError     = document.getElementById('message-error');
+  const formStatus   = document.getElementById('form-status');
+  const submitBtn    = document.getElementById('submit-btn');
+
+  const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  function setError(errorEl, msg) {
+    errorEl.textContent = msg;
+  }
+
+  function clearError(errorEl) {
+    errorEl.textContent = '';
+  }
+
+  function validate() {
+    let valid = true;
+
+    if (!nameInput.value.trim()) {
+      setError(nameError, 'Nome é obrigatório.');
+      valid = false;
+    } else {
+      clearError(nameError);
     }
 
-    function validateEmail() {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(emailInput.value.trim())) {
-            emailError.textContent = 'Please enter a valid email address.';
-            return false;
-        }
-        emailError.textContent = '';
-        return true;
+    if (!EMAIL_REGEX.test(emailInput.value.trim())) {
+      setError(emailError, 'Digite um e-mail válido.');
+      valid = false;
+    } else {
+      clearError(emailError);
     }
 
-    contactForm.addEventListener('submit', function(event) {
-        event.preventDefault(); 
+    if (!messageInput.value.trim()) {
+      setError(msgError, 'Mensagem é obrigatória.');
+      valid = false;
+    } else {
+      clearError(msgError);
+    }
 
-        
-        formStatus.textContent = '';
-        formStatus.className = 'form-status';
+    return valid;
+  }
 
-        
-        const isNameValid = validateField(nameInput, nameError, 'The name field is required.');
-        const isEmailFormatValid = validateEmail();
-        const isMessageValid = validateField(messageInput, messageError, 'The message field is required.');
+  form.addEventListener('submit', e => {
+    e.preventDefault();
 
-        if (!isNameValid || !isEmailFormatValid || !isMessageValid) {
-            return; 
-        }
+    formStatus.textContent = '';
+    formStatus.className   = 'form-status';
 
-        
-        formStatus.textContent = 'Sending...';
-        const submitButton = contactForm.querySelector('.btn-submit');
-        submitButton.disabled = true;
+    if (!validate()) return;
 
-        emailjs.sendForm(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, this)
-            .then(() => {
-                formStatus.textContent = 'Message sent successfully!';
-                formStatus.classList.add('success');    
-                submitButton.disabled = false;
-            }, (error) => {
-                formStatus.textContent = 'Failed to send. Please try again later.';
-                formStatus.classList.add('error');
-                console.log('FAILED...', error);
-                submitButton.disabled = false;
-            });
-    });
+    submitBtn.disabled       = true;
+    submitBtn.textContent    = 'Enviando...';
+
+    emailjs.sendForm(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, form)
+      .then(() => {
+        formStatus.textContent = '✓ Mensagem enviada com sucesso!';
+        formStatus.classList.add('success');
+        form.reset();
+      })
+      .catch(err => {
+        formStatus.textContent = 'Erro ao enviar. Tente novamente ou me contate diretamente.';
+        formStatus.classList.add('error');
+        console.error('EmailJS error:', err);
+      })
+      .finally(() => {
+        submitBtn.disabled    = false;
+        submitBtn.innerHTML   = 'Enviar mensagem <i class="fa-solid fa-paper-plane"></i>';
+      });
+  });
+
 });
