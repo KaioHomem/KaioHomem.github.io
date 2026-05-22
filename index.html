@@ -17,6 +17,7 @@
   <link rel="stylesheet" href="style.css">
 
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script src="translations.js"></script>
 </head>
 <body>
 
@@ -24,11 +25,11 @@
   <header class="header" id="header">
     <a href="#home" class="logo">kf<span class="accent">.</span></a>
     <nav class="navbar" id="navbar" aria-label="Navegação principal">
-      <a href="#about">Sobre</a>
-      <a href="#stack">Stack</a>
-      <a href="#projects">Projetos</a>
-      <a href="#experience">Experiência</a>
-      <a href="#contact">Contato</a>
+      <a href="#about"      data-i18n="nav_about">Sobre</a>
+      <a href="#stack"      data-i18n="nav_stack">Stack</a>
+      <a href="#projects"   data-i18n="nav_projects">Projetos</a>
+      <a href="#experience" data-i18n="nav_experience">Experiência</a>
+      <a href="#contact"    data-i18n="nav_contact">Contato</a>
     </nav>
     <button class="hamburger" id="hamburger" aria-label="Abrir menu" aria-expanded="false" aria-controls="navbar">
       <span></span><span></span><span></span>
@@ -42,18 +43,18 @@
       <div class="hero-content">
         <div class="hero-badge">
           <span class="badge-dot"></span>
-          Disponível para estágio &amp; primeiro emprego
+          <span data-i18n="hero_badge">Disponível para estágio &amp; primeiro emprego</span>
         </div>
         <h1 class="hero-name">Kaio Felipe</h1>
-        <p class="hero-role"><span class="mono">dev</span> — Estudante de Ciências da Computação</p>
-        <p class="hero-description">
+        <p class="hero-role" data-i18n-html="hero_role"><span class="mono">dev</span> — Estudante de Ciências da Computação</p>
+        <p class="hero-description" data-i18n="hero_desc">
           Desenvolvedor web em formação no IFSC. Inglês C1, disciplinado e movido por aprendizado real.
           Construo coisas que funcionam e quero crescer junto com uma equipe.
         </p>
         <div class="hero-actions">
-          <a href="#contact" class="btn btn-primary">Entre em contato</a>
-          <a href="cv-kaio-felipe.pdf" download class="btn btn-outline">
-            <i class="fa-solid fa-download"></i> Download CV
+          <a href="#contact" class="btn btn-primary" data-i18n="hero_cta">Entre em contato</a>
+          <a href="cv-kaio-felipe.pdf" download data-cv-link class="btn btn-outline">
+            <i class="fa-solid fa-download"></i> <span data-i18n="hero_cv_btn">Download CV</span>
           </a>
         </div>
         <div class="social-links">
@@ -73,7 +74,7 @@
           <div class="card-bar">
             <span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
           </div>
-          <pre class="code-snippet"><code><span class="kw">const</span> <span class="fn">dev</span> = {
+          <pre class="code-snippet"><code data-i18n-html="hero_code"><span class="kw">const</span> <span class="fn">dev</span> = {
   nome: <span class="str">"Kaio Felipe"</span>,
   formação: <span class="str">"CC — IFSC"</span>,
   idiomas: [<span class="str">"Português"</span>, <span class="str">"English C1"</span>],
@@ -88,40 +89,40 @@
     <!-- ========== ABOUT ========== -->
     <section id="about" class="section about-section">
       <div class="section-inner">
-        <div class="section-label"><span class="mono">01.</span> Sobre mim</div>
-        <h2 class="section-title">Quem sou eu</h2>
+        <div class="section-label"><span class="mono">01.</span> <span data-i18n="about_label">Sobre mim</span></div>
+        <h2 class="section-title" data-i18n="about_title">Quem sou eu</h2>
         <div class="about-grid">
           <div class="about-text">
-            <p>
+            <p data-i18n-html="about_p1">
               Tenho 19 anos e curso <strong>Ciências da Computação no IFSC</strong> — uma das instituições técnicas mais respeitadas do sul do Brasil.
               Sou movido pela vontade de entender como as coisas funcionam de verdade, não apenas copiar e colar soluções.
             </p>
-            <p>
+            <p data-i18n-html="about_p2">
               Falo e escrevo <strong>inglês em nível avançado (C1)</strong>, resultado de dez anos de estudo dedicado. Consigo ler documentação técnica, participar de conversas profissionais e acompanhar conteúdo em inglês sem dificuldade. Atualmente estudo alemão de forma autônoma.
             </p>
-            <p>
+            <p data-i18n-html="about_p3">
               Fora do teclado, sou <strong>faixa azul de Jiu-Jitsu</strong> e pratico musculação regularmente. Essas práticas me ensinaram que consistência supera talento — e levo esse princípio para os estudos e para o trabalho.
             </p>
             <div class="about-facts">
               <div class="fact">
                 <span class="fact-icon"><i class="fa-solid fa-graduation-cap"></i></span>
                 <div>
-                  <span class="fact-title">Ciências da Computação</span>
-                  <span class="fact-sub">IFSC — 2024–presente · 3ª fase</span>
+                  <span class="fact-title" data-i18n="fact1_title">Ciências da Computação</span>
+                  <span class="fact-sub" data-i18n="fact1_sub">IFSC — 2024–presente · 3ª fase</span>
                 </div>
               </div>
               <div class="fact">
                 <span class="fact-icon"><i class="fa-solid fa-language"></i></span>
                 <div>
-                  <span class="fact-title">Inglês C1 · Alemão básico</span>
-                  <span class="fact-sub">Comunicação técnica e profissional</span>
+                  <span class="fact-title" data-i18n="fact2_title">Inglês C1 · Alemão básico</span>
+                  <span class="fact-sub" data-i18n="fact2_sub">Comunicação técnica e profissional</span>
                 </div>
               </div>
               <div class="fact">
                 <span class="fact-icon"><i class="fa-solid fa-medal"></i></span>
                 <div>
                   <span class="fact-title">3º lugar — OBA</span>
-                  <span class="fact-sub">Olimpíada Brasileira de Astronomia e Astronáutica</span>
+                  <span class="fact-sub" data-i18n="fact3_sub">Olimpíada Brasileira de Astronomia e Astronáutica</span>
                 </div>
               </div>
             </div>
@@ -138,12 +139,12 @@
     <!-- ========== STACK ========== -->
     <section id="stack" class="section stack-section">
       <div class="section-inner">
-        <div class="section-label"><span class="mono">02.</span> Tecnologias</div>
-        <h2 class="section-title">Stack &amp; Ferramentas</h2>
-        <p class="section-subtitle">Tecnologias que estudei e utilizei em projetos reais. Sigo aprendendo constantemente.</p>
+        <div class="section-label"><span class="mono">02.</span> <span data-i18n="stack_label">Tecnologias</span></div>
+        <h2 class="section-title" data-i18n="stack_title">Stack &amp; Ferramentas</h2>
+        <p class="section-subtitle" data-i18n="stack_subtitle">Tecnologias que estudei e utilizei em projetos reais. Sigo aprendendo constantemente.</p>
         <div class="stack-grid">
           <div class="stack-group">
-            <h3 class="stack-group-title">Linguagens</h3>
+            <h3 class="stack-group-title" data-i18n="stack_languages">Linguagens</h3>
             <ul class="tag-list">
               <li class="tag"><i class="fa-brands fa-java"></i> Java</li>
               <li class="tag"><i class="fa-brands fa-python"></i> Python</li>
@@ -154,14 +155,14 @@
             </ul>
           </div>
           <div class="stack-group">
-            <h3 class="stack-group-title">Frameworks &amp; Libs</h3>
+            <h3 class="stack-group-title" data-i18n="stack_frameworks">Frameworks &amp; Libs</h3>
             <ul class="tag-list">
               <li class="tag"><i class="fa-brands fa-bootstrap"></i> Bootstrap</li>
               <li class="tag"><i class="fa-solid fa-database"></i> MySQL</li>
             </ul>
           </div>
           <div class="stack-group">
-            <h3 class="stack-group-title">Ferramentas</h3>
+            <h3 class="stack-group-title" data-i18n="stack_tools">Ferramentas</h3>
             <ul class="tag-list">
               <li class="tag"><i class="fa-brands fa-git-alt"></i> Git</li>
               <li class="tag"><i class="fa-brands fa-github"></i> GitHub</li>
@@ -170,11 +171,11 @@
             </ul>
           </div>
           <div class="stack-group">
-            <h3 class="stack-group-title">Idiomas</h3>
+            <h3 class="stack-group-title" data-i18n="stack_idiomas">Idiomas</h3>
             <ul class="tag-list">
-              <li class="tag tag-highlight"><i class="fa-solid fa-flag"></i> Inglês — C1</li>
-              <li class="tag"><i class="fa-solid fa-flag"></i> Alemão — básico</li>
-              <li class="tag"><i class="fa-solid fa-flag"></i> Português — nativo</li>
+              <li class="tag tag-highlight"><i class="fa-solid fa-flag"></i> <span data-i18n="tag_en">Inglês — C1</span></li>
+              <li class="tag"><i class="fa-solid fa-flag"></i> <span data-i18n="tag_de">Alemão — básico</span></li>
+              <li class="tag"><i class="fa-solid fa-flag"></i> <span data-i18n="tag_pt">Português — nativo</span></li>
             </ul>
           </div>
         </div>
@@ -184,8 +185,8 @@
     <!-- ========== PROJECTS ========== -->
     <section id="projects" class="section projects-section">
       <div class="section-inner">
-        <div class="section-label"><span class="mono">03.</span> Projetos</div>
-        <h2 class="section-title">O que construí</h2>
+        <div class="section-label"><span class="mono">03.</span> <span data-i18n="proj_label">Projetos</span></div>
+        <h2 class="section-title" data-i18n="proj_title">O que construí</h2>
         <div class="projects-grid">
 
           <article class="project-card">
@@ -200,8 +201,8 @@
                 </a>
               </div>
             </div>
-            <h3 class="project-title">Portfólio Pessoal</h3>
-            <p class="project-description">
+            <h3 class="project-title" data-i18n="proj1_title">Portfólio Pessoal</h3>
+            <p class="project-description" data-i18n="proj1_desc">
               Site pessoal desenvolvido do zero, sem frameworks. Inclui formulário de contato com EmailJS,
               animações com IntersectionObserver e design responsivo.
             </p>
@@ -220,7 +221,7 @@
               </div>
             </div>
             <h3 class="project-title">ChatDeConversa</h3>
-            <p class="project-description">
+            <p class="project-description" data-i18n="proj2_desc">
               Aplicação de chat multi-protocolo desenvolvida em Python. Organizada em módulos
               (chat, FTP, IoT) com ponto de entrada central. Projeto do IFSC — Ciências da Computação.
             </p>
@@ -232,9 +233,9 @@
           <article class="project-card project-card-cta">
             <div class="project-cta-inner">
               <i class="fa-solid fa-code-branch"></i>
-              <p>Mais projetos em desenvolvimento.</p>
+              <p data-i18n="proj_more">Mais projetos em desenvolvimento.</p>
               <a href="https://github.com/KaioHomem" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-sm">
-                Ver GitHub <i class="fa-brands fa-github"></i>
+                <span data-i18n="proj_github_btn">Ver GitHub</span> <i class="fa-brands fa-github"></i>
               </a>
             </div>
           </article>
@@ -246,19 +247,19 @@
     <!-- ========== EXPERIENCE ========== -->
     <section id="experience" class="section experience-section">
       <div class="section-inner">
-        <div class="section-label"><span class="mono">04.</span> Experiência</div>
-        <h2 class="section-title">Trajetória</h2>
+        <div class="section-label"><span class="mono">04.</span> <span data-i18n="exp_label">Experiência</span></div>
+        <h2 class="section-title" data-i18n="exp_title">Trajetória</h2>
         <div class="timeline">
 
           <div class="timeline-item">
             <div class="timeline-marker"></div>
             <div class="timeline-content">
               <div class="timeline-header">
-                <h3>Ciências da Computação</h3>
-                <span class="timeline-date">2024 — presente · 3ª fase</span>
+                <h3 data-i18n="exp1_title">Ciências da Computação</h3>
+                <span class="timeline-date" data-i18n="exp1_date">2024 — presente · 3ª fase</span>
               </div>
-              <span class="timeline-company"><i class="fa-solid fa-graduation-cap"></i> IFSC — Instituto Federal de Santa Catarina</span>
-              <p>Formação técnica em programação, lógica computacional, estruturas de dados, banco de dados e sistemas operacionais.</p>
+              <span class="timeline-company"><i class="fa-solid fa-graduation-cap"></i> <span data-i18n="exp1_company">IFSC — Instituto Federal de Santa Catarina</span></span>
+              <p data-i18n="exp1_desc">Formação técnica em programação, lógica computacional, estruturas de dados, banco de dados e sistemas operacionais.</p>
             </div>
           </div>
 
@@ -266,11 +267,11 @@
             <div class="timeline-marker"></div>
             <div class="timeline-content">
               <div class="timeline-header">
-                <h3>Suporte Operacional</h3>
+                <h3 data-i18n="exp2_title">Suporte Operacional</h3>
                 <span class="timeline-date">2023 — 2024</span>
               </div>
               <span class="timeline-company"><i class="fa-solid fa-building"></i> Gihdak</span>
-              <p>Gerenciamento de estoque, organização operacional, suporte administrativo e acompanhamento de processos internos.</p>
+              <p data-i18n="exp2_desc">Gerenciamento de estoque, organização operacional, suporte administrativo e acompanhamento de processos internos.</p>
             </div>
           </div>
 
@@ -278,11 +279,11 @@
             <div class="timeline-marker"></div>
             <div class="timeline-content">
               <div class="timeline-header">
-                <h3>Suporte Administrativo</h3>
+                <h3 data-i18n="exp3_title">Suporte Administrativo</h3>
                 <span class="timeline-date">2022 — 2023</span>
               </div>
-              <span class="timeline-company"><i class="fa-solid fa-building"></i> Espaço Dani K</span>
-              <p>Auxílio nas áreas administrativa, fiscal e financeira. Organização de documentos e suporte às operações do negócio.</p>
+              <span class="timeline-company"><i class="fa-solid fa-building"></i> <span data-i18n="exp3_company">Espaço Dani K</span></span>
+              <p data-i18n="exp3_desc">Auxílio nas áreas administrativa, fiscal e financeira. Organização de documentos e suporte às operações do negócio.</p>
             </div>
           </div>
 
@@ -293,9 +294,9 @@
     <!-- ========== CONTACT ========== -->
     <section id="contact" class="section contact-section">
       <div class="section-inner">
-        <div class="section-label"><span class="mono">05.</span> Contato</div>
-        <h2 class="section-title">Vamos conversar</h2>
-        <p class="section-subtitle">
+        <div class="section-label"><span class="mono">05.</span> <span data-i18n="contact_label">Contato</span></div>
+        <h2 class="section-title" data-i18n="contact_title">Vamos conversar</h2>
+        <p class="section-subtitle" data-i18n="contact_subtitle">
           Estou buscando minha primeira oportunidade em tecnologia. Se tiver uma vaga, um projeto ou só quiser trocar uma ideia — me manda uma mensagem.
         </p>
         <div class="contact-grid">
@@ -316,29 +317,29 @@
               <i class="fa-solid fa-phone"></i>
               <span>+55 49 99136-5411</span>
             </a>
-            <a href="cv-kaio-felipe.pdf" download class="contact-link">
+            <a href="cv-kaio-felipe.pdf" download data-cv-link class="contact-link">
               <i class="fa-solid fa-file-pdf"></i>
-              <span>Download CV (PDF)</span>
+              <span data-i18n="contact_cv">Download CV (PDF)</span>
             </a>
           </div>
           <form id="contact-form" class="contact-form" novalidate>
             <div class="form-group">
-              <label for="from_name">Nome</label>
-              <input type="text" id="from_name" name="from_name" placeholder="Seu nome" required autocomplete="name">
+              <label for="from_name" data-i18n="form_name_lbl">Nome</label>
+              <input type="text" id="from_name" name="from_name" placeholder="Seu nome" data-i18n-ph="form_name_ph" required autocomplete="name">
               <span class="error-msg" id="name-error" role="alert"></span>
             </div>
             <div class="form-group">
-              <label for="from_email">E-mail</label>
-              <input type="email" id="from_email" name="from_email" placeholder="seu@email.com" required autocomplete="email">
+              <label for="from_email" data-i18n="form_email_lbl">E-mail</label>
+              <input type="email" id="from_email" name="from_email" placeholder="seu@email.com" data-i18n-ph="form_email_ph" required autocomplete="email">
               <span class="error-msg" id="email-error" role="alert"></span>
             </div>
             <div class="form-group">
-              <label for="message">Mensagem</label>
-              <textarea id="message" name="message" rows="4" placeholder="Olá Kaio..." required></textarea>
+              <label for="message" data-i18n="form_msg_lbl">Mensagem</label>
+              <textarea id="message" name="message" rows="4" placeholder="Olá Kaio..." data-i18n-ph="form_msg_ph" required></textarea>
               <span class="error-msg" id="message-error" role="alert"></span>
             </div>
             <button type="submit" class="btn btn-primary btn-full" id="submit-btn">
-              Enviar mensagem <i class="fa-solid fa-paper-plane"></i>
+              <span data-i18n="form_submit">Enviar mensagem</span> <i class="fa-solid fa-paper-plane"></i>
             </button>
             <p class="form-status" id="form-status" role="status" aria-live="polite"></p>
           </form>
@@ -351,7 +352,7 @@
   <!-- ========== FOOTER ========== -->
   <footer class="footer">
     <p>
-      <span class="mono">Kaio Felipe</span> — Desenvolvido com HTML, CSS &amp; JavaScript
+      <span class="mono">Kaio Felipe</span> — <span data-i18n="footer_built">Desenvolvido com HTML, CSS &amp; JavaScript</span>
     </p>
     <p class="footer-links">
       <a href="https://github.com/KaioHomem" target="_blank" rel="noopener noreferrer">GitHub</a>

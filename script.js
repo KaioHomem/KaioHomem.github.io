@@ -104,25 +104,37 @@ document.addEventListener('DOMContentLoaded', () => {
     errorEl.textContent = '';
   }
 
+  // i18n helpers — falls back to PT strings if translations.js not loaded
+  const t = window.__t || {};
+  const msg = {
+    val_name:    t.val_name    || 'Nome é obrigatório.',
+    val_email:   t.val_email   || 'Digite um e-mail válido.',
+    val_msg:     t.val_msg     || 'Mensagem é obrigatória.',
+    sending:     t.form_sending || 'Enviando...',
+    success:     t.form_success || '✓ Mensagem enviada com sucesso!',
+    error:       t.form_error   || 'Erro ao enviar. Tente novamente ou me contate diretamente.',
+    submit_html: (t.form_submit || 'Enviar mensagem') + ' <i class="fa-solid fa-paper-plane"></i>',
+  };
+
   function validate() {
     let valid = true;
 
     if (!nameInput.value.trim()) {
-      setError(nameError, 'Nome é obrigatório.');
+      setError(nameError, msg.val_name);
       valid = false;
     } else {
       clearError(nameError);
     }
 
     if (!EMAIL_REGEX.test(emailInput.value.trim())) {
-      setError(emailError, 'Digite um e-mail válido.');
+      setError(emailError, msg.val_email);
       valid = false;
     } else {
       clearError(emailError);
     }
 
     if (!messageInput.value.trim()) {
-      setError(msgError, 'Mensagem é obrigatória.');
+      setError(msgError, msg.val_msg);
       valid = false;
     } else {
       clearError(msgError);
@@ -139,23 +151,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (!validate()) return;
 
-    submitBtn.disabled       = true;
-    submitBtn.textContent    = 'Enviando...';
+    submitBtn.disabled    = true;
+    submitBtn.textContent = msg.sending;
 
     emailjs.sendForm(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, form)
       .then(() => {
-        formStatus.textContent = '✓ Mensagem enviada com sucesso!';
+        formStatus.textContent = msg.success;
         formStatus.classList.add('success');
         form.reset();
       })
       .catch(err => {
-        formStatus.textContent = 'Erro ao enviar. Tente novamente ou me contate diretamente.';
+        formStatus.textContent = msg.error;
         formStatus.classList.add('error');
         console.error('EmailJS error:', err);
       })
       .finally(() => {
-        submitBtn.disabled    = false;
-        submitBtn.innerHTML   = 'Enviar mensagem <i class="fa-solid fa-paper-plane"></i>';
+        submitBtn.disabled  = false;
+        submitBtn.innerHTML = msg.submit_html;
       });
   });
 
