@@ -6,8 +6,11 @@
 (function () {
 
   /* ── Language detection ─────────────────────────────── */
-  const raw  = (navigator.language || 'pt').toLowerCase();
-  const lang = raw.startsWith('de') ? 'de' : raw.startsWith('en') ? 'en' : 'pt';
+  // Priority: 1) user saved choice  2) browser language  3) default PT
+  const stored = localStorage.getItem('kf_lang');
+  const raw    = (navigator.language || 'pt').toLowerCase();
+  const auto   = raw.startsWith('de') ? 'de' : raw.startsWith('en') ? 'en' : 'pt';
+  let   lang   = (stored === 'pt' || stored === 'en' || stored === 'de') ? stored : auto;
 
   window.__lang = lang; // expose to script.js
 
@@ -259,10 +262,14 @@
   };
 
   /* ── Apply translations ─────────────────────────────── */
-  const t = T[lang];
-  window.__t = t; // expose to script.js for form messages
+  function applyAll(activeLang) {
+    const t = T[activeLang];
+    window.__t    = t;         // expose to script.js
+    window.__lang = activeLang;
 
-  function applyAll() {
+    document.documentElement.lang =
+      activeLang === 'pt' ? 'pt-BR' : activeLang === 'de' ? 'de' : 'en';
+
     // Simple text
     document.querySelectorAll('[data-i18n]').forEach(el => {
       const k = el.dataset.i18n;
@@ -283,15 +290,39 @@
 
     // CV download links
     document.querySelectorAll('[data-cv-link]').forEach(el => {
-      el.href = t.cv_file;
+      el.href     = t.cv_file;
+      el.download = t.cv_file;
+    });
+
+    // Highlight active lang button
+    document.querySelectorAll('#lang-switch button').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.lang === activeLang);
+    });
+  }
+
+  /* ── Language switcher ──────────────────────────────── */
+  window.__setLang = function (newLang) {
+    if (!T[newLang]) return;
+    lang = newLang;
+    localStorage.setItem('kf_lang', newLang);
+    applyAll(newLang);
+  };
+
+  function initSwitcher() {
+    document.querySelectorAll('#lang-switch button').forEach(btn => {
+      btn.addEventListener('click', () => window.__setLang(btn.dataset.lang));
     });
   }
 
   // Run immediately if DOM ready, otherwise on DOMContentLoaded
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', applyAll);
+    document.addEventListener('DOMContentLoaded', () => {
+      applyAll(lang);
+      initSwitcher();
+    });
   } else {
-    applyAll();
+    applyAll(lang);
+    initSwitcher();
   }
 
 })();

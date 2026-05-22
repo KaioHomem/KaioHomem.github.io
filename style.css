@@ -227,6 +227,44 @@ button { font-family: inherit; cursor: pointer; }
 .hamburger.open span:nth-child(2) { opacity: 0; }
 .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
+/* Language switcher */
+.lang-switch {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-left: 1.5rem;
+}
+
+.lang-switch button {
+  background: none;
+  border: none;
+  color: var(--text-2);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  padding: 3px 5px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: color var(--ease), background var(--ease);
+}
+
+.lang-switch button:hover {
+  color: var(--text);
+}
+
+.lang-switch button.active {
+  color: var(--accent);
+  background: rgba(88, 166, 255, 0.08);
+}
+
+.lang-divider {
+  color: var(--border);
+  font-size: 0.65rem;
+  user-select: none;
+  pointer-events: none;
+}
+
 
 /* ===================================================
    HERO
@@ -887,6 +925,11 @@ button { font-family: inherit; cursor: pointer; }
   }
 
   .navbar a::after { display: none; }
+
+  /* Language switcher on mobile */
+  .lang-switch {
+    margin-left: 0.5rem;
+  }
 
   /* Hero */
   .hero-section {
