@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
      =================================================== */
   emailjs.init({ publicKey: 'P9ostrZVqVC9oI3Q1' });
 
-  const EMAILJS_SERVICE_ID  = 'service_7wvjkaa';
+  const EMAILJS_SERVICE_ID  = 'service_wgl6b44';
   const EMAILJS_TEMPLATE_ID = 'template_3p626pb';
 
 
