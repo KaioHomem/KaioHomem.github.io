@@ -565,11 +565,43 @@ button { font-family: inherit; cursor: pointer; }
   background-color: var(--bg-2);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  padding: 1.5rem;
+  overflow: hidden;
+  padding: 0;
   transition: border-color var(--ease), transform var(--ease);
   display: flex;
   flex-direction: column;
 }
+
+.project-preview {
+  width: 100%;
+  overflow: hidden;
+  line-height: 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.project-preview img {
+  width: 100%;
+  height: auto;
+  display: block;
+  transition: transform 0.4s var(--ease);
+}
+
+.project-card:hover .project-preview img {
+  transform: scale(1.03);
+}
+
+.project-card > .project-header,
+.project-card > .project-title,
+.project-card > .project-description,
+.project-card > .project-tags {
+  margin-left: 1.5rem;
+  margin-right: 1.5rem;
+}
+
+.project-card > .project-header { margin-top: 1.25rem; margin-bottom: 0; }
+.project-card > .project-title  { margin-top: 0; }
+.project-card > .project-description { margin-top: 0.5rem; }
+.project-card > .project-tags   { margin-bottom: 1.25rem; }
 
 .project-card:hover {
   border-color: var(--accent);
@@ -637,6 +669,7 @@ button { font-family: inherit; cursor: pointer; }
   justify-content: center;
   border-style: dashed;
   cursor: default;
+  padding: 1.5rem;
 }
 
 .project-card-cta:hover {
