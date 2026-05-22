@@ -43,4 +43,4 @@ KaioHomem.github.io/
 
 ---
 
-Made by [Kaio Felipe](https://KaioHomem.github.io) · Florianópolis, SC
+Made by [Kaio Felipe](https://KaioHomem.github.io) · Lages, SC
