@@ -34,7 +34,8 @@
   --radius-lg:   14px;
 
   /* Transitions */
-  --ease: 0.2s ease;
+  --ease: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-spring: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 html { scroll-behavior: smooth; }
@@ -60,8 +61,9 @@ button { font-family: inherit; cursor: pointer; }
 .section {
   padding: var(--section-pad);
   opacity: 0;
-  transform: translateY(24px);
-  transition: opacity 0.55s ease-out, transform 0.55s ease-out;
+  transform: translateY(28px);
+  transition: opacity 0.65s var(--ease-spring), transform 0.65s var(--ease-spring);
+  will-change: transform, opacity;
 }
 
 .section.visible {
@@ -107,7 +109,7 @@ button { font-family: inherit; cursor: pointer; }
   font-size: 0.9rem;
   font-weight: 500;
   transition: background-color var(--ease), color var(--ease),
-              border-color var(--ease), transform var(--ease);
+              border-color var(--ease), transform 0.3s var(--ease-spring);
 }
 
 .btn-primary {
@@ -311,6 +313,20 @@ button { font-family: inherit; cursor: pointer; }
   0%, 100% { opacity: 1; }
   50% { opacity: 0.4; }
 }
+
+/* ---------- HERO ENTRANCE STAGGER ---------- */
+@keyframes hero-in {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.hero-badge       { animation: hero-in 0.65s var(--ease-spring) 0.08s both; }
+.hero-name        { animation: hero-in 0.65s var(--ease-spring) 0.16s both; }
+.hero-role        { animation: hero-in 0.65s var(--ease-spring) 0.23s both; }
+.hero-description { animation: hero-in 0.65s var(--ease-spring) 0.30s both; }
+.hero-actions     { animation: hero-in 0.65s var(--ease-spring) 0.36s both; }
+.social-links     { animation: hero-in 0.65s var(--ease-spring) 0.42s both; }
+.hero-visual      { animation: hero-in 0.75s var(--ease-spring) 0.22s both; }
 
 .hero-name {
   font-size: clamp(2.2rem, 5vw, 3.5rem);
@@ -567,7 +583,7 @@ button { font-family: inherit; cursor: pointer; }
   border-radius: var(--radius-lg);
   overflow: hidden;
   padding: 0;
-  transition: border-color var(--ease), transform var(--ease);
+  transition: border-color var(--ease), transform 0.35s var(--ease-spring);
   display: flex;
   flex-direction: column;
 }
@@ -915,6 +931,48 @@ button { font-family: inherit; cursor: pointer; }
 }
 
 .footer-links a:hover { color: var(--accent); }
+
+
+/* ===================================================
+   CHILD STAGGER — runs when parent section becomes visible
+   =================================================== */
+@keyframes reveal-up {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Project cards */
+.section.visible .project-card:nth-child(1) { animation: reveal-up 0.5s var(--ease-spring) 0.00s both; }
+.section.visible .project-card:nth-child(2) { animation: reveal-up 0.5s var(--ease-spring) 0.09s both; }
+.section.visible .project-card:nth-child(3) { animation: reveal-up 0.5s var(--ease-spring) 0.18s both; }
+
+/* Stack groups */
+.section.visible .stack-group:nth-child(1) { animation: reveal-up 0.5s var(--ease-spring) 0.00s both; }
+.section.visible .stack-group:nth-child(2) { animation: reveal-up 0.5s var(--ease-spring) 0.08s both; }
+.section.visible .stack-group:nth-child(3) { animation: reveal-up 0.5s var(--ease-spring) 0.16s both; }
+.section.visible .stack-group:nth-child(4) { animation: reveal-up 0.5s var(--ease-spring) 0.24s both; }
+
+/* Timeline items */
+.section.visible .timeline-item:nth-child(1) { animation: reveal-up 0.5s var(--ease-spring) 0.00s both; }
+.section.visible .timeline-item:nth-child(2) { animation: reveal-up 0.5s var(--ease-spring) 0.11s both; }
+.section.visible .timeline-item:nth-child(3) { animation: reveal-up 0.5s var(--ease-spring) 0.22s both; }
+
+/* Contact links */
+.section.visible .contact-link:nth-child(1) { animation: reveal-up 0.45s var(--ease-spring) 0.00s both; }
+.section.visible .contact-link:nth-child(2) { animation: reveal-up 0.45s var(--ease-spring) 0.08s both; }
+.section.visible .contact-link:nth-child(3) { animation: reveal-up 0.45s var(--ease-spring) 0.16s both; }
+
+/* Respeitar preferência de redução de movimento */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+    transition-duration: 0.01ms !important;
+  }
+  .section { opacity: 1; transform: none; }
+}
 
 
 /* ===================================================
