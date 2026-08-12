@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Calculadora de Salário Líquido 2026 — INSS e IRRF atualizados</title>
+<meta name="description" content="Calcule seu salário líquido em 2026 com as tabelas atualizadas do INSS e do IRRF, já com a isenção até R$ 5.000 da Lei 15.270/2025. Grátis, sem cadastro.">
+<link rel="canonical" href="https://kaiohomem.github.io/ferramentas/salario-liquido.html">
+
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://kaiohomem.github.io/ferramentas/salario-liquido.html">
+<meta property="og:title" content="Calculadora de Salário Líquido 2026">
+<meta property="og:description" content="Descubra quanto cai na sua conta: INSS progressivo, IRRF com a nova isenção até R$ 5.000 e FGTS.">
+<meta property="og:locale" content="pt_BR">
+<meta name="twitter:card" content="summary">
+
+<meta http-equiv="Content-Security-Policy" content="
+  default-src 'self';
+  script-src 'self' https://pagead2.googlesyndication.com https://*.googlesyndication.com https://*.doubleclick.net https://*.google.com https://*.gstatic.com;
+  style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+  font-src https://fonts.gstatic.com;
+  img-src 'self' data: https:;
+  frame-src https://*.googlesyndication.com https://*.doubleclick.net;
+  connect-src 'self' https://*.google.com https://*.doubleclick.net;
+  object-src 'none'; base-uri 'self'; form-action 'self';
+">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧮</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tools.css">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Calculadora de Salário Líquido 2026",
+  "url": "https://kaiohomem.github.io/ferramentas/salario-liquido.html",
+  "applicationCategory": "FinanceApplication",
+  "operatingSystem": "Any",
+  "inLanguage": "pt-BR",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "BRL" }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Quem ganha até R$ 5.000 está isento de Imposto de Renda em 2026?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Sim. A Lei 15.270/2025 criou um redutor que zera o IRRF para rendimentos mensais de até R$ 5.000. Entre R$ 5.000,01 e R$ 7.350,00 o redutor diminui de forma gradual, e acima de R$ 7.350 ele deixa de existir."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "O FGTS é descontado do meu salário?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Não. O FGTS corresponde a 8% do salário bruto e é depositado pelo empregador em uma conta vinculada em seu nome. Ele não reduz o valor que cai na sua conta."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Como funciona o desconto progressivo do INSS?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Cada alíquota incide apenas sobre a parte do salário dentro da respectiva faixa, e não sobre o salário inteiro. Por isso a alíquota efetiva é sempre menor que a alíquota da última faixa atingida. O desconto máximo em 2026 é de R$ 988,09."
+      }
+    }
+  ]
+}
+</script>
+</head>
+<body data-ferramenta="salario-liquido">
+
+<header class="topo" id="topo"></header>
+
+<main class="wrap">
+
+  <div class="cabecalho">
+    <div class="trilha"><a href="index.html">ferramentas</a> / salário líquido</div>
+    <h1>Calculadora de salário líquido 2026</h1>
+    <p class="resumo">
+      Informe o salário bruto e veja exatamente quanto cai na conta — com INSS progressivo,
+      IRRF já considerando a isenção até R$ 5.000 e o depósito de FGTS.
+    </p>
+  </div>
+
+  <div class="espaco-anuncio" data-slot="topo"></div>
+
+  <section class="cartao">
+    <form id="formulario" autocomplete="off">
+      <div class="grade">
+
+        <div class="campo col-2">
+          <label for="bruto">Salário bruto mensal (R$)</label>
+          <input class="entrada" type="text" id="bruto" inputmode="decimal" placeholder="3.500,00" value="3.500,00">
+        </div>
+
+        <div class="campo">
+          <label for="dependentes">Dependentes</label>
+          <input class="entrada" type="number" id="dependentes" min="0" max="20" step="1" value="0">
+          <span class="dica">Cada um deduz R$ 189,59 da base do IRRF.</span>
+        </div>
+
+        <div class="campo">
+          <label for="pensao">Pensão alimentícia (R$)</label>
+          <input class="entrada" type="text" id="pensao" inputmode="decimal" placeholder="0,00">
+          <span class="dica">Somente pensão fixada judicialmente.</span>
+        </div>
+
+        <div class="campo col-2">
+          <label for="outros">Outros descontos (R$)</label>
+          <input class="entrada" type="text" id="outros" inputmode="decimal" placeholder="0,00">
+          <span class="dica">Vale-transporte, plano de saúde, contribuição sindical, adiantamentos.</span>
+        </div>
+
+      </div>
+
+      <div class="botoes">
+        <button type="button" class="btn" id="calcular">Calcular</button>
+        <button type="button" class="btn btn-vazado" id="limpar">Limpar</button>
+      </div>
+    </form>
+
+    <div class="resultado" id="resultado" aria-live="polite"></div>
+  </section>
+
+  <div class="espaco-anuncio" data-slot="resultado"></div>
+  <div class="bloco-afiliados"></div>
+
+  <article class="conteudo">
+
+    <h2>Como o cálculo é feito</h2>
+    <p>
+      O salário líquido é o que sobra do bruto depois dos descontos obrigatórios. São
+      dois, e nessa ordem: primeiro o INSS, depois o Imposto de Renda — que incide sobre
+      o salário <strong>já descontado</strong> o INSS.
+    </p>
+
+    <h3>1. INSS: progressivo, faixa por faixa</h3>
+    <p>
+      Um erro comum é achar que quem ganha R$ 3.000 paga 12% sobre tudo. Não é assim.
+      Cada alíquota vale apenas para a fatia do salário dentro da faixa:
+    </p>
+    <div class="tabela-rolagem">
+      <table>
+        <thead>
+          <tr><th>Faixa salarial em 2026</th><th>Alíquota</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Até R$ 1.621,00</td><td>7,5%</td></tr>
+          <tr><td>De R$ 1.621,01 a R$ 2.902,84</td><td>9%</td></tr>
+          <tr><td>De R$ 2.902,85 a R$ 4.354,27</td><td>12%</td></tr>
+          <tr><td>De R$ 4.354,28 a R$ 8.475,55</td><td>14%</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>
+      Por isso a alíquota efetiva é sempre menor do que a da última faixa atingida. Acima
+      do teto de R$ 8.475,55 o desconto trava em <strong>R$ 988,09</strong> — ganhando
+      R$ 9.000 ou R$ 90.000, o INSS descontado é o mesmo.
+    </p>
+
+    <h3>2. IRRF e a isenção até R$ 5.000</h3>
+    <p>
+      A tabela progressiva do Imposto de Renda continua a mesma de 2025. O que mudou em
+      2026 foi a criação de um <strong>redutor</strong> pela Lei 15.270/2025, aplicado
+      depois do imposto calculado:
+    </p>
+    <ul>
+      <li>Até R$ 5.000 de rendimento bruto, o redutor cobre todo o imposto — resultado: isento.</li>
+      <li>Entre R$ 5.000,01 e R$ 7.350,00, o redutor cai de forma gradual conforme a renda sobe.</li>
+      <li>Acima de R$ 7.350,00, não há redutor e o imposto é o da tabela cheia.</li>
+    </ul>
+    <p>
+      A calculadora também testa automaticamente o <strong>desconto simplificado</strong>
+      de R$ 607,20 contra as deduções legais (INSS, dependentes e pensão) e usa o que
+      resultar em menos imposto — exatamente o que a folha de pagamento faz.
+    </p>
+
+    <h3>3. FGTS não é desconto</h3>
+    <p>
+      Os 8% de FGTS não saem do seu salário: o empregador deposita esse valor por fora,
+      numa conta vinculada em seu nome. Ele aparece no resultado como informação, nunca
+      abatido do líquido.
+    </p>
+
+    <div class="aviso">
+      <p>
+        <strong>Atenção:</strong> o resultado é uma estimativa. Adicionais de
+        periculosidade, insalubridade, horas extras, comissões e regras de acordo
+        coletivo alteram tanto a base de cálculo quanto o líquido final. Para valores
+        oficiais, confira seu holerite ou consulte o RH.
+      </p>
+    </div>
+
+    <h2>Perguntas frequentes</h2>
+
+    <details>
+      <summary>Ganho R$ 5.200. Por que ainda pago imposto?</summary>
+      <p>
+        Porque a isenção total vale até R$ 5.000. Acima disso o redutor diminui
+        progressivamente até zerar em R$ 7.350 — então você paga, mas bem menos do que
+        pagaria pela tabela sem o redutor.
+      </p>
+    </details>
+
+    <details>
+      <summary>Vale-transporte desconta quanto?</summary>
+      <p>
+        O empregador pode descontar até 6% do salário bruto para o vale-transporte. Se
+        o custo real do transporte for menor que esses 6%, o desconto é o custo real.
+        Informe o valor no campo "outros descontos".
+      </p>
+    </details>
+
+    <details>
+      <summary>O décimo terceiro é calculado do mesmo jeito?</summary>
+      <p>
+        Não exatamente. O 13º tem INSS e IRRF calculados sobre uma base separada da do
+        salário mensal, e não se soma ao salário do mês para efeito de alíquota. O
+        redutor da Lei 15.270/2025 também se aplica a ele.
+      </p>
+    </details>
+
+    <details>
+      <summary>Quem tem dependente paga menos imposto?</summary>
+      <p>
+        Cada dependente reduz R$ 189,59 da base de cálculo do IRRF. O efeito só aparece
+        quando as deduções legais superam o desconto simplificado de R$ 607,20 — o que
+        normalmente acontece em salários mais altos ou com vários dependentes.
+      </p>
+    </details>
+
+  </article>
+
+  <div class="espaco-anuncio" data-slot="rodape"></div>
+
+</main>
+
+<footer class="rodape" id="rodape"></footer>
+
+<script src="nucleo.js"></script>
+<script src="app.js"></script>
+<script src="monetizacao.js"></script>
+<script src="pg-salario.js"></script>
+</body>
+</html>

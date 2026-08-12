@@ -1,0 +1,112 @@
+name: Ferramentas — testes e manutenção
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - 'ferramentas/**'
+      - '.github/workflows/ferramentas.yml'
+  pull_request:
+    paths:
+      - 'ferramentas/**'
+  # First day of every month, 09:00 UTC.
+  schedule:
+    - cron: '0 9 1 * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  testes:
+    name: Verificar cálculos
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # Gate: wrong fiscal maths must never reach the published site.
+      - name: Rodar suíte de testes
+        run: node ferramentas/testes.js
+
+  manutencao:
+    name: Manutenção mensal
+    runs-on: ubuntu-latest
+    needs: testes
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Conferir se as tabelas fiscais estão em dia
+        id: tabelas
+        run: node ferramentas/verificar-tabelas.js
+
+      - name: Regenerar sitemap
+        run: node ferramentas/gerar-sitemap.js
+
+      - name: Publicar sitemap se mudou
+        run: |
+          if [[ -z "$(git status --porcelain sitemap.xml)" ]]; then
+            echo "Sitemap sem alterações."
+            exit 0
+          fi
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add sitemap.xml
+          git commit -m "chore: regenerar sitemap"
+          git push
+
+      # Opening an issue is the one thing the automation cannot do itself:
+      # updating a fiscal table needs a human to read the new official
+      # values. The issue is the handoff.
+      - name: Abrir tarefa se as tabelas precisarem de revisão
+        if: steps.tabelas.outputs.precisa_atualizar == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MOTIVOS: ${{ steps.tabelas.outputs.motivos }}
+          ANO: ${{ steps.tabelas.outputs.ano_tabelas }}
+        run: |
+          TITULO="Revisar tabelas fiscais das calculadoras (site está em $ANO)"
+
+          # Don't stack duplicates month after month.
+          if gh issue list --state open --search "$TITULO in:title" --json number --jq 'length' | grep -qv '^0$'; then
+            echo "Já existe uma issue aberta para isso."
+            exit 0
+          fi
+
+          gh issue create \
+            --title "$TITULO" \
+            --label "manutenção" \
+            --body "$(cat <<EOF
+          A verificação automática mensal apontou que as tabelas precisam de atenção.
+
+          **Motivo:** $MOTIVOS
+
+          ## O que fazer
+
+          Editar apenas o objeto \`TABELAS\` em \`ferramentas/nucleo.js\`:
+
+          - [ ] Faixas e alíquotas do INSS, teto e salário mínimo
+          - [ ] Tabela progressiva do IRRF, desconto simplificado e dedução por dependente
+          - [ ] Parâmetros do redutor (constante, índice e limite)
+          - [ ] Atualizar \`ano\` e \`atualizadoEm\`
+
+          ## Depois de editar
+
+          Rodar \`node ferramentas/testes.js\`. Os valores de referência da suíte vão
+          falhar de propósito — eles apontam para os números do ano anterior. Conferir
+          cada falha contra a fonte oficial e só então ajustar o valor esperado no teste.
+
+          Fontes: Portaria interministerial do INSS e Instrução Normativa da Receita Federal.
+          EOF
+          )"

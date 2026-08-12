@@ -8,7 +8,17 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ===================================================
      EMAIL JS
      =================================================== */
-  emailjs.init({ publicKey: 'P9ostrZVqVC9oI3Q1' });
+  // Guarded on purpose: this runs before the section-reveal observer below.
+  // If the EmailJS CDN is blocked (ad blocker) or down, an uncaught error
+  // here would abort the whole DOMContentLoaded handler — and every section
+  // would stay at opacity 0, leaving the page blank below the hero.
+  let emailjsPronto = false;
+  try {
+    emailjs.init({ publicKey: 'P9ostrZVqVC9oI3Q1' });
+    emailjsPronto = true;
+  } catch (e) {
+    console.warn('EmailJS indisponível — o formulário de contato ficará desativado.');
+  }
 
   const EMAILJS_SERVICE_ID  = 'service_wgl6b44';
   const EMAILJS_TEMPLATE_ID = 'template_3p626pb';
@@ -150,6 +160,12 @@ document.addEventListener('DOMContentLoaded', () => {
     formStatus.className   = 'form-status';
 
     if (!validate()) return;
+
+    if (!emailjsPronto) {
+      formStatus.textContent = msg.error;
+      formStatus.classList.add('error');
+      return;
+    }
 
     submitBtn.disabled    = true;
     submitBtn.textContent = msg.sending;

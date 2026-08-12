@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Calculadora de Rescisão Trabalhista 2026 — CLT, valores atualizados</title>
+<meta name="description" content="Calcule sua rescisão de contrato CLT em 2026: aviso prévio, saldo de salário, 13º e férias proporcionais, multa de 40% do FGTS e descontos. Grátis e sem cadastro.">
+<link rel="canonical" href="https://kaiohomem.github.io/ferramentas/rescisao.html">
+
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://kaiohomem.github.io/ferramentas/rescisao.html">
+<meta property="og:title" content="Calculadora de Rescisão Trabalhista 2026">
+<meta property="og:description" content="Demissão, pedido de demissão ou acordo: veja verba por verba quanto você tem a receber.">
+<meta property="og:locale" content="pt_BR">
+<meta name="twitter:card" content="summary">
+
+<meta http-equiv="Content-Security-Policy" content="
+  default-src 'self';
+  script-src 'self' https://pagead2.googlesyndication.com https://*.googlesyndication.com https://*.doubleclick.net https://*.google.com https://*.gstatic.com;
+  style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+  font-src https://fonts.gstatic.com;
+  img-src 'self' data: https:;
+  frame-src https://*.googlesyndication.com https://*.doubleclick.net;
+  connect-src 'self' https://*.google.com https://*.doubleclick.net;
+  object-src 'none'; base-uri 'self'; form-action 'self';
+">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📄</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tools.css">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Calculadora de Rescisão Trabalhista 2026",
+  "url": "https://kaiohomem.github.io/ferramentas/rescisao.html",
+  "applicationCategory": "FinanceApplication",
+  "operatingSystem": "Any",
+  "inLanguage": "pt-BR",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "BRL" }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Quanto tempo de aviso prévio eu tenho direito?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "São 30 dias, mais 3 dias por ano completo de trabalho na mesma empresa, limitado a 90 dias no total. Um funcionário com 5 anos de casa tem direito a 45 dias."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Pedindo demissão eu recebo a multa de 40% do FGTS?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Não. A multa de 40% é devida apenas na dispensa sem justa causa. No pedido de demissão não há multa e o saldo do FGTS não pode ser sacado. No acordo entre as partes a multa é de 20% e o saque é limitado a 80% do saldo."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Férias indenizadas têm desconto de INSS e Imposto de Renda?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Não. As férias proporcionais e vencidas pagas na rescisão, junto com o adicional de um terço, têm natureza indenizatória e não sofrem incidência de INSS nem de IRRF. Já o saldo de salário e o 13º proporcional são tributados."
+      }
+    }
+  ]
+}
+</script>
+</head>
+<body data-ferramenta="rescisao">
+
+<header class="topo" id="topo"></header>
+
+<main class="wrap">
+
+  <div class="cabecalho">
+    <div class="trilha"><a href="index.html">ferramentas</a> / rescisão</div>
+    <h1>Calculadora de rescisão trabalhista</h1>
+    <p class="resumo">
+      Informe as datas do contrato e veja verba por verba o que entra na rescisão —
+      aviso prévio, saldo de salário, 13º, férias, multa do FGTS e os descontos.
+    </p>
+  </div>
+
+  <div class="espaco-anuncio" data-slot="topo"></div>
+
+  <section class="cartao">
+    <form id="formulario" autocomplete="off">
+      <div class="grade">
+
+        <div class="campo col-2">
+          <label for="tipo">Motivo do desligamento</label>
+          <select class="entrada" id="tipo">
+            <option value="sem-justa-causa">Dispensa sem justa causa</option>
+            <option value="pedido-demissao">Pedido de demissão</option>
+            <option value="acordo">Acordo entre as partes (art. 484-A)</option>
+            <option value="fim-contrato">Fim de contrato por prazo determinado</option>
+            <option value="justa-causa">Dispensa por justa causa</option>
+          </select>
+        </div>
+
+        <div class="campo">
+          <label for="salario">Último salário bruto (R$)</label>
+          <input class="entrada" type="text" id="salario" inputmode="decimal" placeholder="3.000,00" value="3.000,00">
+        </div>
+
+        <div class="campo">
+          <label for="saldoFGTS">Saldo do FGTS (R$)</label>
+          <input class="entrada" type="text" id="saldoFGTS" inputmode="decimal" placeholder="0,00">
+          <span class="dica">Consulte no app FGTS. Base da multa.</span>
+        </div>
+
+        <div class="campo">
+          <label for="admissao">Data de admissão</label>
+          <input class="entrada" type="date" id="admissao">
+        </div>
+
+        <div class="campo">
+          <label for="saida">Data do desligamento</label>
+          <input class="entrada" type="date" id="saida">
+        </div>
+
+        <div class="campo">
+          <label for="dependentes">Dependentes</label>
+          <input class="entrada" type="number" id="dependentes" min="0" max="20" step="1" value="0">
+        </div>
+
+        <div class="campo">
+          <label>Situações</label>
+          <div class="campo check">
+            <input type="checkbox" id="feriasVencidas">
+            <label for="feriasVencidas">Tenho férias vencidas não gozadas</label>
+          </div>
+          <div class="campo check" id="linhaAvisoCumprido">
+            <input type="checkbox" id="avisoCumprido" checked>
+            <label for="avisoCumprido">Vou cumprir o aviso prévio</label>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="botoes">
+        <button type="button" class="btn" id="calcular">Calcular rescisão</button>
+        <button type="button" class="btn btn-vazado" id="limpar">Limpar</button>
+      </div>
+    </form>
+
+    <div class="resultado" id="resultado" aria-live="polite"></div>
+  </section>
+
+  <div class="espaco-anuncio" data-slot="resultado"></div>
+  <div class="bloco-afiliados"></div>
+
+  <article class="conteudo">
+
+    <h2>O que muda conforme o motivo da saída</h2>
+    <p>
+      A diferença entre ser demitido e pedir demissão pode chegar a vários salários. O
+      que muda não são as verbas em si, mas quais delas você recebe:
+    </p>
+
+    <div class="tabela-rolagem">
+      <table>
+        <thead>
+          <tr>
+            <th>Verba</th>
+            <th>Dispensa</th>
+            <th>Pedido</th>
+            <th>Acordo</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Aviso prévio</td><td>Recebe</td><td>Cumpre ou paga</td><td>Metade</td></tr>
+          <tr><td>Multa do FGTS</td><td>40%</td><td>—</td><td>20%</td></tr>
+          <tr><td>Saque do FGTS</td><td>100%</td><td>—</td><td>80%</td></tr>
+          <tr><td>Seguro-desemprego</td><td>Sim</td><td>—</td><td>—</td></tr>
+          <tr><td>13º proporcional</td><td>Sim</td><td>Sim</td><td>Sim</td></tr>
+          <tr><td>Férias + 1/3</td><td>Sim</td><td>Sim</td><td>Sim</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Aviso prévio: 30 dias mais 3 por ano</h3>
+    <p>
+      O aviso prévio começa em 30 dias e ganha 3 dias a cada ano completo na empresa,
+      até o teto de 90 dias. Na dispensa sem justa causa, se a empresa dispensa o
+      cumprimento, ela paga o período em dinheiro (aviso indenizado). No pedido de
+      demissão a lógica se inverte: quem não cumpre o aviso tem 30 dias descontados
+      da rescisão.
+    </p>
+
+    <h3>O que é tributado e o que não é</h3>
+    <ul>
+      <li><strong>Saldo de salário</strong> — sofre INSS e IRRF normalmente.</li>
+      <li><strong>13º proporcional</strong> — tributado, mas em base separada do saldo.</li>
+      <li><strong>Férias e 1/3, aviso indenizado e multa do FGTS</strong> — verbas indenizatórias, sem INSS nem IRRF.</li>
+    </ul>
+    <p>
+      É por isso que a rescisão costuma ter desconto proporcionalmente menor do que um
+      salário comum: boa parte do valor é indenizatória.
+    </p>
+
+    <h3>Contagem de avos</h3>
+    <p>
+      13º e férias proporcionais são pagos em avos — cada mês trabalhado vale 1/12. Um
+      mês só entra na conta quando você trabalhou <strong>15 dias ou mais</strong> nele.
+      A calculadora faz essa contagem a partir das datas informadas.
+    </p>
+
+    <div class="aviso">
+      <p>
+        <strong>Estimativa, não documento oficial.</strong> O cálculo cobre as verbas
+        padrão da CLT. Ele não considera adicionais (insalubridade, periculosidade,
+        horas extras habituais), médias variáveis de comissão, estabilidades, benefícios
+        de convenção coletiva nem eventuais verbas em disputa. Em caso de dúvida ou
+        divergência com o Termo de Rescisão, procure o sindicato da categoria ou um
+        advogado trabalhista.
+      </p>
+    </div>
+
+    <h2>Perguntas frequentes</h2>
+
+    <details>
+      <summary>Fui demitido no dia 10. Recebo o mês todo?</summary>
+      <p>
+        Não. Você recebe o saldo de salário proporcional aos dias trabalhados — 10/30 do
+        salário. O que estende o pagamento é o aviso prévio indenizado, que é pago à
+        parte e ainda projeta a data de saída para efeito de avos.
+      </p>
+    </details>
+
+    <details>
+      <summary>Qual a diferença entre férias vencidas e proporcionais?</summary>
+      <p>
+        Vencidas são as de um período aquisitivo já completo (12 meses trabalhados) que
+        você não tirou — pagas integralmente. Proporcionais são os avos do período em
+        andamento. Ambas recebem o adicional de um terço.
+      </p>
+    </details>
+
+    <details>
+      <summary>Em quanto tempo a empresa precisa pagar?</summary>
+      <p>
+        O prazo é de até 10 dias corridos contados do término do contrato. O atraso gera
+        multa equivalente a um salário do trabalhador, prevista no artigo 477 da CLT.
+      </p>
+    </details>
+
+    <details>
+      <summary>No acordo eu recebo seguro-desemprego?</summary>
+      <p>
+        Não. O acordo do artigo 484-A permite sacar 80% do FGTS e receber 20% de multa,
+        mas não dá direito ao seguro-desemprego.
+      </p>
+    </details>
+
+  </article>
+
+  <div class="espaco-anuncio" data-slot="rodape"></div>
+
+</main>
+
+<footer class="rodape" id="rodape"></footer>
+
+<script src="nucleo.js"></script>
+<script src="app.js"></script>
+<script src="monetizacao.js"></script>
+<script src="pg-rescisao.js"></script>
+</body>
+</html>
