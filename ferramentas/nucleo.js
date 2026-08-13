@@ -333,6 +333,114 @@
     };
   }
 
+  /* ---------- 13TH SALARY ---------- */
+  /**
+   * Christmas bonus (13º salário).
+   *
+   * Paid in two instalments: the first is half the gross with no
+   * deductions at all, and the whole tax bill lands on the second.
+   * INSS and IRRF are calculated on a base of their own — the bonus is
+   * never added to the month's salary for bracket purposes.
+   */
+  function decimoTerceiro(opcoes) {
+    var o = opcoes || {};
+    var salario = positivo(o.salario);
+    var meses = Math.min(12, Math.max(0, parseInt(o.meses, 10) || 0));
+    var adiantamentoJaRecebido = positivo(o.adiantamentoJaRecebido);
+
+    var bruto = round2((salario / 12) * meses);
+
+    // First instalment: 50% of gross, untaxed.
+    var primeira = round2(bruto / 2);
+    var jaPago = adiantamentoJaRecebido > 0 ? adiantamentoJaRecebido : primeira;
+
+    var inss = calcularINSS(bruto);
+    var irrf = calcularIRRF({
+      bruto: bruto,
+      inss: inss.valor,
+      dependentes: o.dependentes,
+      pensao: o.pensao
+    });
+
+    var descontos = round2(inss.valor + irrf.valor);
+    var liquido = round2(bruto - descontos);
+    var segunda = round2(liquido - jaPago);
+
+    return {
+      bruto: bruto,
+      meses: meses,
+      primeiraParcela: primeira,
+      jaPago: round2(jaPago),
+      segundaParcela: segunda,
+      inss: inss,
+      irrf: irrf,
+      totalDescontos: descontos,
+      liquido: liquido,
+      fgts: round2(bruto * TABELAS.fgts.aliquota),
+      integral: meses === 12
+    };
+  }
+
+  /* ---------- VACATION ---------- */
+  /**
+   * Vacation pay.
+   *
+   * The constitutional extra third is taxed together with the vacation
+   * days. Selling days back (abono pecuniário, up to a third of the
+   * period) is indemnity in nature: it carries its own extra third and
+   * neither part is taxed.
+   */
+  function ferias(opcoes) {
+    var o = opcoes || {};
+    var salario = positivo(o.salario);
+    var dias = Math.min(30, Math.max(1, parseInt(o.dias, 10) || 30));
+    // Legal cap on selling days is a third of the entitled period.
+    var diasVendidos = Math.min(
+      Math.floor(dias / 3),
+      Math.max(0, parseInt(o.diasVendidos, 10) || 0)
+    );
+    var diasGozados = dias - diasVendidos;
+
+    var valorFerias = round2((salario / 30) * diasGozados);
+    var terco = round2(valorFerias / 3);
+    var baseTributavel = round2(valorFerias + terco);
+
+    var abono = round2((salario / 30) * diasVendidos);
+    var tercoAbono = round2(abono / 3);
+    var totalAbono = round2(abono + tercoAbono);
+
+    var inss = calcularINSS(baseTributavel);
+    var irrf = calcularIRRF({
+      bruto: baseTributavel,
+      inss: inss.valor,
+      dependentes: o.dependentes,
+      pensao: o.pensao
+    });
+
+    // Optional: ask for the first half of the 13th along with vacation.
+    var adiantamento13 = o.adiantar13 ? round2(salario / 2) : 0;
+
+    var descontos = round2(inss.valor + irrf.valor);
+    var liquido = round2(baseTributavel - descontos + totalAbono + adiantamento13);
+
+    return {
+      dias: dias,
+      diasGozados: diasGozados,
+      diasVendidos: diasVendidos,
+      valorFerias: valorFerias,
+      terco: terco,
+      baseTributavel: baseTributavel,
+      abono: abono,
+      tercoAbono: tercoAbono,
+      totalAbono: totalAbono,
+      adiantamento13: adiantamento13,
+      inss: inss,
+      irrf: irrf,
+      totalDescontos: descontos,
+      liquido: liquido
+    };
+  }
+
   /* ---------- COMPOUND INTEREST ---------- */
   /**
    * Future value with an initial deposit plus monthly contributions
@@ -477,6 +585,8 @@
     calcularRedutor: calcularRedutor,
     salarioLiquido: salarioLiquido,
     rescisao: rescisao,
+    decimoTerceiro: decimoTerceiro,
+    ferias: ferias,
     jurosCompostos: jurosCompostos,
     anualParaMensal: anualParaMensal,
     financiamento: financiamento,

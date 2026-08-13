@@ -10,6 +10,8 @@
   var FERRAMENTAS = [
     { id: 'salario-liquido', arquivo: 'salario-liquido.html', nome: 'Salário líquido' },
     { id: 'rescisao',        arquivo: 'rescisao.html',        nome: 'Rescisão' },
+    { id: 'decimo-terceiro', arquivo: 'decimo-terceiro.html', nome: '13º salário' },
+    { id: 'ferias',          arquivo: 'ferias.html',          nome: 'Férias' },
     { id: 'juros-compostos', arquivo: 'juros-compostos.html', nome: 'Juros compostos' },
     { id: 'financiamento',   arquivo: 'financiamento.html',   nome: 'Financiamento' }
   ];

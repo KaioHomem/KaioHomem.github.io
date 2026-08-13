@@ -49,8 +49,8 @@ KaioHomem.github.io/
 
 A set of free, no-signup calculators at
 [/ferramentas](https://kaiohomem.github.io/ferramentas/): net salary, severance
-pay, compound interest and loan amortization, using the 2026 Brazilian tax
-tables.
+pay, 13th salary, vacation pay, compound interest and loan amortization, using
+the 2026 Brazilian tax tables.
 
 Everything runs client-side. There is no back-end, no database and no form that
 captures user data — the numbers people type never leave their browser.
@@ -95,7 +95,7 @@ under Node in CI.
 node ferramentas/testes.js
 ```
 
-66 assertions pinned to independently verifiable reference points — the
+94 assertions pinned to independently verifiable reference points — the
 R$ 988,09 INSS ceiling, the redutor reaching exactly zero at R$ 7.350,
 Price and SAC schedules amortizing to a zero balance — plus invariants such as
 "net pay never decreases when gross pay increases".

@@ -175,6 +175,72 @@ console.log('\nRESCISÃO');
 eq('aviso prévio limitado a 90 dias',
   F.rescisao({ salario: 3000, tipo: 'sem-justa-causa', anosCompletos: 30 }).diasAviso, 90);
 
+/* ---------- 13TH SALARY ---------- */
+console.log('\nDÉCIMO TERCEIRO');
+
+(function () {
+  var r = F.decimoTerceiro({ salario: 3000, meses: 12 });
+  eq('12 meses → 13º integral igual ao salário', r.bruto, 3000);
+  eq('primeira parcela é metade do bruto, sem desconto', r.primeiraParcela, 1500);
+  eq('INSS incide sobre o 13º cheio', r.inss.valor, 248.60);
+  verdadeiro('R$ 3.000 de 13º é isento de IRRF', r.irrf.isento);
+  eq('líquido = bruto - descontos', r.liquido, 2751.40);
+  eq('segunda parcela absorve todos os descontos', r.segundaParcela, 1251.40);
+  eq('as duas parcelas somam o líquido', r.primeiraParcela + r.segundaParcela, r.liquido);
+  eq('FGTS de 8% também incide sobre o 13º', r.fgts, 240);
+})();
+
+(function () {
+  var r = F.decimoTerceiro({ salario: 3000, meses: 6 });
+  eq('6 meses → metade do 13º', r.bruto, 1500);
+  verdadeiro('proporcional não é marcado como integral', r.integral === false);
+  eq('parcelas do proporcional fecham', r.primeiraParcela + r.segundaParcela, r.liquido);
+})();
+
+// The bonus is taxed on its own base — never stacked onto the month's pay.
+(function () {
+  var isolado = F.decimoTerceiro({ salario: 6000, meses: 12 });
+  var mensal = F.salarioLiquido({ bruto: 6000 });
+  eq('13º usa a mesma base isolada de um salário igual', isolado.inss.valor, mensal.inss.valor);
+})();
+
+eq('sem meses trabalhados não há 13º', F.decimoTerceiro({ salario: 3000, meses: 0 }).bruto, 0);
+
+/* ---------- VACATION ---------- */
+console.log('\nFÉRIAS');
+
+(function () {
+  var r = F.ferias({ salario: 3000, dias: 30, diasVendidos: 0 });
+  eq('30 dias de férias = um salário', r.valorFerias, 3000);
+  eq('adicional de um terço', r.terco, 1000);
+  eq('base tributável = férias + 1/3', r.baseTributavel, 4000);
+  eq('INSS sobre férias mais o terço', r.inss.valor, 368.60);
+  verdadeiro('R$ 4.000 de férias fica isento de IRRF', r.irrf.isento);
+  eq('líquido de férias cheias', r.liquido, 3631.40);
+})();
+
+(function () {
+  var r = F.ferias({ salario: 3000, dias: 30, diasVendidos: 10 });
+  eq('vendendo 10 dias, goza 20', r.diasGozados, 20);
+  eq('abono de 10 dias', r.abono, 1000);
+  eq('abono também recebe um terço', r.tercoAbono, 333.33);
+  eq('base tributável cai (abono é isento)', r.baseTributavel, 2666.67);
+  verdadeiro('abono fica fora da base do INSS', r.inss.valor < 368.60);
+  eq('líquido soma o abono isento',
+    r.baseTributavel - r.totalDescontos + r.totalAbono, r.liquido);
+})();
+
+eq('venda de dias é limitada a um terço do período',
+  F.ferias({ salario: 3000, dias: 30, diasVendidos: 25 }).diasVendidos, 10, 0);
+
+eq('férias parciais de 15 dias', F.ferias({ salario: 3000, dias: 15 }).valorFerias, 1500);
+
+(function () {
+  var com = F.ferias({ salario: 3000, dias: 30, adiantar13: true });
+  var sem = F.ferias({ salario: 3000, dias: 30 });
+  eq('adiantar o 13º soma meio salário', com.liquido - sem.liquido, 1500);
+})();
+
 /* ---------- COMPOUND INTEREST ---------- */
 console.log('\nJUROS COMPOSTOS');
 

@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Calculadora de 13º Salário 2026 — 1ª e 2ª parcela com descontos</title>
+<meta name="description" content="Calcule o 13º salário de 2026: valor da primeira e da segunda parcela, desconto de INSS e IRRF e o proporcional por meses trabalhados. Grátis e sem cadastro.">
+<link rel="canonical" href="https://kaiohomem.github.io/ferramentas/decimo-terceiro.html">
+
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://kaiohomem.github.io/ferramentas/decimo-terceiro.html">
+<meta property="og:title" content="Calculadora de 13º Salário 2026">
+<meta property="og:description" content="Veja quanto cai em cada parcela do décimo terceiro, já com INSS e IRRF.">
+<meta property="og:locale" content="pt_BR">
+<meta name="twitter:card" content="summary">
+
+<meta http-equiv="Content-Security-Policy" content="
+  default-src 'self';
+  script-src 'self' https://pagead2.googlesyndication.com https://*.googlesyndication.com https://*.doubleclick.net https://*.google.com https://*.gstatic.com;
+  style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+  font-src https://fonts.gstatic.com;
+  img-src 'self' data: https:;
+  frame-src https://*.googlesyndication.com https://*.doubleclick.net;
+  connect-src 'self' https://*.google.com https://*.doubleclick.net;
+  object-src 'none'; base-uri 'self'; form-action 'self';
+">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎁</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tools.css">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Calculadora de 13º Salário 2026",
+  "url": "https://kaiohomem.github.io/ferramentas/decimo-terceiro.html",
+  "applicationCategory": "FinanceApplication",
+  "operatingSystem": "Any",
+  "inLanguage": "pt-BR",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "BRL" }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Por que a segunda parcela do 13º vem muito menor que a primeira?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Porque a primeira parcela é paga sem nenhum desconto: são 50% do valor bruto. O INSS e o Imposto de Renda do décimo terceiro inteiro só são descontados na segunda parcela, que por isso chega bem menor."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Quando o 13º salário precisa ser pago?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "A primeira parcela vai até 30 de novembro e a segunda até 20 de dezembro. A primeira também pode ser paga junto com as férias, se o trabalhador pedir por escrito em janeiro."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Trabalhei só parte do ano. Recebo 13º?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Sim, proporcional. Cada mês trabalhado vale 1/12 do salário, e o mês entra na conta quando você trabalhou 15 dias ou mais nele."
+      }
+    }
+  ]
+}
+</script>
+</head>
+<body data-ferramenta="decimo-terceiro">
+
+<header class="topo" id="topo"></header>
+
+<main class="wrap">
+
+  <div class="cabecalho">
+    <div class="trilha"><a href="index.html">ferramentas</a> / 13º salário</div>
+    <h1>Calculadora de 13º salário</h1>
+    <p class="resumo">
+      Veja quanto cai em cada parcela do décimo terceiro, já com INSS e IRRF descontados —
+      e por que a segunda vem sempre menor que a primeira.
+    </p>
+  </div>
+
+  <div class="espaco-anuncio" data-slot="topo"></div>
+
+  <section class="cartao">
+    <form id="formulario" autocomplete="off">
+      <div class="grade">
+
+        <div class="campo">
+          <label for="salario">Salário bruto mensal (R$)</label>
+          <input class="entrada" type="text" id="salario" inputmode="decimal" placeholder="3.000,00" value="3.000,00">
+        </div>
+
+        <div class="campo">
+          <label for="meses">Meses trabalhados no ano</label>
+          <input class="entrada" type="number" id="meses" min="0" max="12" step="1" value="12">
+          <span class="dica">Conta o mês em que trabalhou 15 dias ou mais.</span>
+        </div>
+
+        <div class="campo">
+          <label for="dependentes">Dependentes</label>
+          <input class="entrada" type="number" id="dependentes" min="0" max="20" step="1" value="0">
+        </div>
+
+        <div class="campo">
+          <label for="pensao">Pensão alimentícia (R$)</label>
+          <input class="entrada" type="text" id="pensao" inputmode="decimal" placeholder="0,00">
+        </div>
+
+      </div>
+
+      <div class="botoes">
+        <button type="button" class="btn" id="calcular">Calcular</button>
+        <button type="button" class="btn btn-vazado" id="limpar">Limpar</button>
+      </div>
+    </form>
+
+    <div class="resultado" id="resultado" aria-live="polite"></div>
+  </section>
+
+  <div class="espaco-anuncio" data-slot="resultado"></div>
+  <div class="bloco-afiliados"></div>
+
+  <article class="conteudo">
+
+    <h2>Por que a segunda parcela decepciona</h2>
+    <p>
+      Essa é a dúvida que mais aparece em dezembro, e a resposta é simples: a
+      <strong>primeira parcela é paga bruta</strong>, sem nenhum desconto. Todo o INSS e
+      todo o Imposto de Renda do décimo terceiro inteiro são cobrados de uma vez só na
+      <strong>segunda</strong>.
+    </p>
+    <p>
+      Quem ganha R$ 3.000 recebe R$ 1.500 limpos em novembro e imagina outros R$ 1.500 em
+      dezembro. Na prática chegam cerca de R$ 1.251 — a diferença é o INSS do 13º inteiro,
+      concentrado ali.
+    </p>
+
+    <h3>Base de cálculo separada</h3>
+    <p>
+      O décimo terceiro <strong>não se soma ao salário do mês</strong> para efeito de
+      alíquota. Ele tem base própria, o que costuma ser bom: evita empurrar o trabalhador
+      para uma faixa mais alta de imposto só porque recebeu duas coisas no mesmo mês.
+    </p>
+
+    <h3>Proporcional: cada mês vale 1/12</h3>
+    <p>
+      Quem trabalhou o ano inteiro recebe um salário cheio. Quem entrou em julho recebe
+      6/12. A regra do mês é a mesma do resto da CLT: <strong>15 dias ou mais</strong> e o
+      mês conta inteiro.
+    </p>
+
+    <h3>Prazos</h3>
+    <ul>
+      <li><strong>Primeira parcela</strong> — até 30 de novembro.</li>
+      <li><strong>Segunda parcela</strong> — até 20 de dezembro.</li>
+      <li>A primeira pode sair junto com as férias, se pedida por escrito até janeiro.</li>
+    </ul>
+
+    <div class="aviso">
+      <p>
+        <strong>Estimativa.</strong> Horas extras, adicionais e comissões habituais entram
+        na média que compõe o 13º e elevam o valor. A calculadora usa o salário fixo que
+        você informar. Confira o holerite para o número oficial.
+      </p>
+    </div>
+
+    <h2>Perguntas frequentes</h2>
+
+    <details>
+      <summary>O 13º tem FGTS?</summary>
+      <p>
+        Tem. O empregador deposita 8% sobre o décimo terceiro, do mesmo jeito que faz com
+        o salário. Esse valor não sai do seu bolso — aparece no resultado apenas como
+        informação.
+      </p>
+    </details>
+
+    <details>
+      <summary>Fui demitido. Perco o 13º do ano?</summary>
+      <p>
+        Não, exceto em demissão por justa causa. Nos demais casos você recebe o
+        proporcional aos meses trabalhados, pago junto da rescisão. Nossa
+        <a href="rescisao.html">calculadora de rescisão</a> já inclui essa verba.
+      </p>
+    </details>
+
+    <details>
+      <summary>Quem recebe pouco paga imposto no 13º?</summary>
+      <p>
+        Em 2026, um décimo terceiro de até R$ 5.000 fica isento de IRRF pelo mesmo redutor
+        que isenta o salário mensal. O INSS, porém, continua sendo descontado normalmente.
+      </p>
+    </details>
+
+  </article>
+
+  <div class="espaco-anuncio" data-slot="rodape"></div>
+
+</main>
+
+<footer class="rodape" id="rodape"></footer>
+
+<script src="nucleo.js"></script>
+<script src="app.js"></script>
+<script src="monetizacao.js"></script>
+<script src="pg-decimo.js"></script>
+</body>
+</html>

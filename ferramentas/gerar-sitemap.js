@@ -23,6 +23,8 @@ var PAGINAS = [
   { caminho: 'ferramentas/index.html',              url: '/ferramentas/',                       prioridade: '0.9', frequencia: 'weekly' },
   { caminho: 'ferramentas/salario-liquido.html',    url: '/ferramentas/salario-liquido.html',   prioridade: '1.0', frequencia: 'monthly' },
   { caminho: 'ferramentas/rescisao.html',           url: '/ferramentas/rescisao.html',          prioridade: '1.0', frequencia: 'monthly' },
+  { caminho: 'ferramentas/decimo-terceiro.html',    url: '/ferramentas/decimo-terceiro.html',   prioridade: '1.0', frequencia: 'monthly' },
+  { caminho: 'ferramentas/ferias.html',             url: '/ferramentas/ferias.html',            prioridade: '1.0', frequencia: 'monthly' },
   { caminho: 'ferramentas/juros-compostos.html',    url: '/ferramentas/juros-compostos.html',   prioridade: '0.9', frequencia: 'monthly' },
   { caminho: 'ferramentas/financiamento.html',      url: '/ferramentas/financiamento.html',     prioridade: '0.9', frequencia: 'monthly' }
 ];
