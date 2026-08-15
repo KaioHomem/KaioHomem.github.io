@@ -5,10 +5,13 @@ on:
     branches: ["main"]
     paths:
       - 'ferramentas/**'
+      - 'agentes/**'
       - '.github/workflows/ferramentas.yml'
   pull_request:
     paths:
       - 'ferramentas/**'
+      - 'agentes/**'
+      - '.github/workflows/ferramentas.yml'
   # First day of every month, 09:00 UTC.
   schedule:
     - cron: '0 9 1 * *'
@@ -43,6 +46,11 @@ jobs:
       # rebaixar a página.
       - name: Auditoria de links, acessibilidade e peso
         run: node ferramentas/auditoria.js
+
+      # Gate: um contrato de handoff que aceita tudo é decoração. Estes
+      # testes provam o que ele rejeita.
+      - name: Verificar contratos dos agentes
+        run: node agentes/testes-contratos.js
 
   manutencao:
     name: Manutenção mensal
