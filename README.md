@@ -150,6 +150,23 @@ earns, a random banner just costs trust.
 These are the only steps that need a person: an account has to be opened by
 whoever legally owns it and gets paid.
 
+## Consent and privacy (LGPD)
+
+`ferramentas/consentimento.js` is a real gate, not a banner: AdSense is never
+loaded until the visitor accepts, and `monetizacao.js` fails closed if the
+consent module is missing. Declining keeps the page fully functional — the
+calculators never depended on cookies.
+
+The banner only renders when something actually sets a cookie. With
+monetization off the site sets none, so no banner appears. A consent prompt on
+a site that sets no cookies is theatre, and it trains people to click through
+the real ones.
+
+`/privacidade.html` is the policy AdSense requires for approval. It discloses
+the Google Fonts request (an IP transfer with no cookie), what `localStorage`
+holds, and the LGPD rights of the visitor. Keep it truthful as integrations
+change — it is the page a reviewer reads.
+
 ---
 
 Made by [Kaio Felipe](https://KaioHomem.github.io) · Lages, SC

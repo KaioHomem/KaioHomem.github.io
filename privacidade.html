@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Política de Privacidade — kaiohomem.github.io</title>
+<meta name="description" content="Como este site trata (e não trata) seus dados: os cálculos ficam no seu navegador, e os cookies de terceiros dependem do seu consentimento.">
+<link rel="canonical" href="https://kaiohomem.github.io/privacidade.html">
+
+<meta http-equiv="Content-Security-Policy" content="
+  default-src 'self';
+  script-src 'self';
+  style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+  font-src https://fonts.gstatic.com;
+  img-src 'self' data:;
+  connect-src 'self';
+  object-src 'none'; base-uri 'self'; form-action 'none';
+">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔒</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="ferramentas/tools.css">
+</head>
+<body>
+
+<header class="topo">
+  <div class="wrap topo-inner">
+    <a href="ferramentas/index.html" class="marca">ferramentas<span>.</span></a>
+    <nav aria-label="Navegação">
+      <a href="ferramentas/index.html">Calculadoras</a>
+      <a href="index.html">Sobre o autor</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <div class="cabecalho">
+    <div class="trilha"><a href="index.html">início</a> / privacidade</div>
+    <h1>Política de Privacidade</h1>
+    <p class="resumo">
+      Última atualização: 13 de agosto de 2026. Escrita para ser lida, não para
+      cumprir tabela.
+    </p>
+  </div>
+
+  <article class="conteudo">
+
+    <h2>O resumo honesto</h2>
+    <p>
+      Este site <strong>não tem servidor, não tem banco de dados e não tem cadastro</strong>.
+      Tudo o que você digita nas calculadoras — salário, datas, saldo de FGTS — é processado
+      pelo JavaScript do seu próprio navegador e desaparece quando você fecha a aba. Esses
+      valores nunca são enviados para mim nem para ninguém, porque não existe para onde
+      enviá-los.
+    </p>
+    <p>
+      O que existe são serviços de terceiros que o site carrega, e é sobre eles que
+      esta política precisa ser específica.
+    </p>
+
+    <h2>Quem é o responsável</h2>
+    <p>
+      Kaio Felipe Homem, pessoa física, responsável pelo site
+      <strong>kaiohomem.github.io</strong>. Contato para qualquer assunto relacionado
+      a dados: <a href="mailto:kaiokateto@gmail.com">kaiokateto@gmail.com</a>.
+    </p>
+
+    <h2>Dados que eu coleto diretamente</h2>
+    <p>
+      Nenhum. Não há formulário de captura, não há login, não há newsletter e não há
+      qualquer coleta de dados pessoais feita por mim nas páginas das calculadoras.
+    </p>
+    <p>
+      A única exceção no site é o <strong>formulário de contato</strong> na página
+      inicial do portfólio: se você optar por me escrever por ele, o nome, e-mail e
+      mensagem que você digitar são enviados para o meu e-mail através do serviço
+      EmailJS. Isso só acontece se você preencher e enviar o formulário.
+    </p>
+
+    <h2>O que fica guardado no seu navegador</h2>
+    <p>
+      Algumas informações ficam no <code>localStorage</code> — um espaço do
+      <em>seu</em> aparelho. Elas não são transmitidas para mim:
+    </p>
+    <ul>
+      <li><strong>Sua escolha sobre cookies</strong> — para não perguntar de novo a cada visita.</li>
+      <li><strong>Credenciais do painel administrativo</strong> — se você for o proprietário e usar a página <code>/painel</code>, as chaves de API que você digitar ficam apenas ali, no seu navegador.</li>
+    </ul>
+    <p>
+      Você pode apagar tudo isso a qualquer momento limpando os dados do site nas
+      configurações do navegador.
+    </p>
+
+    <h2>Serviços de terceiros</h2>
+
+    <h3>Google Fonts</h3>
+    <p>
+      As fontes do site são carregadas dos servidores do Google. Isso faz com que o
+      Google receba o seu <strong>endereço IP</strong> e informações básicas do
+      navegador, como acontece em qualquer requisição na internet.
+      <strong>Nenhum cookie é criado por isso.</strong> É por esse motivo que as fontes
+      não entram no aviso de consentimento — não há cookie a consentir, mas a
+      transferência de IP precisa ser informada, e está sendo aqui.
+    </p>
+
+    <h3>Google AdSense</h3>
+    <p>
+      Quando a publicidade estiver ativa, o Google e seus parceiros usam
+      <strong>cookies</strong> para exibir anúncios e medir desempenho, o que pode
+      incluir personalização com base em visitas anteriores a este e a outros sites.
+    </p>
+    <p>
+      Esses cookies <strong>só são carregados depois que você clica em "Aceitar"</strong>
+      no aviso exibido na parte de baixo da tela. Se você recusar, o script de anúncios
+      simplesmente não é carregado — o site continua funcionando igual, e as
+      calculadoras não mudam em nada.
+    </p>
+    <p>
+      Você também pode desativar a publicidade personalizada diretamente nas
+      <a href="https://adssettings.google.com" rel="noopener nofollow" target="_blank">configurações de anúncios do Google</a>.
+    </p>
+
+    <h3>Google Analytics</h3>
+    <p>
+      Se e quando for ativado, o Analytics coleta dados de navegação de forma agregada:
+      páginas vistas, origem do acesso, tipo de dispositivo. Ele também depende do mesmo
+      consentimento acima e não é carregado sem ele.
+    </p>
+
+    <h3>GitHub Pages</h3>
+    <p>
+      O site é hospedado no GitHub Pages. Como qualquer hospedagem, a infraestrutura do
+      GitHub processa o endereço IP das requisições para conseguir entregar as páginas.
+      Isso é inerente ao funcionamento da web e não passa por mim.
+    </p>
+
+    <h2>Cookies: o que existe de fato</h2>
+    <p>
+      Enquanto a publicidade estiver desativada, este site <strong>não cria nenhum
+      cookie</strong>. É por isso que o aviso de consentimento pode nem aparecer para
+      você: ele só é exibido quando há realmente algo a consentir. Banner de cookie em
+      site que não usa cookie é encenação, e eu preferi não fazer isso.
+    </p>
+    <p>
+      Mudou de ideia? Você pode rever sua escolha a qualquer momento pelo link
+      "Cookies" no rodapé de qualquer página.
+    </p>
+
+    <h2>Seus direitos pela LGPD</h2>
+    <p>
+      A Lei Geral de Proteção de Dados (Lei 13.709/2018) garante a você o direito de
+      confirmar a existência de tratamento, acessar seus dados, corrigir dados
+      incompletos ou desatualizados, solicitar anonimização ou eliminação, revogar o
+      consentimento e se opor a tratamentos feitos sem consentimento.
+    </p>
+    <p>
+      Na prática, como eu não guardo dados seus, a maior parte desses pedidos não tem o
+      que devolver — mas o canal existe e é atendido:
+      <a href="mailto:kaiokateto@gmail.com">kaiokateto@gmail.com</a>.
+    </p>
+    <p>
+      Para dados que estejam com o Google (publicidade e analytics), os pedidos devem
+      ser feitos ao próprio Google, que é o controlador desses dados.
+    </p>
+
+    <h2>Crianças e adolescentes</h2>
+    <p>
+      O site trata de assuntos trabalhistas e financeiros e não é direcionado a menores
+      de 16 anos, nem coleta dados dessa faixa etária de forma intencional.
+    </p>
+
+    <h2>Mudanças nesta política</h2>
+    <p>
+      Se algo relevante mudar — uma nova integração, um novo tipo de cookie — esta
+      página é atualizada e a data no topo muda junto. O histórico completo de alterações
+      é público no
+      <a href="https://github.com/KaioHomem/KaioHomem.github.io" rel="noopener" target="_blank">repositório do site no GitHub</a>,
+      commit por commit.
+    </p>
+
+  </article>
+
+</main>
+
+<footer class="rodape" id="rodape"></footer>
+
+<script src="ferramentas/nucleo.js"></script>
+<script src="ferramentas/app.js"></script>
+<script src="ferramentas/consentimento.js"></script>
+<script src="ferramentas/monetizacao.js"></script>
+</body>
+</html>

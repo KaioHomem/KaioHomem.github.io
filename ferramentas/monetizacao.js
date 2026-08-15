@@ -82,6 +82,16 @@ window.MONETIZACAO = {
     return !!(cfg.adsense && cfg.adsense.ativo && cfg.adsense.cliente);
   }
 
+  /**
+   * LGPD gate. AdSense sets third-party cookies, so it must not load
+   * before the visitor accepts. If the consent module is missing for any
+   * reason, we fail closed — no consent, no ads.
+   */
+  function podeCarregarAnuncios() {
+    if (!adsenseConfigurado()) return false;
+    return !!(window.Consentimento && window.Consentimento.aceito());
+  }
+
   var scriptPedido = false;
   function carregarScriptAdsense() {
     if (scriptPedido) return;
@@ -100,7 +110,7 @@ window.MONETIZACAO = {
    * so an unconfigured site shows no gaps.
    */
   function montarAnuncio(container) {
-    if (!adsenseConfigurado()) return;
+    if (!podeCarregarAnuncios()) return;
 
     var nome = container.getAttribute('data-slot');
     var slot = cfg.adsense.slots && cfg.adsense.slots[nome];
@@ -173,12 +183,26 @@ window.MONETIZACAO = {
     });
   }
 
-  function iniciar() {
+  function montarTodosAnuncios() {
     var anuncios = document.querySelectorAll('.espaco-anuncio');
     for (var i = 0; i < anuncios.length; i++) montarAnuncio(anuncios[i]);
+  }
 
+  function iniciar() {
+    montarTodosAnuncios();
+
+    // Affiliate cards are plain links — they set no cookie of ours, so
+    // they render regardless of the advertising consent choice.
     var blocos = document.querySelectorAll('.bloco-afiliados');
     for (var j = 0; j < blocos.length; j++) montarAfiliados(blocos[j]);
+
+    // If consent arrives later in the visit, fill the ad slots then
+    // instead of making the visitor reload.
+    if (adsenseConfigurado() && window.Consentimento) {
+      window.Consentimento.aoDecidir(function (decisao) {
+        if (decisao === 'aceito') montarTodosAnuncios();
+      });
+    }
   }
 
   if (document.readyState === 'loading') {

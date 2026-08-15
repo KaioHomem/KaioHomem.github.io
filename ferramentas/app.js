@@ -18,6 +18,12 @@
 
   var atual = document.body.getAttribute('data-ferramenta') || '';
 
+  // The shell is reused by pages that live at the site root (the privacy
+  // policy), so links have to be built relative to where we actually are.
+  var emSubpasta = /\/(ferramentas|painel)\//.test(window.location.pathname);
+  var paraFerramentas = emSubpasta ? '' : 'ferramentas/';
+  var paraRaiz = emSubpasta ? '../' : '';
+
   /* ---------- SHELL ---------- */
   function montarTopo() {
     var alvo = document.getElementById('topo');
@@ -45,9 +51,11 @@
       '<div class="wrap">' +
         '<div class="rodape-links">' +
           FERRAMENTAS.map(function (f) {
-            return '<a href="' + f.arquivo + '">' + f.nome + '</a>';
+            return '<a href="' + paraFerramentas + f.arquivo + '">' + f.nome + '</a>';
           }).join('') +
-          '<a href="../index.html">Sobre o autor</a>' +
+          '<a href="' + paraRaiz + 'index.html">Sobre o autor</a>' +
+          '<a href="' + paraRaiz + 'privacidade.html">Privacidade</a>' +
+          '<a href="#" id="rever-cookies">Cookies</a>' +
         '</div>' +
         '<p>Cálculos baseados nas tabelas oficiais de ' + tabelas.ano +
         ' (INSS, IRRF e Lei 15.270/2025). Última revisão das tabelas: ' +
@@ -55,9 +63,24 @@
         '<p>As ferramentas são estimativas para orientação pessoal e não substituem ' +
         'o cálculo do seu empregador, contador ou sindicato. Valores reais podem variar ' +
         'por acordo coletivo, benefícios e verbas específicas do seu contrato.</p>' +
-        '<p>Feito por <a href="../index.html">Kaio Felipe</a> · ' +
+        '<p>Feito por <a href="' + paraRaiz + 'index.html">Kaio Felipe</a> · ' +
         '<a href="https://github.com/KaioHomem/KaioHomem.github.io">código aberto no GitHub</a></p>' +
       '</div>';
+
+    var rever = document.getElementById('rever-cookies');
+    if (rever) {
+      rever.addEventListener('click', function (e) {
+        e.preventDefault();
+        if (window.Consentimento) {
+          if (window.Consentimento.precisaDeConsentimento()) {
+            window.Consentimento.reabrir();
+          } else {
+            alert('Este site ainda não usa cookies — a publicidade está desativada. ' +
+                  'Quando for ativada, o aviso de consentimento aparece automaticamente.');
+          }
+        }
+      });
+    }
   }
 
   /* ---------- INPUT HELPERS ---------- */

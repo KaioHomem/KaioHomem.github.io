@@ -353,6 +353,46 @@ details p { margin: 0.7rem 0 0; font-size: 0.89rem; }
   text-align: left;
 }
 
+/* ---------- CONSENT BANNER ---------- */
+.consent-banner {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 200;
+  background: var(--bg-2);
+  border-top: 1px solid var(--border);
+  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.45);
+  animation: consent-sobe 0.4s var(--ease-spring);
+}
+@keyframes consent-sobe {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+.consent-inner {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 1.1rem 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 1.4rem;
+  flex-wrap: wrap;
+}
+.consent-texto {
+  flex: 1 1 340px;
+  font-size: 0.86rem;
+  color: var(--text-2);
+  line-height: 1.6;
+}
+.consent-texto strong { color: var(--text); }
+.consent-botoes { display: flex; gap: 0.6rem; flex-shrink: 0; }
+.consent-botoes .btn { padding: 0.55rem 1.25rem; }
+
+@media (max-width: 560px) {
+  .consent-botoes { width: 100%; }
+  .consent-botoes .btn { flex: 1; justify-content: center; }
+}
+
 /* ---------- FOOTER ---------- */
 .rodape {
   border-top: 1px solid var(--border);

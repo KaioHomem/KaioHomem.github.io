@@ -21,6 +21,7 @@ var RAIZ = path.join(__dirname, '..');
 var PAGINAS = [
   { caminho: 'index.html',                          url: '/',                                   prioridade: '0.8', frequencia: 'monthly' },
   { caminho: 'ferramentas/index.html',              url: '/ferramentas/',                       prioridade: '0.9', frequencia: 'weekly' },
+  { caminho: 'privacidade.html',                    url: '/privacidade.html',                   prioridade: '0.3', frequencia: 'yearly' },
   { caminho: 'ferramentas/salario-liquido.html',    url: '/ferramentas/salario-liquido.html',   prioridade: '1.0', frequencia: 'monthly' },
   { caminho: 'ferramentas/rescisao.html',           url: '/ferramentas/rescisao.html',          prioridade: '1.0', frequencia: 'monthly' },
   { caminho: 'ferramentas/decimo-terceiro.html',    url: '/ferramentas/decimo-terceiro.html',   prioridade: '1.0', frequencia: 'monthly' },
