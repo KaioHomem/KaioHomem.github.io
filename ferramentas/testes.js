@@ -241,6 +241,94 @@ eq('férias parciais de 15 dias', F.ferias({ salario: 3000, dias: 15 }).valorFer
   eq('adiantar o 13º soma meio salário', com.liquido - sem.liquido, 1500);
 })();
 
+/* ---------- UNEMPLOYMENT BENEFIT ---------- */
+console.log('\nSEGURO-DESEMPREGO');
+
+// Both bracket boundaries are exact in the official table — if an edit
+// breaks either, the published table was transcribed wrong.
+eq('fim da faixa 1 casa com a base da faixa 2',
+  F.seguroDesemprego({ media: 2222.17, mesesTrabalhados: 24, solicitacao: 1 }).valorParcela, 1777.74);
+eq('fim da faixa 2 casa exatamente com o teto',
+  F.seguroDesemprego({ media: 3703.99, mesesTrabalhados: 24, solicitacao: 1 }).valorParcela, 2518.65);
+
+eq('faixa 2 → base + 50% do excedente',
+  F.seguroDesemprego({ media: 3000, mesesTrabalhados: 24, solicitacao: 1 }).valorParcela, 2166.66);
+eq('acima da faixa 2 trava no teto',
+  F.seguroDesemprego({ media: 9000, mesesTrabalhados: 24, solicitacao: 1 }).valorParcela, 2518.65);
+
+(function () {
+  var r = F.seguroDesemprego({ media: 2000, mesesTrabalhados: 24, solicitacao: 1 });
+  eq('parcela nunca fica abaixo do salário mínimo', r.valorParcela, 1621.00);
+  verdadeiro('sinaliza quando subiu para o piso', r.ajustadoAoPiso === true);
+})();
+
+(function () {
+  var r = F.seguroDesemprego({ salarios: [3000, 3000, 3000], mesesTrabalhados: 24, solicitacao: 1 });
+  eq('média de três salários iguais é o próprio salário', r.media, 3000);
+  eq('5 parcelas com 24 meses na 1ª solicitação', r.numeroParcelas, 5, 0);
+  eq('total = parcela × número de parcelas', r.total, 10833.30);
+})();
+
+eq('média de salários diferentes',
+  F.seguroDesemprego({ salarios: [2000, 3000, 4000], mesesTrabalhados: 24 }).media, 3000);
+
+// Months worked and claim count interact — the usual source of confusion.
+eq('1ª solicitação com 12 meses → 4 parcelas',
+  F.seguroDesemprego({ media: 3000, mesesTrabalhados: 12, solicitacao: 1 }).numeroParcelas, 4, 0);
+eq('2ª solicitação com 9 meses → 3 parcelas',
+  F.seguroDesemprego({ media: 3000, mesesTrabalhados: 9, solicitacao: 2 }).numeroParcelas, 3, 0);
+eq('2ª solicitação com 24 meses → 5 parcelas',
+  F.seguroDesemprego({ media: 3000, mesesTrabalhados: 24, solicitacao: 2 }).numeroParcelas, 5, 0);
+eq('3ª solicitação com 6 meses → 3 parcelas',
+  F.seguroDesemprego({ media: 3000, mesesTrabalhados: 6, solicitacao: 3 }).numeroParcelas, 3, 0);
+
+verdadeiro('1ª solicitação com 10 meses não dá direito',
+  F.seguroDesemprego({ media: 3000, mesesTrabalhados: 10, solicitacao: 1 }).elegivel === false);
+verdadeiro('3ª solicitação com 10 meses dá direito',
+  F.seguroDesemprego({ media: 3000, mesesTrabalhados: 10, solicitacao: 3 }).elegivel === true);
+eq('sem direito, não há valor a receber',
+  F.seguroDesemprego({ media: 3000, mesesTrabalhados: 3, solicitacao: 1 }).total, 0);
+
+/* ---------- OVERTIME ---------- */
+console.log('\nHORAS EXTRAS');
+
+(function () {
+  var r = F.horasExtras({ salario: 3000, jornadaMensal: 220, horas50: 10, horas100: 5 });
+  eq('valor da hora = salário / jornada', r.valorHora, 13.64);
+  eq('10 horas com adicional de 50%', r.valor50, 204.60);
+  eq('5 horas com adicional de 100%', r.valor100, 136.40);
+  eq('DSR reflete as extras no descanso', r.dsr, 68.20);
+  eq('total das extras', r.total, 409.20);
+  eq('salário do mês com as extras', r.salarioComExtras, 3409.20);
+})();
+
+(function () {
+  var r = F.horasExtras({ salario: 3000, horas50: 10, horas100: 5, calcularDSR: false });
+  eq('sem DSR o reflexo some', r.dsr, 0);
+  eq('total cai para as extras puras', r.total, 341.00);
+})();
+
+(function () {
+  var r = F.horasExtras({ salario: 3000, horasNoturnas: 10, calcularDSR: false });
+  eq('adicional noturno paga só os 20%', r.valorNoturno, 27.28);
+  eq('hora noturna reduzida: 10h valem 11,43h', r.horasNoturnasEquivalentes, 11.43);
+  eq('sem marcar a hora reduzida, ela não é paga', r.valorHoraReduzida, 0);
+})();
+
+eq('com hora noturna reduzida, paga a diferença',
+  F.horasExtras({ salario: 3000, horasNoturnas: 10, horaNoturnaReduzida: true, calcularDSR: false })
+    .valorHoraReduzida, 19.51);
+
+eq('jornada de 200h encarece a hora',
+  F.horasExtras({ salario: 3000, jornadaMensal: 200 }).valorHora, 15.00);
+
+verdadeiro('hora de 100% vale mais que a de 50%',
+  F.horasExtras({ salario: 3000, horas100: 1 }).valor100 >
+  F.horasExtras({ salario: 3000, horas50: 1 }).valor50);
+
+eq('sem horas lançadas não há o que pagar',
+  F.horasExtras({ salario: 3000 }).total, 0);
+
 /* ---------- COMPOUND INTEREST ---------- */
 console.log('\nJUROS COMPOSTOS');
 

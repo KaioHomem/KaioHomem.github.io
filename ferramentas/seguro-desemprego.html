@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Calculadora de Seguro-Desemprego 2026 — valor e número de parcelas</title>
+<meta name="description" content="Calcule o valor das parcelas do seguro-desemprego em 2026 e quantas você tem direito a receber, segundo a tabela atualizada do Ministério do Trabalho.">
+<link rel="canonical" href="https://kaiohomem.github.io/ferramentas/seguro-desemprego.html">
+
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://kaiohomem.github.io/ferramentas/seguro-desemprego.html">
+<meta property="og:title" content="Calculadora de Seguro-Desemprego 2026">
+<meta property="og:description" content="Quanto você recebe por parcela e quantas parcelas tem direito.">
+<meta property="og:locale" content="pt_BR">
+<meta name="twitter:card" content="summary">
+
+<meta http-equiv="Content-Security-Policy" content="
+  default-src 'self';
+  script-src 'self' https://pagead2.googlesyndication.com https://*.googlesyndication.com https://*.doubleclick.net https://*.google.com https://*.gstatic.com;
+  style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+  font-src https://fonts.gstatic.com;
+  img-src 'self' data: https:;
+  frame-src https://*.googlesyndication.com https://*.doubleclick.net;
+  connect-src 'self' https://*.google.com https://*.doubleclick.net;
+  object-src 'none'; base-uri 'self'; form-action 'self';
+">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛟</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tools.css">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Calculadora de Seguro-Desemprego 2026",
+  "url": "https://kaiohomem.github.io/ferramentas/seguro-desemprego.html",
+  "applicationCategory": "FinanceApplication",
+  "operatingSystem": "Any",
+  "inLanguage": "pt-BR",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "BRL" }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Quantas parcelas de seguro-desemprego eu recebo?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Depende de dois fatores combinados: quanto tempo você trabalhou e quantas vezes já pediu o benefício. Na primeira solicitação são 4 parcelas com 12 a 23 meses trabalhados e 5 parcelas com 24 meses ou mais. Da segunda solicitação em diante o mínimo exigido cai, mas o número de parcelas pode ser menor."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Qual o valor máximo do seguro-desemprego em 2026?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "O teto é de R$ 2.518,65 por parcela, valor pago a quem tinha média salarial de R$ 3.704,00 ou mais. Nenhuma parcela pode ser inferior ao salário mínimo de R$ 1.621,00."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Quem pede demissão tem direito ao seguro-desemprego?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Não. O benefício é devido apenas na dispensa sem justa causa. Pedido de demissão, dispensa por justa causa e acordo entre as partes não dão direito ao seguro-desemprego."
+      }
+    }
+  ]
+}
+</script>
+</head>
+<body data-ferramenta="seguro-desemprego">
+
+<header class="topo" id="topo"></header>
+
+<main class="wrap">
+
+  <div class="cabecalho">
+    <div class="trilha"><a href="index.html">ferramentas</a> / seguro-desemprego</div>
+    <h1>Calculadora de seguro-desemprego</h1>
+    <p class="resumo">
+      Informe os três últimos salários e veja quanto vale cada parcela e quantas você tem
+      direito a receber, pela tabela de 2026.
+    </p>
+  </div>
+
+  <div class="espaco-anuncio" data-slot="topo"></div>
+
+  <section class="cartao">
+    <form id="formulario" autocomplete="off">
+      <div class="grade">
+
+        <div class="campo">
+          <label for="s1">Último salário bruto (R$)</label>
+          <input class="entrada" type="text" id="s1" inputmode="decimal" placeholder="3.000,00" value="3.000,00">
+        </div>
+
+        <div class="campo">
+          <label for="s2">Penúltimo salário (R$)</label>
+          <input class="entrada" type="text" id="s2" inputmode="decimal" placeholder="3.000,00" value="3.000,00">
+        </div>
+
+        <div class="campo">
+          <label for="s3">Antepenúltimo salário (R$)</label>
+          <input class="entrada" type="text" id="s3" inputmode="decimal" placeholder="3.000,00" value="3.000,00">
+        </div>
+
+        <div class="campo">
+          <label for="meses">Meses trabalhados no último vínculo</label>
+          <input class="entrada" type="number" id="meses" min="0" max="600" step="1" value="24">
+        </div>
+
+        <div class="campo col-2">
+          <label for="solicitacao">Qual solicitação é esta?</label>
+          <select class="entrada" id="solicitacao">
+            <option value="1">1ª vez que peço o seguro-desemprego</option>
+            <option value="2">2ª vez</option>
+            <option value="3">3ª vez ou mais</option>
+          </select>
+          <span class="dica">O mínimo de meses exigido cai a cada solicitação: 12, depois 9, depois 6.</span>
+        </div>
+
+      </div>
+
+      <div class="botoes">
+        <button type="button" class="btn" id="calcular">Calcular</button>
+        <button type="button" class="btn btn-vazado" id="limpar">Limpar</button>
+      </div>
+    </form>
+
+    <div class="resultado" id="resultado" aria-live="polite"></div>
+  </section>
+
+  <div class="espaco-anuncio" data-slot="resultado"></div>
+  <div class="bloco-afiliados"></div>
+
+  <article class="conteudo">
+
+    <h2>Como o valor é calculado</h2>
+    <p>
+      A base é a <strong>média dos três últimos salários</strong>. Sobre essa média
+      aplica-se a tabela de 2026, que é progressiva — e não uma porcentagem única:
+    </p>
+
+    <div class="tabela-rolagem">
+      <table>
+        <thead>
+          <tr><th>Média salarial</th><th>Valor da parcela</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Até R$ 2.222,17</td><td>Média × 0,8</td></tr>
+          <tr><td>De R$ 2.222,18 a R$ 3.703,99</td><td>R$ 1.777,74 + 50% do que passar de R$ 2.222,17</td></tr>
+          <tr><td>A partir de R$ 3.704,00</td><td>R$ 2.518,65 (teto)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>
+      Duas travas fecham a conta: nenhuma parcela pode ser menor que o
+      <strong>salário mínimo de R$ 1.621,00</strong>, nem maior que o teto de
+      <strong>R$ 2.518,65</strong>. Quem ganhava R$ 4.000 e quem ganhava R$ 40.000 recebem
+      exatamente o mesmo valor.
+    </p>
+
+    <h3>Quantas parcelas</h3>
+    <p>
+      Aqui está o detalhe que mais confunde: o número de parcelas depende de
+      <strong>duas coisas ao mesmo tempo</strong> — o tempo trabalhado e quantas vezes você
+      já pediu o benefício antes.
+    </p>
+
+    <div class="tabela-rolagem">
+      <table>
+        <thead>
+          <tr><th>Solicitação</th><th>Tempo trabalhado</th><th>Parcelas</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>1ª</td><td>12 a 23 meses</td><td>4</td></tr>
+          <tr><td>1ª</td><td>24 meses ou mais</td><td>5</td></tr>
+          <tr><td>2ª</td><td>9 a 11 meses</td><td>3</td></tr>
+          <tr><td>2ª</td><td>12 a 23 meses</td><td>4</td></tr>
+          <tr><td>2ª</td><td>24 meses ou mais</td><td>5</td></tr>
+          <tr><td>3ª ou mais</td><td>6 a 11 meses</td><td>3</td></tr>
+          <tr><td>3ª ou mais</td><td>12 a 23 meses</td><td>4</td></tr>
+          <tr><td>3ª ou mais</td><td>24 meses ou mais</td><td>5</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Quem tem direito</h3>
+    <ul>
+      <li>Ter sido <strong>dispensado sem justa causa</strong>.</li>
+      <li>Não ter renda própria suficiente para o sustento.</li>
+      <li>Não estar recebendo benefício continuado do INSS, exceto pensão por morte ou auxílio-acidente.</li>
+    </ul>
+    <p>
+      Pedido de demissão, justa causa e acordo entre as partes <strong>não dão
+      direito</strong>. Se você ainda está decidindo como sair, a
+      <a href="rescisao.html">calculadora de rescisão</a> mostra o impacto de cada opção.
+    </p>
+
+    <h3>Prazo para pedir</h3>
+    <p>
+      Do <strong>7º ao 120º dia</strong> após a demissão, pelo aplicativo Carteira de
+      Trabalho Digital, pelo portal gov.br ou presencialmente. Perdeu o prazo, perdeu o
+      benefício.
+    </p>
+
+    <div class="aviso">
+      <p>
+        <strong>Estimativa.</strong> O valor oficial é apurado pelo Ministério do Trabalho
+        com base nos salários informados no sistema, que podem divergir do que você
+        digitou aqui. A tabela é reajustada todo mês de janeiro.
+      </p>
+    </div>
+
+    <h2>Perguntas frequentes</h2>
+
+    <details>
+      <summary>Trabalhei pouco tempo. Recebo alguma coisa?</summary>
+      <p>
+        Na primeira solicitação, menos de 12 meses trabalhados nos últimos 18 não dá
+        direito a nada. O mínimo exigido só cai nas solicitações seguintes: 9 meses na
+        segunda e 6 meses da terceira em diante.
+      </p>
+    </details>
+
+    <details>
+      <summary>Consigo trabalhar registrado enquanto recebo?</summary>
+      <p>
+        Não. Ao ser admitido em novo emprego com carteira assinada, o benefício é
+        suspenso automaticamente. Continuar recebendo nessa situação configura fraude e
+        gera devolução dos valores.
+      </p>
+    </details>
+
+    <details>
+      <summary>A parcela sofre desconto de INSS ou Imposto de Renda?</summary>
+      <p>
+        Não. O seguro-desemprego é benefício assistencial, não salário. Ele não sofre
+        desconto de INSS nem de IRRF e não conta como tempo de contribuição para
+        aposentadoria.
+      </p>
+    </details>
+
+  </article>
+
+  <div class="espaco-anuncio" data-slot="rodape"></div>
+
+</main>
+
+<footer class="rodape" id="rodape"></footer>
+
+<script src="nucleo.js"></script>
+<script src="app.js"></script>
+<script src="consentimento.js"></script>
+<script src="monetizacao.js"></script>
+<script src="pg-seguro.js"></script>
+</body>
+</html>

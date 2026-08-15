@@ -26,6 +26,8 @@ var PAGINAS = [
   { caminho: 'ferramentas/rescisao.html',           url: '/ferramentas/rescisao.html',          prioridade: '1.0', frequencia: 'monthly' },
   { caminho: 'ferramentas/decimo-terceiro.html',    url: '/ferramentas/decimo-terceiro.html',   prioridade: '1.0', frequencia: 'monthly' },
   { caminho: 'ferramentas/ferias.html',             url: '/ferramentas/ferias.html',            prioridade: '1.0', frequencia: 'monthly' },
+  { caminho: 'ferramentas/seguro-desemprego.html',  url: '/ferramentas/seguro-desemprego.html', prioridade: '1.0', frequencia: 'monthly' },
+  { caminho: 'ferramentas/horas-extras.html',       url: '/ferramentas/horas-extras.html',      prioridade: '0.9', frequencia: 'monthly' },
   { caminho: 'ferramentas/juros-compostos.html',    url: '/ferramentas/juros-compostos.html',   prioridade: '0.9', frequencia: 'monthly' },
   { caminho: 'ferramentas/financiamento.html',      url: '/ferramentas/financiamento.html',     prioridade: '0.9', frequencia: 'monthly' }
 ];

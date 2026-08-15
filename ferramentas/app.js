@@ -12,6 +12,8 @@
     { id: 'rescisao',        arquivo: 'rescisao.html',        nome: 'Rescisão' },
     { id: 'decimo-terceiro', arquivo: 'decimo-terceiro.html', nome: '13º salário' },
     { id: 'ferias',          arquivo: 'ferias.html',          nome: 'Férias' },
+    { id: 'seguro-desemprego', arquivo: 'seguro-desemprego.html', nome: 'Seguro-desemprego' },
+    { id: 'horas-extras',    arquivo: 'horas-extras.html',    nome: 'Horas extras' },
     { id: 'juros-compostos', arquivo: 'juros-compostos.html', nome: 'Juros compostos' },
     { id: 'financiamento',   arquivo: 'financiamento.html',   nome: 'Financiamento' }
   ];

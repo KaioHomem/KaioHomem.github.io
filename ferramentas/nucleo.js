@@ -47,7 +47,29 @@
       redutor: { limite: 7350.00, constante: 978.62, indice: 0.133145 }
     },
 
-    fgts: { aliquota: 0.08 }
+    fgts: { aliquota: 0.08 },
+
+    // Unemployment benefit. Brackets are restated every January by the
+    // Ministry of Labour, indexed to the INPC.
+    // Sanity anchors, both exact: 2222.17 * 0.8 = 1777.74 (where bracket 2
+    // starts) and 1777.74 + (3703.99 - 2222.17) * 0.5 = 2518.65 (the cap).
+    seguroDesemprego: {
+      limiteFaixa1: 2222.17,
+      limiteFaixa2: 3703.99,
+      fator1: 0.8,
+      baseFaixa2: 1777.74,
+      fator2: 0.5,
+      teto: 2518.65
+    },
+
+    // Overtime and night-shift premiums come from the CLT and the
+    // Constitution, not from an annual table — they do not drift yearly.
+    jornada: {
+      adicionalExtraComum: 0.5,   // business days, legal minimum
+      adicionalExtraDomingo: 1.0, // Sundays and public holidays
+      adicionalNoturno: 0.2,      // urban worker, 22h–05h
+      minutosHoraNoturna: 52.5    // the "reduced" night hour
+    }
   };
 
   /* ---------- HELPERS ---------- */
@@ -441,6 +463,135 @@
     };
   }
 
+  /* ---------- UNEMPLOYMENT BENEFIT ---------- */
+  /**
+   * Seguro-desemprego.
+   *
+   * The instalment is derived from the average of the last three salaries,
+   * then floored at the minimum wage and capped at the published ceiling.
+   * How many instalments you get depends on how long you worked *and* on
+   * how many times you have claimed before — the two interact, which is
+   * the part most people get wrong.
+   */
+  function seguroDesemprego(opcoes) {
+    var o = opcoes || {};
+    var t = TABELAS.seguroDesemprego;
+
+    var media;
+    if (Array.isArray(o.salarios) && o.salarios.length) {
+      var validos = o.salarios.map(positivo).filter(function (s) { return s > 0; });
+      media = validos.length
+        ? validos.reduce(function (a, b) { return a + b; }, 0) / validos.length
+        : 0;
+    } else {
+      media = positivo(o.media);
+    }
+    media = round2(media);
+
+    var mesesTrabalhados = Math.max(0, parseInt(o.mesesTrabalhados, 10) || 0);
+    var solicitacao = Math.max(1, parseInt(o.solicitacao, 10) || 1);
+
+    // Instalment value.
+    var parcela;
+    if (media <= t.limiteFaixa1) {
+      parcela = media * t.fator1;
+    } else if (media <= t.limiteFaixa2) {
+      parcela = t.baseFaixa2 + (media - t.limiteFaixa1) * t.fator2;
+    } else {
+      parcela = t.teto;
+    }
+    parcela = round2(parcela);
+
+    var piso = TABELAS.inss.salarioMinimo;
+    var abaixoDoPiso = parcela < piso;
+    if (abaixoDoPiso) parcela = piso;
+    if (parcela > t.teto) parcela = t.teto;
+
+    // Minimum months required, by how many times the worker has claimed.
+    var minimoExigido = solicitacao === 1 ? 12 : (solicitacao === 2 ? 9 : 6);
+    var elegivel = mesesTrabalhados >= minimoExigido;
+
+    var numeroParcelas = 0;
+    if (elegivel) {
+      if (mesesTrabalhados >= 24) numeroParcelas = 5;
+      else if (mesesTrabalhados >= 12) numeroParcelas = 4;
+      else numeroParcelas = 3;
+
+      // A first claim never pays only three.
+      if (solicitacao === 1 && numeroParcelas < 4) numeroParcelas = 4;
+    }
+
+    return {
+      media: media,
+      valorParcela: elegivel ? parcela : 0,
+      numeroParcelas: numeroParcelas,
+      total: round2(elegivel ? parcela * numeroParcelas : 0),
+      elegivel: elegivel,
+      minimoExigido: minimoExigido,
+      solicitacao: solicitacao,
+      ajustadoAoPiso: elegivel && abaixoDoPiso,
+      noTeto: elegivel && parcela >= t.teto
+    };
+  }
+
+  /* ---------- OVERTIME ---------- */
+  /**
+   * Overtime and night-shift pay.
+   *
+   * `dsr` is the weekly-rest reflex: overtime worked during the week also
+   * raises the paid rest days, and it is the line most often missing from
+   * a payslip.
+   */
+  function horasExtras(opcoes) {
+    var o = opcoes || {};
+    var t = TABELAS.jornada;
+
+    var salario = positivo(o.salario);
+    var jornadaMensal = positivo(o.jornadaMensal) || 220;
+    var valorHora = round2(salario / jornadaMensal);
+
+    var horas50 = positivo(o.horas50);
+    var horas100 = positivo(o.horas100);
+    var horasNoturnas = positivo(o.horasNoturnas);
+
+    var valor50 = round2(horas50 * valorHora * (1 + t.adicionalExtraComum));
+    var valor100 = round2(horas100 * valorHora * (1 + t.adicionalExtraDomingo));
+
+    // Night premium pays only the 20% on top of the normal hour — the hour
+    // itself is already inside the monthly salary.
+    var valorNoturno = round2(horasNoturnas * valorHora * t.adicionalNoturno);
+
+    // With the reduced night hour, 52'30" counts as a full hour, so seven
+    // clock hours are paid as eight.
+    var horasNoturnasEquivalentes = round2(horasNoturnas * (60 / t.minutosHoraNoturna));
+    var valorHoraReduzida = o.horaNoturnaReduzida
+      ? round2((horasNoturnasEquivalentes - horasNoturnas) * valorHora)
+      : 0;
+
+    var diasUteis = Math.max(1, parseInt(o.diasUteis, 10) || 25);
+    var descansos = Math.max(0, parseInt(o.domingosFeriados, 10) || 5);
+    var totalExtras = round2(valor50 + valor100);
+    var dsr = o.calcularDSR === false ? 0 : round2((totalExtras / diasUteis) * descansos);
+
+    var total = round2(totalExtras + valorNoturno + valorHoraReduzida + dsr);
+
+    return {
+      valorHora: valorHora,
+      jornadaMensal: jornadaMensal,
+      horas50: horas50,
+      horas100: horas100,
+      valor50: valor50,
+      valor100: valor100,
+      valorNoturno: valorNoturno,
+      horasNoturnasEquivalentes: horasNoturnasEquivalentes,
+      valorHoraReduzida: valorHoraReduzida,
+      dsr: dsr,
+      totalExtras: totalExtras,
+      total: total,
+      salarioComExtras: round2(salario + total)
+    };
+  }
+
   /* ---------- COMPOUND INTEREST ---------- */
   /**
    * Future value with an initial deposit plus monthly contributions
@@ -587,6 +738,8 @@
     rescisao: rescisao,
     decimoTerceiro: decimoTerceiro,
     ferias: ferias,
+    seguroDesemprego: seguroDesemprego,
+    horasExtras: horasExtras,
     jurosCompostos: jurosCompostos,
     anualParaMensal: anualParaMensal,
     financiamento: financiamento,

@@ -33,6 +33,11 @@ jobs:
       - name: Rodar suíte de testes
         run: node ferramentas/testes.js
 
+      # Gate: a calculator that exists but is not linked from the nav, the
+      # hub and the sitemap is invisible to users and to search engines.
+      - name: Verificar consistência entre navegação, hub e sitemap
+        run: node ferramentas/verificar-consistencia.js
+
   manutencao:
     name: Manutenção mensal
     runs-on: ubuntu-latest
@@ -50,6 +55,9 @@ jobs:
       - name: Conferir se as tabelas fiscais estão em dia
         id: tabelas
         run: node ferramentas/verificar-tabelas.js
+
+      - name: Verificar consistência
+        run: node ferramentas/verificar-consistencia.js
 
       - name: Regenerar sitemap
         run: node ferramentas/gerar-sitemap.js

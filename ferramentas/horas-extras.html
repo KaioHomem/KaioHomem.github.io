@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Calculadora de Horas Extras — com DSR e adicional noturno</title>
+<meta name="description" content="Calcule suas horas extras com adicional de 50% ou 100%, reflexo no DSR e adicional noturno de 20%. Veja o valor da sua hora e quanto entra no mês.">
+<link rel="canonical" href="https://kaiohomem.github.io/ferramentas/horas-extras.html">
+
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://kaiohomem.github.io/ferramentas/horas-extras.html">
+<meta property="og:title" content="Calculadora de Horas Extras">
+<meta property="og:description" content="Adicional de 50% e 100%, DSR e adicional noturno — o cálculo completo.">
+<meta property="og:locale" content="pt_BR">
+<meta name="twitter:card" content="summary">
+
+<meta http-equiv="Content-Security-Policy" content="
+  default-src 'self';
+  script-src 'self' https://pagead2.googlesyndication.com https://*.googlesyndication.com https://*.doubleclick.net https://*.google.com https://*.gstatic.com;
+  style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+  font-src https://fonts.gstatic.com;
+  img-src 'self' data: https:;
+  frame-src https://*.googlesyndication.com https://*.doubleclick.net;
+  connect-src 'self' https://*.google.com https://*.doubleclick.net;
+  object-src 'none'; base-uri 'self'; form-action 'self';
+">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⏰</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tools.css">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Calculadora de Horas Extras",
+  "url": "https://kaiohomem.github.io/ferramentas/horas-extras.html",
+  "applicationCategory": "FinanceApplication",
+  "operatingSystem": "Any",
+  "inLanguage": "pt-BR",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "BRL" }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "O que é o DSR sobre horas extras?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "É o Descanso Semanal Remunerado. Como as horas extras aumentam a remuneração da semana, elas também aumentam o valor pago pelos dias de descanso. O cálculo divide o total de extras pelos dias úteis do mês e multiplica pelos domingos e feriados. É a verba que mais falta em holerite."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Quanto vale a minha hora de trabalho?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Divide-se o salário mensal pela jornada mensal. Para 44 horas semanais a jornada é de 220 horas por mês, então quem ganha R$ 3.000 tem hora de R$ 13,64. Para 40 horas semanais a base é 200 horas."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Qual o adicional da hora noturna?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Para o trabalhador urbano, o adicional noturno é de 20% sobre a hora normal, aplicado ao trabalho entre 22h e 5h. Além disso a hora noturna é reduzida: 52 minutos e 30 segundos contam como uma hora cheia."
+      }
+    }
+  ]
+}
+</script>
+</head>
+<body data-ferramenta="horas-extras">
+
+<header class="topo" id="topo"></header>
+
+<main class="wrap">
+
+  <div class="cabecalho">
+    <div class="trilha"><a href="index.html">ferramentas</a> / horas extras</div>
+    <h1>Calculadora de horas extras</h1>
+    <p class="resumo">
+      Quanto vale sua hora, quanto entra de adicional e o reflexo no DSR — a verba que
+      mais some do holerite.
+    </p>
+  </div>
+
+  <div class="espaco-anuncio" data-slot="topo"></div>
+
+  <section class="cartao">
+    <form id="formulario" autocomplete="off">
+      <div class="grade">
+
+        <div class="campo">
+          <label for="salario">Salário bruto mensal (R$)</label>
+          <input class="entrada" type="text" id="salario" inputmode="decimal" placeholder="3.000,00" value="3.000,00">
+        </div>
+
+        <div class="campo">
+          <label for="jornada">Jornada mensal</label>
+          <select class="entrada" id="jornada">
+            <option value="220">220h — 44h por semana</option>
+            <option value="200">200h — 40h por semana</option>
+            <option value="180">180h — 36h por semana</option>
+            <option value="150">150h — 30h por semana</option>
+          </select>
+        </div>
+
+        <div class="campo">
+          <label for="horas50">Horas extras a 50%</label>
+          <input class="entrada" type="text" id="horas50" inputmode="decimal" placeholder="0" value="10">
+          <span class="dica">Dias úteis e sábados.</span>
+        </div>
+
+        <div class="campo">
+          <label for="horas100">Horas extras a 100%</label>
+          <input class="entrada" type="text" id="horas100" inputmode="decimal" placeholder="0" value="0">
+          <span class="dica">Domingos e feriados.</span>
+        </div>
+
+        <div class="campo">
+          <label for="horasNoturnas">Horas noturnas (22h às 5h)</label>
+          <input class="entrada" type="text" id="horasNoturnas" inputmode="decimal" placeholder="0" value="0">
+        </div>
+
+        <div class="campo">
+          <label for="diasUteis">Dias úteis no mês</label>
+          <input class="entrada" type="number" id="diasUteis" min="1" max="31" step="1" value="25">
+        </div>
+
+        <div class="campo">
+          <label for="descansos">Domingos e feriados no mês</label>
+          <input class="entrada" type="number" id="descansos" min="0" max="15" step="1" value="5">
+        </div>
+
+        <div class="campo">
+          <label>Opções</label>
+          <div class="campo check">
+            <input type="checkbox" id="horaReduzida">
+            <label for="horaReduzida">Aplicar hora noturna reduzida (52min30s)</label>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="botoes">
+        <button type="button" class="btn" id="calcular">Calcular</button>
+        <button type="button" class="btn btn-vazado" id="limpar">Limpar</button>
+      </div>
+    </form>
+
+    <div class="resultado" id="resultado" aria-live="polite"></div>
+  </section>
+
+  <div class="espaco-anuncio" data-slot="resultado"></div>
+  <div class="bloco-afiliados"></div>
+
+  <article class="conteudo">
+
+    <h2>O cálculo, em três passos</h2>
+
+    <h3>1. O valor da sua hora</h3>
+    <p>
+      Divide-se o salário pela jornada mensal. Quem trabalha 44 horas semanais tem jornada
+      de <strong>220 horas</strong>; 40 horas semanais dão 200 horas. Com salário de
+      R$ 3.000 e jornada de 220h, a hora vale R$ 13,64.
+    </p>
+
+    <h3>2. O adicional</h3>
+    <ul>
+      <li><strong>50%</strong> — mínimo constitucional, para extras em dias úteis e sábados. A hora de R$ 13,64 passa a valer R$ 20,46.</li>
+      <li><strong>100%</strong> — domingos e feriados sem folga compensatória. A hora dobra.</li>
+      <li><strong>20% noturno</strong> — trabalho entre 22h e 5h, para o trabalhador urbano. Esse adicional se soma ao de hora extra, quando as duas coisas acontecem juntas.</li>
+    </ul>
+    <p>
+      Convenção coletiva pode fixar percentual maior — 60%, 70% e 100% em dias úteis são
+      comuns em várias categorias. Vale sempre o que for melhor para o trabalhador.
+    </p>
+
+    <h3>3. O DSR — a parte esquecida</h3>
+    <p>
+      Este é o item que mais falta em holerite. Como as horas extras aumentam a
+      remuneração da semana, elas também aumentam o valor dos dias de descanso. A conta é:
+      <strong>total de extras ÷ dias úteis × domingos e feriados</strong>.
+    </p>
+    <p>
+      Em R$ 341 de extras num mês com 25 dias úteis e 5 domingos, o DSR acrescenta
+      R$ 68,20 — cerca de <strong>20% a mais</strong>, que muita gente nunca recebeu.
+    </p>
+
+    <h3>A hora noturna reduzida</h3>
+    <p>
+      Além dos 20%, a lei considera que a hora noturna dura <strong>52 minutos e 30
+      segundos</strong>. Na prática, quem trabalha 7 horas entre 22h e 5h deve receber
+      por 8. É o segundo item que mais some da folha.
+    </p>
+
+    <div class="aviso">
+      <p>
+        <strong>Limite legal:</strong> são no máximo 2 horas extras por dia. O banco de
+        horas, quando previsto em acordo, permite compensar em vez de pagar — mas o
+        excedente não compensado dentro do prazo tem de ser pago com adicional.
+      </p>
+    </div>
+
+    <h2>Perguntas frequentes</h2>
+
+    <details>
+      <summary>Horas extras habituais entram no 13º e nas férias?</summary>
+      <p>
+        Sim. Quando são habituais, entram na média que compõe 13º, férias, aviso prévio e
+        FGTS. Nossas calculadoras de
+        <a href="decimo-terceiro.html">13º</a> e <a href="ferias.html">férias</a> usam o
+        salário fixo — some a média das extras ao valor informado para chegar mais perto.
+      </p>
+    </details>
+
+    <details>
+      <summary>Meu chefe pode obrigar a fazer hora extra?</summary>
+      <p>
+        Só em caso de necessidade imperiosa, força maior ou serviços inadiáveis. Fora
+        dessas hipóteses, a prorrogação depende de acordo — individual escrito ou
+        coletivo.
+      </p>
+    </details>
+
+    <details>
+      <summary>Recebo hora extra se fico à disposição sem trabalhar?</summary>
+      <p>
+        Sim. O tempo à disposição do empregador conta como jornada, ainda que você não
+        esteja executando tarefa. Já o tempo de deslocamento e a troca de uniforme têm
+        regras específicas que variam conforme o caso.
+      </p>
+    </details>
+
+  </article>
+
+  <div class="espaco-anuncio" data-slot="rodape"></div>
+
+</main>
+
+<footer class="rodape" id="rodape"></footer>
+
+<script src="nucleo.js"></script>
+<script src="app.js"></script>
+<script src="consentimento.js"></script>
+<script src="monetizacao.js"></script>
+<script src="pg-horas.js"></script>
+</body>
+</html>

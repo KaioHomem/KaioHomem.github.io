@@ -47,10 +47,10 @@ KaioHomem.github.io/
 
 # Ferramentas BR — calculator suite
 
-A set of free, no-signup calculators at
+Eight free, no-signup calculators at
 [/ferramentas](https://kaiohomem.github.io/ferramentas/): net salary, severance
-pay, 13th salary, vacation pay, compound interest and loan amortization, using
-the 2026 Brazilian tax tables.
+pay, 13th salary, vacation pay, unemployment benefit, overtime, compound
+interest and loan amortization — using the 2026 Brazilian tax tables.
 
 Everything runs client-side. There is no back-end, no database and no form that
 captures user data — the numbers people type never leave their browser.
@@ -70,6 +70,8 @@ ferramentas/
 ├── nucleo.js            # Calculation core — pure functions, no DOM
 ├── testes.js            # Test suite (Node). CI gate.
 ├── verificar-tabelas.js # Flags when the fiscal tables go stale
+├── verificar-consistencia.js # Nav / hub / sitemap must agree
+├── consentimento.js     # LGPD gate — ads load only after consent
 ├── gerar-sitemap.js     # Regenerates sitemap.xml
 ├── app.js               # Shared header/footer + input helpers
 ├── monetizacao.js       # >>> Monetization config — the file you edit
@@ -95,14 +97,37 @@ under Node in CI.
 node ferramentas/testes.js
 ```
 
-94 assertions pinned to independently verifiable reference points — the
-R$ 988,09 INSS ceiling, the redutor reaching exactly zero at R$ 7.350,
-Price and SAC schedules amortizing to a zero balance — plus invariants such as
-"net pay never decreases when gross pay increases".
+126 assertions pinned to independently verifiable reference points — the
+R$ 988,09 INSS ceiling, the redutor reaching exactly zero at R$ 7.350, the
+unemployment brackets meeting exactly at R$ 1.777,74 and R$ 2.518,65, Price and
+SAC schedules amortizing to a zero balance — plus invariants such as "net pay
+never decreases when gross pay increases".
+
+Several assertions exist to catch a *specific* wrong refactor rather than to
+check a number. The 13th-salary INSS is asserted equal to the monthly INSS of
+the same amount, so that if anyone ever adds the bonus to the month's salary
+before taxing it, the suite fails instead of quietly overtaxing users.
 
 The suite runs on every push to `ferramentas/` and blocks the monthly
 maintenance job. If a table is edited and a reference stops holding, CI fails
 instead of quietly publishing wrong numbers.
+
+```bash
+node ferramentas/verificar-consistencia.js
+```
+
+A second gate, 232 checks. The list of calculators lives in four places that
+must agree — the nav in `app.js`, the hub cards, the sitemap, and the pages
+themselves — and nothing enforced that. Adding a tool and forgetting one spot
+produced a page that existed but was unreachable: invisible to users and to
+search engines, with no error anywhere. This makes that a failed build.
+
+It also checks per-page SEO basics (one `<h1>`, canonical, usable meta
+description, JSON-LD), that `consentimento.js` is loaded before
+`monetizacao.js` on every page — the consent gate does nothing if that order
+is wrong — and scans for committed secrets. Publisher ids and OAuth client ids
+are deliberately *not* flagged: they are public by design, and warning on
+correct configuration teaches people to ignore warnings.
 
 ## Automated maintenance
 
