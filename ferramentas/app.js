@@ -15,6 +15,7 @@
     { id: 'seguro-desemprego', arquivo: 'seguro-desemprego.html', nome: 'Seguro-desemprego' },
     { id: 'horas-extras',    arquivo: 'horas-extras.html',    nome: 'Horas extras' },
     { id: 'clt-vs-pj',       arquivo: 'clt-vs-pj.html',       nome: 'CLT vs PJ' },
+    { id: 'trafego-pago',    arquivo: 'trafego-pago.html',    nome: 'ROAS e CPA' },
     { id: 'juros-compostos', arquivo: 'juros-compostos.html', nome: 'Juros compostos' },
     { id: 'financiamento',   arquivo: 'financiamento.html',   nome: 'Financiamento' }
   ];
@@ -104,7 +105,8 @@
     'horas-extras':      ['salario-liquido', 'decimo-terceiro', 'ferias'],
     'clt-vs-pj':         ['salario-liquido', 'rescisao', 'seguro-desemprego'],
     'juros-compostos':   ['financiamento', 'salario-liquido'],
-    'financiamento':     ['juros-compostos', 'salario-liquido']
+    'financiamento':     ['juros-compostos', 'salario-liquido'],
+    'trafego-pago':      ['clt-vs-pj', 'juros-compostos', 'salario-liquido']
   };
 
   var DESCRICOES = {
@@ -116,7 +118,8 @@
     'horas-extras':      'Com o DSR que costuma faltar no holerite.',
     'clt-vs-pj':         'Quanto faturar como PJ para empatar.',
     'juros-compostos':   'O efeito dos aportes ao longo do tempo.',
-    'financiamento':     'Price e SAC lado a lado.'
+    'financiamento':     'Price e SAC lado a lado.',
+    'trafego-pago':      'Breakeven, CPA máximo e onde está o gargalo.'
   };
 
   function acharFerramenta(id) {

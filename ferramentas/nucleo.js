@@ -741,6 +741,91 @@
     };
   }
 
+  /* ---------- PAID TRAFFIC UNIT ECONOMICS ---------- */
+  /**
+   * Break-even maths for paid advertising.
+   *
+   * The number that kills most beginners is the break-even ROAS: it is
+   * 1 / contribution margin, not a feeling. On a 25% margin, break-even
+   * is 4x — so a ROAS of 3x, which looks healthy, is a loss.
+   *
+   * Everything here is derived from the funnel the advertiser actually
+   * observes (CPM, CTR, conversion) rather than assumed, so the result
+   * says which lever is broken instead of just "it did not work".
+   */
+  function trafegoPago(opcoes) {
+    var o = opcoes || {};
+
+    var ticket = positivo(o.ticket);
+    var custoProduto = positivo(o.custoProduto);
+    var custoOperacional = positivo(o.custoOperacional); // shipping, fees, gateway
+    var cpm = positivo(o.cpm);
+    var ctr = positivo(o.ctr);                     // decimal, 0.015 = 1,5%
+    var conversao = positivo(o.taxaConversao);     // decimal
+    var recompras = Math.max(0, Number(o.comprasPorCliente) || 1);
+
+    var contribuicao = round2(ticket - custoProduto - custoOperacional);
+    var margem = ticket > 0 ? contribuicao / ticket : 0;
+
+    // 1 / margin. Undefined when nothing is left after costs.
+    var roasBreakeven = margem > 0 ? 1 / margem : Infinity;
+
+    // The most you can pay for a sale and still break even.
+    var cpaMaximo = round2(contribuicao);
+    var cpaMaximoComLTV = round2(contribuicao * recompras);
+
+    // Funnel: CPM buys impressions, CTR turns them into clicks,
+    // conversion turns clicks into sales.
+    var cpc = ctr > 0 ? round2(cpm / 1000 / ctr) : 0;
+    var cpaProjetado = conversao > 0 && cpc > 0 ? round2(cpc / conversao) : 0;
+
+    var lucroPorVenda = round2(contribuicao - cpaProjetado);
+    var roasProjetado = cpaProjetado > 0 ? ticket / cpaProjetado : 0;
+    var viavel = cpaProjetado > 0 && cpaProjetado < cpaMaximo;
+
+    // Which lever is actually broken. Mirrors the standard diagnosis
+    // table, but decided from this account's own numbers.
+    var diagnostico;
+    if (ticket <= 0) {
+      diagnostico = 'sem-ticket';
+    } else if (contribuicao <= 0) {
+      diagnostico = 'sem-margem';
+    } else if (cpaProjetado === 0) {
+      diagnostico = 'faltam-dados';
+    } else if (ctr > 0 && ctr < 0.01) {
+      diagnostico = 'criativo';
+    } else if (conversao > 0 && conversao < 0.01) {
+      diagnostico = 'pagina-ou-oferta';
+    } else if (!viavel) {
+      diagnostico = 'cpa-alto';
+    } else {
+      diagnostico = 'viavel';
+    }
+
+    // Budget needed to learn anything. Roughly 3 conversions per creative
+    // is the floor below which a result is noise, not signal.
+    var verbaTeste = round2(cpaProjetado * 3);
+
+    return {
+      ticket: round2(ticket),
+      contribuicao: contribuicao,
+      margem: margem,
+      roasBreakeven: roasBreakeven,
+      cpaMaximo: cpaMaximo,
+      cpaMaximoComLTV: cpaMaximoComLTV,
+      cpc: cpc,
+      cpaProjetado: cpaProjetado,
+      roasProjetado: roasProjetado,
+      lucroPorVenda: lucroPorVenda,
+      viavel: viavel,
+      diagnostico: diagnostico,
+      verbaTestePorCriativo: verbaTeste,
+      // Cut rule, decided before the campaign goes live rather than in
+      // the heat of the moment.
+      regraDeCorte: round2(cpaMaximo * 2)
+    };
+  }
+
   /* ---------- COMPOUND INTEREST ---------- */
   /**
    * Future value with an initial deposit plus monthly contributions
@@ -891,6 +976,7 @@
     horasExtras: horasExtras,
     aliquotaSimples: aliquotaSimples,
     cltVsPj: cltVsPj,
+    trafegoPago: trafegoPago,
     jurosCompostos: jurosCompostos,
     anualParaMensal: anualParaMensal,
     financiamento: financiamento,
