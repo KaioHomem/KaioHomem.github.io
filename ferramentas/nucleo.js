@@ -62,6 +62,31 @@
       teto: 2518.65
     },
 
+    // Simples Nacional, service companies.
+    //
+    // Only the first three brackets are modelled — they cover revenue up to
+    // R$ 720k/year (R$ 60k/month), far beyond anyone weighing a CLT offer.
+    // Their continuity was verified against the official effective-rate
+    // formula [(RBT12 * aliq) - deducao] / RBT12: the rate matches exactly
+    // on both sides of every boundary. The upper brackets are deliberately
+    // left out rather than guessed.
+    simples: {
+      limiteModelado: 720000,
+      fatorRMinimo: 0.28,
+      // Anexo III — payroll is at least 28% of revenue (Fator R).
+      anexoIII: [
+        { ate: 180000,  aliquota: 0.06,  deducao: 0 },
+        { ate: 360000,  aliquota: 0.112, deducao: 9360 },
+        { ate: 720000,  aliquota: 0.135, deducao: 17640 }
+      ],
+      // Anexo V — payroll below 28% of revenue. Markedly heavier.
+      anexoV: [
+        { ate: 180000,  aliquota: 0.155, deducao: 0 },
+        { ate: 360000,  aliquota: 0.18,  deducao: 4500 },
+        { ate: 720000,  aliquota: 0.195, deducao: 9900 }
+      ]
+    },
+
     // Overtime and night-shift premiums come from the CLT and the
     // Constitution, not from an annual table — they do not drift yearly.
     jornada: {
@@ -592,6 +617,130 @@
     };
   }
 
+  /* ---------- SIMPLES NACIONAL ---------- */
+  /**
+   * Effective tax rate under Simples Nacional.
+   * The headline rate is nominal; what you actually pay is
+   * [(RBT12 * aliquota) - deducao] / RBT12, which is always lower from
+   * the second bracket on.
+   */
+  function aliquotaSimples(receitaAnual, anexo) {
+    var tabela = anexo === 'V' ? TABELAS.simples.anexoV : TABELAS.simples.anexoIII;
+    var receita = positivo(receitaAnual);
+
+    if (receita <= 0) return { efetiva: tabela[0].aliquota, faixa: 1, foraDoModelo: false };
+
+    for (var i = 0; i < tabela.length; i++) {
+      if (receita <= tabela[i].ate) {
+        var efetiva = (receita * tabela[i].aliquota - tabela[i].deducao) / receita;
+        return { efetiva: efetiva, faixa: i + 1, foraDoModelo: false };
+      }
+    }
+
+    // Beyond what we verified — say so instead of inventing a number.
+    var ultima = tabela[tabela.length - 1];
+    return {
+      efetiva: (TABELAS.simples.limiteModelado * ultima.aliquota - ultima.deducao) /
+               TABELAS.simples.limiteModelado,
+      faixa: tabela.length,
+      foraDoModelo: true
+    };
+  }
+
+  /* ---------- CLT vs PJ ---------- */
+  /**
+   * Compare a CLT package against working as a PJ.
+   *
+   * The headline number is not "which is bigger" but how much a PJ has to
+   * invoice to come out even — because a CLT salary quietly carries 13th,
+   * the vacation third and FGTS, while a PJ has to fund all of that from
+   * the invoice and still pay tax and an accountant.
+   */
+  function cltVsPj(opcoes) {
+    var o = opcoes || {};
+    var salario = positivo(o.salario);
+    var dependentes = Math.max(0, parseInt(o.dependentes, 10) || 0);
+    var beneficios = positivo(o.beneficios);        // monthly, untaxed
+    var contador = positivo(o.contadorMensal);
+    var proLabore = positivo(o.proLabore) || TABELAS.inss.salarioMinimo;
+    var anexo = o.anexo === 'V' ? 'V' : 'III';
+
+    /* --- CLT side --- */
+    var mensal = salarioLiquido({ bruto: salario, dependentes: dependentes });
+    var d13 = decimoTerceiro({ salario: salario, meses: 12, dependentes: dependentes });
+    var fer = ferias({ salario: salario, dias: 30, dependentes: dependentes });
+
+    // FGTS accrues on the 12 salaries plus the 13th.
+    var fgtsAno = round2(salario * TABELAS.fgts.aliquota * 13);
+
+    // A vacation month replaces a normal month, so only the extra third is
+    // incremental. Expressing it as (férias líquidas - um mês líquido)
+    // captures that exactly, taxes included.
+    var ganhoFerias = round2(fer.liquido - mensal.liquido);
+
+    var anualCLT = round2(
+      mensal.liquido * 12 +
+      d13.liquido +
+      ganhoFerias +
+      beneficios * 12 +
+      fgtsAno
+    );
+    var mensalEquivalenteCLT = round2(anualCLT / 12);
+
+    /* --- PJ side: what invoice matches it --- */
+    // INSS on pró-labore is 11%, and the pró-labore is also what keeps the
+    // Fator R above 28% and the company inside Anexo III.
+    var inssProLabore = round2(proLabore * 0.11);
+    var custoFixoPJ = round2(contador + inssProLabore);
+
+    // Solve F - F*aliq - custos = alvo. The rate depends on F, so iterate:
+    // it converges in a handful of passes.
+    var faturamento = mensalEquivalenteCLT + custoFixoPJ;
+    var aliq = aliquotaSimples(faturamento * 12, anexo);
+    for (var i = 0; i < 12; i++) {
+      aliq = aliquotaSimples(faturamento * 12, anexo);
+      var novo = (mensalEquivalenteCLT + custoFixoPJ) / (1 - aliq.efetiva);
+      if (Math.abs(novo - faturamento) < 0.01) { faturamento = novo; break; }
+      faturamento = novo;
+    }
+    faturamento = round2(faturamento);
+
+    var impostoPJ = round2(faturamento * aliq.efetiva);
+    var liquidoPJ = round2(faturamento - impostoPJ - custoFixoPJ);
+
+    // Fator R: payroll over revenue. Below 28% the company falls to Anexo V.
+    var fatorR = faturamento > 0 ? (proLabore * 12) / (faturamento * 12) : 0;
+
+    return {
+      clt: {
+        bruto: round2(salario),
+        liquidoMensal: mensal.liquido,
+        decimoTerceiro: d13.liquido,
+        ganhoFerias: ganhoFerias,
+        beneficiosAno: round2(beneficios * 12),
+        fgtsAno: fgtsAno,
+        totalAno: anualCLT,
+        mensalEquivalente: mensalEquivalenteCLT
+      },
+      pj: {
+        faturamentoEquivalente: faturamento,
+        aliquotaEfetiva: aliq.efetiva,
+        faixa: aliq.faixa,
+        anexo: anexo,
+        imposto: impostoPJ,
+        contador: round2(contador),
+        proLabore: round2(proLabore),
+        inssProLabore: inssProLabore,
+        liquido: liquidoPJ,
+        fatorR: fatorR,
+        perdeAnexoIII: fatorR < TABELAS.simples.fatorRMinimo,
+        foraDoModelo: aliq.foraDoModelo
+      },
+      // How much more the invoice has to be, in percent, just to break even.
+      premioNecessario: salario > 0 ? (faturamento - salario) / salario : 0
+    };
+  }
+
   /* ---------- COMPOUND INTEREST ---------- */
   /**
    * Future value with an initial deposit plus monthly contributions
@@ -740,6 +889,8 @@
     ferias: ferias,
     seguroDesemprego: seguroDesemprego,
     horasExtras: horasExtras,
+    aliquotaSimples: aliquotaSimples,
+    cltVsPj: cltVsPj,
     jurosCompostos: jurosCompostos,
     anualParaMensal: anualParaMensal,
     financiamento: financiamento,

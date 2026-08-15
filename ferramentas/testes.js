@@ -329,6 +329,89 @@ verdadeiro('hora de 100% vale mais que a de 50%',
 eq('sem horas lançadas não há o que pagar',
   F.horasExtras({ salario: 3000 }).total, 0);
 
+/* ---------- SIMPLES NACIONAL ---------- */
+console.log('\nSIMPLES NACIONAL');
+
+eq('Anexo III faixa 1 → 6%', F.aliquotaSimples(100000, 'III').efetiva * 100, 6, 0.001);
+eq('Anexo III no fim da faixa 1 continua 6%', F.aliquotaSimples(180000, 'III').efetiva * 100, 6, 0.001);
+eq('Anexo III em 360k → 8,6%', F.aliquotaSimples(360000, 'III').efetiva * 100, 8.6, 0.001);
+eq('Anexo III em 720k → 11,05%', F.aliquotaSimples(720000, 'III').efetiva * 100, 11.05, 0.001);
+eq('Anexo V faixa 1 → 15,5%', F.aliquotaSimples(180000, 'V').efetiva * 100, 15.5, 0.001);
+eq('Anexo V em 360k → 16,75%', F.aliquotaSimples(360000, 'V').efetiva * 100, 16.75, 0.001);
+
+verdadeiro('Anexo V é sempre mais caro que o III',
+  F.aliquotaSimples(300000, 'V').efetiva > F.aliquotaSimples(300000, 'III').efetiva);
+
+// The whole table is designed so the effective rate never jumps at a
+// boundary. If a bracket is ever transcribed wrong, this breaks first.
+['III', 'V'].forEach(function (anexo) {
+  var tabela = anexo === 'V' ? F.TABELAS.simples.anexoV : F.TABELAS.simples.anexoIII;
+  tabela.slice(0, -1).forEach(function (faixa) {
+    var antes = F.aliquotaSimples(faixa.ate, anexo).efetiva;
+    var depois = F.aliquotaSimples(faixa.ate + 1, anexo).efetiva;
+    eq('Anexo ' + anexo + ': alíquota é contínua em ' + faixa.ate, depois * 100, antes * 100, 0.001);
+  });
+});
+
+// Progressivity: paying more revenue never lowers the effective rate.
+(function () {
+  var anterior = -1;
+  var cresce = true;
+  for (var r = 10000; r <= 720000; r += 10000) {
+    var e = F.aliquotaSimples(r, 'III').efetiva;
+    if (e < anterior - 1e-9) cresce = false;
+    anterior = e;
+  }
+  verdadeiro('alíquota efetiva nunca cai quando o faturamento sobe', cresce);
+})();
+
+verdadeiro('acima de 720k o modelo se declara incompleto',
+  F.aliquotaSimples(1000000, 'III').foraDoModelo === true);
+verdadeiro('dentro do modelo não levanta a bandeira',
+  F.aliquotaSimples(500000, 'III').foraDoModelo === false);
+
+/* ---------- CLT vs PJ ---------- */
+console.log('\nCLT vs PJ');
+
+(function () {
+  var r = F.cltVsPj({ salario: 5000, contadorMensal: 200 });
+
+  // The core promise: invoicing the suggested amount really does leave the
+  // PJ with the same money as the CLT package. If the solver drifts, this
+  // is what catches it.
+  eq('faturamento equivalente empata com o pacote CLT',
+    r.pj.liquido, r.clt.mensalEquivalente, 0.05);
+
+  verdadeiro('PJ precisa faturar mais que o salário CLT',
+    r.pj.faturamentoEquivalente > r.clt.bruto);
+  verdadeiro('o prêmio necessário é positivo', r.premioNecessario > 0);
+  eq('FGTS acumula sobre 13 salários', r.clt.fgtsAno, F.round2(5000 * 0.08 * 13));
+  verdadeiro('13º entra no pacote anual', r.clt.decimoTerceiro > 0);
+  verdadeiro('o terço de férias entra como ganho', r.clt.ganhoFerias > 0);
+})();
+
+// Benefits are untaxed money and must raise the bar for the PJ side.
+verdadeiro('vale-refeição eleva o faturamento necessário',
+  F.cltVsPj({ salario: 5000, beneficios: 800, contadorMensal: 200 }).pj.faturamentoEquivalente >
+  F.cltVsPj({ salario: 5000, contadorMensal: 0 }).pj.faturamentoEquivalente);
+
+verdadeiro('contador mais caro exige faturar mais',
+  F.cltVsPj({ salario: 5000, contadorMensal: 600 }).pj.faturamentoEquivalente >
+  F.cltVsPj({ salario: 5000, contadorMensal: 200 }).pj.faturamentoEquivalente);
+
+verdadeiro('cair no Anexo V exige faturar bem mais',
+  F.cltVsPj({ salario: 8000, anexo: 'V' }).pj.faturamentoEquivalente >
+  F.cltVsPj({ salario: 8000, anexo: 'III' }).pj.faturamentoEquivalente);
+
+(function () {
+  var r = F.cltVsPj({ salario: 12000, proLabore: 1621 });
+  verdadeiro('pró-labore baixo derruba o Fator R abaixo de 28%', r.pj.perdeAnexoIII === true);
+  eq('INSS sobre pró-labore é 11%', r.pj.inssProLabore, F.round2(1621 * 0.11));
+})();
+
+verdadeiro('pró-labore alto mantém o Anexo III',
+  F.cltVsPj({ salario: 5000, proLabore: 6000 }).pj.perdeAnexoIII === false);
+
 /* ---------- COMPOUND INTEREST ---------- */
 console.log('\nJUROS COMPOSTOS');
 

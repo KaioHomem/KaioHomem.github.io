@@ -14,6 +14,7 @@
     { id: 'ferias',          arquivo: 'ferias.html',          nome: 'Férias' },
     { id: 'seguro-desemprego', arquivo: 'seguro-desemprego.html', nome: 'Seguro-desemprego' },
     { id: 'horas-extras',    arquivo: 'horas-extras.html',    nome: 'Horas extras' },
+    { id: 'clt-vs-pj',       arquivo: 'clt-vs-pj.html',       nome: 'CLT vs PJ' },
     { id: 'juros-compostos', arquivo: 'juros-compostos.html', nome: 'Juros compostos' },
     { id: 'financiamento',   arquivo: 'financiamento.html',   nome: 'Financiamento' }
   ];
@@ -83,6 +84,78 @@
         }
       });
     }
+  }
+
+  /* ---------- RELATED TOOLS ---------- */
+  /**
+   * Cross-links between calculators.
+   *
+   * These are the pairs a real visitor actually needs next — someone
+   * calculating severance wants the unemployment benefit, not compound
+   * interest. Internal links also spread crawl and ranking signal across
+   * pages instead of leaving each one isolated.
+   */
+  var RELACIONADAS = {
+    'salario-liquido':   ['decimo-terceiro', 'ferias', 'horas-extras'],
+    'rescisao':          ['seguro-desemprego', 'ferias', 'decimo-terceiro'],
+    'decimo-terceiro':   ['salario-liquido', 'ferias', 'rescisao'],
+    'ferias':            ['decimo-terceiro', 'salario-liquido', 'rescisao'],
+    'seguro-desemprego': ['rescisao', 'salario-liquido', 'clt-vs-pj'],
+    'horas-extras':      ['salario-liquido', 'decimo-terceiro', 'ferias'],
+    'clt-vs-pj':         ['salario-liquido', 'rescisao', 'seguro-desemprego'],
+    'juros-compostos':   ['financiamento', 'salario-liquido'],
+    'financiamento':     ['juros-compostos', 'salario-liquido']
+  };
+
+  var DESCRICOES = {
+    'salario-liquido':   'Quanto realmente cai na conta.',
+    'rescisao':          'Verba por verba, com a multa do FGTS.',
+    'decimo-terceiro':   'As duas parcelas e por que a segunda é menor.',
+    'ferias':            'Com o terço e a conta de vender dias.',
+    'seguro-desemprego': 'Valor da parcela e quantas você recebe.',
+    'horas-extras':      'Com o DSR que costuma faltar no holerite.',
+    'clt-vs-pj':         'Quanto faturar como PJ para empatar.',
+    'juros-compostos':   'O efeito dos aportes ao longo do tempo.',
+    'financiamento':     'Price e SAC lado a lado.'
+  };
+
+  function acharFerramenta(id) {
+    for (var i = 0; i < FERRAMENTAS.length; i++) {
+      if (FERRAMENTAS[i].id === id) return FERRAMENTAS[i];
+    }
+    return null;
+  }
+
+  function montarRelacionadas() {
+    if (!atual) return;
+
+    var ids = RELACIONADAS[atual];
+    if (!ids || !ids.length) return;
+
+    var principal = document.querySelector('main');
+    if (!principal) return;
+
+    var cartoes = ids.map(function (id) {
+      var f = acharFerramenta(id);
+      if (!f) return '';
+      return '<a class="item-ferramenta" href="' + paraFerramentas + f.arquivo + '">' +
+               '<h3>' + f.nome + '</h3>' +
+               '<p>' + (DESCRICOES[id] || '') + '</p>' +
+               '<span class="seta">Abrir →</span>' +
+             '</a>';
+    }).join('');
+
+    if (!cartoes) return;
+
+    var secao = document.createElement('section');
+    secao.className = 'relacionadas';
+    secao.innerHTML = '<h2>Continue a conta</h2>' +
+                      '<div class="lista-ferramentas">' + cartoes + '</div>';
+
+    // Sits after the article, before the closing ad slot.
+    var ultimoAnuncio = principal.querySelector('.espaco-anuncio[data-slot="rodape"]');
+    if (ultimoAnuncio) principal.insertBefore(secao, ultimoAnuncio);
+    else principal.appendChild(secao);
   }
 
   /* ---------- INPUT HELPERS ---------- */
@@ -194,6 +267,7 @@
 
   function iniciar() {
     montarTopo();
+    montarRelacionadas();
     montarRodape();
   }
 
