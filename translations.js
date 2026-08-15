@@ -64,6 +64,7 @@
       proj1_title:      'Portfólio Pessoal',
       proj1_desc:       'Site pessoal desenvolvido do zero, sem frameworks. Inclui formulário de contato com EmailJS, animações com IntersectionObserver e design responsivo.',
       proj2_desc:       'Aplicação de chat multi-protocolo desenvolvida em Python. Organizada em módulos (chat, FTP, IoT) com ponto de entrada central. Projeto do IFSC — Ciências da Computação.',
+      proj3_desc:       'Calculadoras de salário líquido, rescisão, juros compostos e financiamento, com as tabelas fiscais de 2026. Motor de cálculo puro coberto por testes automatizados que rodam no CI a cada alteração.',
       proj_more:        'Mais projetos em desenvolvimento.',
       proj_github_btn:  'Ver GitHub',
 
@@ -144,6 +145,7 @@
       proj1_title:      'Personal Portfolio',
       proj1_desc:       'Personal website built from scratch, no frameworks. Includes a contact form with EmailJS, animations with IntersectionObserver and responsive design.',
       proj2_desc:       'Multi-protocol chat application built in Python. Organized in modules (chat, FTP, IoT) with a central entry point. IFSC — Computer Science project.',
+      proj3_desc:       'Calculators for net salary, severance pay, compound interest and loan amortization, using the 2026 Brazilian tax tables. A pure calculation core covered by automated tests that run in CI on every change.',
       proj_more:        'More projects in development.',
       proj_github_btn:  'View GitHub',
 
@@ -224,6 +226,7 @@
       proj1_title:      'Persönliches Portfolio',
       proj1_desc:       'Persönliche Website von Grund auf ohne Frameworks gebaut. Mit Kontaktformular (EmailJS), Scroll-Animationen (IntersectionObserver) und responsivem Design.',
       proj2_desc:       'Multi-Protokoll-Chat-Anwendung in Python. Strukturiert in Module (Chat, FTP, IoT) mit zentralem Einstiegspunkt. IFSC — Informatik-Projekt.',
+      proj3_desc:       'Rechner für Nettogehalt, Abfindung, Zinseszins und Finanzierung mit den brasilianischen Steuertabellen 2026. Ein reiner Rechenkern, abgesichert durch automatisierte Tests, die bei jeder Änderung in der CI laufen.',
       proj_more:        'Weitere Projekte in Entwicklung.',
       proj_github_btn:  'GitHub ansehen',
 

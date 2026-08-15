@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>CLT ou PJ? Calculadora de quanto você precisa faturar para empatar</title>
+<meta name="description" content="Descubra quanto precisa faturar como PJ para empatar com seu salário CLT, considerando 13º, férias, FGTS, Simples Nacional e contador. Comparação honesta.">
+<link rel="canonical" href="https://kaiohomem.github.io/ferramentas/clt-vs-pj.html">
+
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://kaiohomem.github.io/ferramentas/clt-vs-pj.html">
+<meta property="og:title" content="CLT ou PJ? Quanto você precisa faturar">
+<meta property="og:description" content="A conta completa: 13º, férias, FGTS, impostos e contador — para saber se a proposta PJ compensa mesmo.">
+<meta property="og:locale" content="pt_BR">
+<meta name="twitter:card" content="summary">
+
+<meta http-equiv="Content-Security-Policy" content="
+  default-src 'self';
+  script-src 'self' https://pagead2.googlesyndication.com https://*.googlesyndication.com https://*.doubleclick.net https://*.google.com https://*.gstatic.com;
+  style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+  font-src https://fonts.gstatic.com;
+  img-src 'self' data: https:;
+  frame-src https://*.googlesyndication.com https://*.doubleclick.net;
+  connect-src 'self' https://*.google.com https://*.doubleclick.net;
+  object-src 'none'; base-uri 'self'; form-action 'self';
+">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚖️</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tools.css">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Calculadora CLT vs PJ",
+  "url": "https://kaiohomem.github.io/ferramentas/clt-vs-pj.html",
+  "applicationCategory": "FinanceApplication",
+  "operatingSystem": "Any",
+  "inLanguage": "pt-BR",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "BRL" }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Quanto preciso faturar como PJ para ganhar o mesmo que na CLT?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Na média, entre 30% e 40% a mais que o salário CLT. A diferença cobre o que o salário carrega de forma invisível: 13º salário, o terço de férias, FGTS, além dos impostos do Simples Nacional e do custo do contador que o PJ passa a pagar."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "O que é o Fator R do Simples Nacional?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "É a proporção entre a folha de pagamento, incluindo o pró-labore, e o faturamento dos últimos 12 meses. Se for igual ou maior que 28%, a empresa de serviços é tributada pelo Anexo III, começando em 6%. Abaixo disso cai no Anexo V, que começa em 15,5%."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Como PJ eu perco quais direitos?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Como PJ não há 13º salário, férias remuneradas com adicional de um terço, FGTS, multa de 40% na demissão, seguro-desemprego, aviso prévio nem estabilidade em licenças. Também não há contribuição automática ao INSS: ela passa a depender do pró-labore."
+      }
+    }
+  ]
+}
+</script>
+</head>
+<body data-ferramenta="clt-vs-pj">
+
+<header class="topo" id="topo"></header>
+
+<main class="wrap">
+
+  <div class="cabecalho">
+    <div class="trilha"><a href="index.html">ferramentas</a> / CLT vs PJ</div>
+    <h1>CLT ou PJ: quanto você precisa faturar</h1>
+    <p class="resumo">
+      Receber uma proposta PJ com valor maior não significa ganhar mais. Aqui está a conta
+      completa — com 13º, férias, FGTS, impostos e contador.
+    </p>
+  </div>
+
+  <div class="espaco-anuncio" data-slot="topo"></div>
+
+  <section class="cartao">
+    <form id="formulario" autocomplete="off">
+      <div class="grade">
+
+        <div class="campo">
+          <label for="salario">Salário CLT bruto (R$)</label>
+          <input class="entrada" type="text" id="salario" inputmode="decimal" placeholder="5.000,00" value="5.000,00">
+        </div>
+
+        <div class="campo">
+          <label for="beneficios">Benefícios mensais (R$)</label>
+          <input class="entrada" type="text" id="beneficios" inputmode="decimal" placeholder="0,00" value="800,00">
+          <span class="dica">Vale-refeição, alimentação, plano de saúde.</span>
+        </div>
+
+        <div class="campo">
+          <label for="dependentes">Dependentes</label>
+          <input class="entrada" type="number" id="dependentes" min="0" max="20" step="1" value="0">
+        </div>
+
+        <div class="campo">
+          <label for="contador">Contador por mês (R$)</label>
+          <input class="entrada" type="text" id="contador" inputmode="decimal" placeholder="200,00" value="200,00">
+        </div>
+
+        <div class="campo">
+          <label for="proLabore">Pró-labore mensal (R$)</label>
+          <input class="entrada" type="text" id="proLabore" inputmode="decimal" placeholder="1.621,00" value="1.621,00">
+          <span class="dica">É ele que segura o Fator R acima de 28%.</span>
+        </div>
+
+        <div class="campo">
+          <label for="anexo">Anexo do Simples</label>
+          <select class="entrada" id="anexo">
+            <option value="III">Anexo III — Fator R ≥ 28% (a partir de 6%)</option>
+            <option value="V">Anexo V — Fator R &lt; 28% (a partir de 15,5%)</option>
+          </select>
+        </div>
+
+      </div>
+
+      <div class="botoes">
+        <button type="button" class="btn" id="calcular">Comparar</button>
+        <button type="button" class="btn btn-vazado" id="limpar">Limpar</button>
+      </div>
+    </form>
+
+    <div class="resultado" id="resultado" aria-live="polite"></div>
+  </section>
+
+  <div class="espaco-anuncio" data-slot="resultado"></div>
+  <div class="bloco-afiliados"></div>
+
+  <article class="conteudo">
+
+    <h2>O erro que quase todo mundo comete</h2>
+    <p>
+      A proposta chega assim: "seu salário é R$ 5.000 CLT, como PJ pago R$ 6.500". Parece
+      30% de aumento. Quase nunca é.
+    </p>
+    <p>
+      O salário CLT carrega coisas que não aparecem no holerite mensal, mas são dinheiro:
+      o <strong>13º</strong>, o <strong>terço de férias</strong> e o <strong>FGTS</strong>
+      depositado todo mês. Somados, valem cerca de <strong>um quinto a mais</strong> do que
+      o salário nominal. Como PJ, tudo isso some — e ainda entram impostos e contador.
+    </p>
+
+    <h3>O que o salário esconde</h3>
+    <ul>
+      <li><strong>13º salário</strong> — um salário extra por ano.</li>
+      <li><strong>Terço de férias</strong> — um terço a mais quando sai de férias.</li>
+      <li><strong>FGTS</strong> — 8% sobre 13 salários por ano, depositado por fora.</li>
+      <li><strong>Multa de 40%</strong> — se for demitido sem justa causa.</li>
+      <li><strong>Seguro-desemprego</strong> — que o PJ não tem.</li>
+    </ul>
+
+    <h3>O que o PJ paga a mais</h3>
+    <ul>
+      <li><strong>Simples Nacional</strong> — a partir de 6% do faturamento no Anexo III.</li>
+      <li><strong>Contador</strong> — de R$ 150 a R$ 400 por mês, obrigatório na prática.</li>
+      <li><strong>INSS sobre o pró-labore</strong> — 11%, e sem ele não há aposentadoria.</li>
+    </ul>
+
+    <h3>Fator R: o detalhe que dobra o imposto</h3>
+    <p>
+      Empresa de serviços cai no <strong>Anexo III</strong> (a partir de 6%) apenas se a
+      folha de pagamento, somando o pró-labore, for de pelo menos <strong>28% do
+      faturamento</strong>. Abaixo disso vai para o <strong>Anexo V</strong>, que começa em
+      15,5% — quase o triplo.
+    </p>
+    <p>
+      É por isso que reduzir o pró-labore ao mínimo para "economizar INSS" costuma sair
+      caro: economiza 11% sobre uma base pequena e perde a faixa de imposto sobre o
+      faturamento inteiro.
+    </p>
+
+    <h3>O que não entra em conta nenhuma</h3>
+    <p>
+      Estabilidade em licença médica e maternidade, previsibilidade de renda, férias que
+      alguém garante que você vai tirar, e o custo de administrar uma empresa. Nada disso
+      vira número aqui — mas pesa na decisão, e às vezes pesa mais que o dinheiro.
+    </p>
+
+    <div class="aviso">
+      <p>
+        <strong>Estimativa, e simplificada.</strong> A simulação usa as três primeiras
+        faixas do Simples Nacional, que cobrem faturamento de até R$ 720 mil por ano.
+        Não considera ISS municipal fora do Simples, distribuição de lucros, despesas
+        dedutíveis nem a possibilidade de a "pejotização" ser questionada judicialmente
+        quando há subordinação e horário fixo. Consulte um contador antes de decidir.
+      </p>
+    </div>
+
+    <h2>Perguntas frequentes</h2>
+
+    <details>
+      <summary>PJ é ilegal?</summary>
+      <p>
+        A contratação PJ é legítima quando há autonomia real. Ela se torna irregular
+        quando existem os elementos do vínculo empregatício — pessoalidade, habitualidade,
+        onerosidade e subordinação. Trabalhar com horário fixo, chefia direta e
+        exclusividade como PJ pode caracterizar fraude, e a Justiça do Trabalho pode
+        reconhecer o vínculo.
+      </p>
+    </details>
+
+    <details>
+      <summary>Como PJ eu me aposento?</summary>
+      <p>
+        Só se contribuir. A contribuição vem do pró-labore, sobre o qual incide 11% de
+        INSS. Sem pró-labore não há contribuição, não há tempo contábil e não há
+        auxílio-doença nem salário-maternidade.
+      </p>
+    </details>
+
+    <details>
+      <summary>Qual o percentual mínimo que devo pedir?</summary>
+      <p>
+        O que a calculadora mostrar como faturamento equivalente é o <strong>empate</strong>,
+        não o ganho. Para compensar a perda de estabilidade, seguro-desemprego e FGTS,
+        pedir algo acima disso é razoável — quanto, depende do quanto você valoriza
+        segurança.
+      </p>
+    </details>
+
+  </article>
+
+  <div class="espaco-anuncio" data-slot="rodape"></div>
+
+</main>
+
+<footer class="rodape" id="rodape"></footer>
+
+<script src="nucleo.js"></script>
+<script src="app.js"></script>
+<script src="consentimento.js"></script>
+<script src="monetizacao.js"></script>
+<script src="pg-clt-pj.js"></script>
+</body>
+</html>

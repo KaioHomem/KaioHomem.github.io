@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Simulador de Financiamento — Tabela Price e SAC comparadas</title>
+<meta name="description" content="Simule o financiamento de imóvel ou carro e compare Tabela Price e SAC lado a lado: valor das parcelas, total de juros e tabela de amortização completa.">
+<link rel="canonical" href="https://kaiohomem.github.io/ferramentas/financiamento.html">
+
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://kaiohomem.github.io/ferramentas/financiamento.html">
+<meta property="og:title" content="Simulador de Financiamento — Price e SAC">
+<meta property="og:description" content="Compare os dois sistemas de amortização e veja quanto de juros cada um custa.">
+<meta property="og:locale" content="pt_BR">
+<meta name="twitter:card" content="summary">
+
+<meta http-equiv="Content-Security-Policy" content="
+  default-src 'self';
+  script-src 'self' https://pagead2.googlesyndication.com https://*.googlesyndication.com https://*.doubleclick.net https://*.google.com https://*.gstatic.com;
+  style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+  font-src https://fonts.gstatic.com;
+  img-src 'self' data: https:;
+  frame-src https://*.googlesyndication.com https://*.doubleclick.net;
+  connect-src 'self' https://*.google.com https://*.doubleclick.net;
+  object-src 'none'; base-uri 'self'; form-action 'self';
+">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏠</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tools.css">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Simulador de Financiamento — Price e SAC",
+  "url": "https://kaiohomem.github.io/ferramentas/financiamento.html",
+  "applicationCategory": "FinanceApplication",
+  "operatingSystem": "Any",
+  "inLanguage": "pt-BR",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "BRL" }
+}
+</script>
+</head>
+<body data-ferramenta="financiamento">
+
+<header class="topo" id="topo"></header>
+
+<main class="wrap">
+
+  <div class="cabecalho">
+    <div class="trilha"><a href="index.html">ferramentas</a> / financiamento</div>
+    <h1>Simulador de financiamento</h1>
+    <p class="resumo">
+      Compare Tabela Price e SAC lado a lado: quanto fica cada parcela, quanto você paga
+      de juros no total e como o saldo devedor cai mês a mês.
+    </p>
+  </div>
+
+  <div class="espaco-anuncio" data-slot="topo"></div>
+
+  <section class="cartao">
+    <form id="formulario" autocomplete="off">
+      <div class="grade">
+
+        <div class="campo">
+          <label for="valor">Valor do bem (R$)</label>
+          <input class="entrada" type="text" id="valor" inputmode="decimal" placeholder="300.000,00" value="300.000,00">
+        </div>
+
+        <div class="campo">
+          <label for="entrada">Entrada (R$)</label>
+          <input class="entrada" type="text" id="entrada" inputmode="decimal" placeholder="60.000,00" value="60.000,00">
+        </div>
+
+        <div class="campo">
+          <label for="taxa">Taxa de juros (%)</label>
+          <input class="entrada" type="text" id="taxa" inputmode="decimal" placeholder="11" value="11">
+        </div>
+
+        <div class="campo">
+          <label for="periodoTaxa">Período da taxa</label>
+          <select class="entrada" id="periodoTaxa">
+            <option value="ano">ao ano</option>
+            <option value="mes">ao mês</option>
+          </select>
+        </div>
+
+        <div class="campo col-2">
+          <label for="prazo">Prazo (meses)</label>
+          <input class="entrada" type="number" id="prazo" min="1" max="600" step="1" value="360">
+          <span class="dica">360 meses = 30 anos, prazo comum em financiamento imobiliário.</span>
+        </div>
+
+      </div>
+
+      <div class="botoes">
+        <button type="button" class="btn" id="calcular">Simular</button>
+        <button type="button" class="btn btn-vazado" id="limpar">Limpar</button>
+      </div>
+    </form>
+
+    <div class="resultado" id="resultado" aria-live="polite"></div>
+  </section>
+
+  <div class="espaco-anuncio" data-slot="resultado"></div>
+  <div class="bloco-afiliados"></div>
+
+  <article class="conteudo">
+
+    <h2>Price ou SAC: qual escolher</h2>
+    <p>
+      Os dois sistemas quitam a mesma dívida com a mesma taxa. A diferença está em
+      <strong>quando</strong> você paga.
+    </p>
+
+    <h3>Tabela Price — parcela fixa</h3>
+    <p>
+      A prestação é a mesma do começo ao fim. No início, quase tudo o que você paga é
+      juros e muito pouco abate o saldo devedor. Isso facilita o planejamento do
+      orçamento, mas custa mais caro no total e faz a dívida cair devagar nos primeiros
+      anos.
+    </p>
+
+    <h3>SAC — parcela decrescente</h3>
+    <p>
+      A amortização é constante e os juros caem junto com o saldo devedor, então a
+      parcela diminui todo mês. A primeira prestação é bem mais alta que na Price — o
+      que exige mais renda para aprovação — mas o total de juros é sempre menor.
+    </p>
+
+    <p>
+      Na prática: se o aperto da primeira parcela couber no seu orçamento, o SAC costuma
+      ser a escolha mais barata. É também o sistema mais usado nos financiamentos
+      imobiliários da Caixa.
+    </p>
+
+    <div class="aviso">
+      <p>
+        <strong>Faltam custos que o banco cobra.</strong> A simulação considera apenas
+        principal e juros. Um financiamento real inclui ainda seguros obrigatórios
+        (MIP e DFI), taxa de administração mensal e, no caso de imóveis, custos de
+        avaliação e registro. O CET — Custo Efetivo Total — informado pelo banco é
+        sempre maior que a taxa nominal usada aqui.
+      </p>
+    </div>
+
+    <h2>Perguntas frequentes</h2>
+
+    <details>
+      <summary>Vale a pena amortizar antecipadamente?</summary>
+      <p>
+        Quase sempre, e quanto antes melhor — nos primeiros anos a maior parte da
+        parcela é juros. Ao amortizar, você pode reduzir o prazo (economiza mais juros)
+        ou reduzir o valor da parcela (alivia o orçamento). A lei garante desconto
+        proporcional dos juros na antecipação.
+      </p>
+    </details>
+
+    <details>
+      <summary>Aumentar a entrada compensa?</summary>
+      <p>
+        Sim. Cada real de entrada é um real que não paga juros por 30 anos. Aumentar a
+        entrada reduz o principal, a parcela e o total de juros ao mesmo tempo — e
+        costuma melhorar a taxa oferecida pelo banco.
+      </p>
+    </details>
+
+    <details>
+      <summary>Por que o total pago é tão maior que o valor financiado?</summary>
+      <p>
+        Por causa do prazo. Em 30 anos a taxa incide sobre o saldo devedor mês após mês,
+        e o total de juros frequentemente supera o próprio valor financiado. Reduzir o
+        prazo é o que mais derruba o custo total.
+      </p>
+    </details>
+
+  </article>
+
+  <div class="espaco-anuncio" data-slot="rodape"></div>
+
+</main>
+
+<footer class="rodape" id="rodape"></footer>
+
+<script src="nucleo.js"></script>
+<script src="app.js"></script>
+<script src="consentimento.js"></script>
+<script src="monetizacao.js"></script>
+<script src="pg-financiamento.js"></script>
+</body>
+</html>

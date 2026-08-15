@@ -1,0 +1,903 @@
+/* ===================================================
+   FERRAMENTAS BR — CALCULATION CORE
+   Pure functions, no DOM. Runs in browser and Node
+   (Node is used by the CI test suite).
+
+   All fiscal tables live in TABELAS below — this is
+   the single source of truth. To update for a new
+   year, edit only that object.
+   =================================================== */
+
+(function (root) {
+  'use strict';
+
+  /* ---------- FISCAL TABLES ---------- */
+  var TABELAS = {
+    ano: 2026,
+    atualizadoEm: '2026-08-12',
+
+    // INSS — progressive, applied bracket by bracket.
+    // Source: Portaria Interministerial MPS/MF (vigência jan/2026).
+    inss: {
+      teto: 8475.55,
+      salarioMinimo: 1621.00,
+      faixas: [
+        { ate: 1621.00, aliquota: 0.075 },
+        { ate: 2902.84, aliquota: 0.09 },
+        { ate: 4354.27, aliquota: 0.12 },
+        { ate: 8475.55, aliquota: 0.14 }
+      ]
+    },
+
+    // IRRF — monthly progressive table (unchanged since May/2025).
+    // The 2026 exemption up to R$ 5.000 is delivered by `redutor`,
+    // not by changing the brackets (Lei 15.270/2025).
+    irrf: {
+      faixas: [
+        { ate: 2428.80, aliquota: 0,     deduzir: 0 },
+        { ate: 2826.65, aliquota: 0.075, deduzir: 182.16 },
+        { ate: 3751.05, aliquota: 0.15,  deduzir: 394.16 },
+        { ate: 4664.68, aliquota: 0.225, deduzir: 675.49 },
+        { ate: Infinity, aliquota: 0.275, deduzir: 908.73 }
+      ],
+      descontoSimplificado: 607.20,
+      deducaoDependente: 189.59,
+      // Redutor = constante - (indice * rendimento bruto), floored at 0,
+      // and 0 for gross income above `limite`.
+      redutor: { limite: 7350.00, constante: 978.62, indice: 0.133145 }
+    },
+
+    fgts: { aliquota: 0.08 },
+
+    // Unemployment benefit. Brackets are restated every January by the
+    // Ministry of Labour, indexed to the INPC.
+    // Sanity anchors, both exact: 2222.17 * 0.8 = 1777.74 (where bracket 2
+    // starts) and 1777.74 + (3703.99 - 2222.17) * 0.5 = 2518.65 (the cap).
+    seguroDesemprego: {
+      limiteFaixa1: 2222.17,
+      limiteFaixa2: 3703.99,
+      fator1: 0.8,
+      baseFaixa2: 1777.74,
+      fator2: 0.5,
+      teto: 2518.65
+    },
+
+    // Simples Nacional, service companies.
+    //
+    // Only the first three brackets are modelled — they cover revenue up to
+    // R$ 720k/year (R$ 60k/month), far beyond anyone weighing a CLT offer.
+    // Their continuity was verified against the official effective-rate
+    // formula [(RBT12 * aliq) - deducao] / RBT12: the rate matches exactly
+    // on both sides of every boundary. The upper brackets are deliberately
+    // left out rather than guessed.
+    simples: {
+      limiteModelado: 720000,
+      fatorRMinimo: 0.28,
+      // Anexo III — payroll is at least 28% of revenue (Fator R).
+      anexoIII: [
+        { ate: 180000,  aliquota: 0.06,  deducao: 0 },
+        { ate: 360000,  aliquota: 0.112, deducao: 9360 },
+        { ate: 720000,  aliquota: 0.135, deducao: 17640 }
+      ],
+      // Anexo V — payroll below 28% of revenue. Markedly heavier.
+      anexoV: [
+        { ate: 180000,  aliquota: 0.155, deducao: 0 },
+        { ate: 360000,  aliquota: 0.18,  deducao: 4500 },
+        { ate: 720000,  aliquota: 0.195, deducao: 9900 }
+      ]
+    },
+
+    // Overtime and night-shift premiums come from the CLT and the
+    // Constitution, not from an annual table — they do not drift yearly.
+    jornada: {
+      adicionalExtraComum: 0.5,   // business days, legal minimum
+      adicionalExtraDomingo: 1.0, // Sundays and public holidays
+      adicionalNoturno: 0.2,      // urban worker, 22h–05h
+      minutosHoraNoturna: 52.5    // the "reduced" night hour
+    }
+  };
+
+  /* ---------- HELPERS ---------- */
+  /**
+   * Round to cents, half-up.
+   *
+   * Naive `Math.round(n * 100) / 100` is wrong for payroll: 1621 * 0.075
+   * is 121.575 in decimal but lands just below it in binary, so it would
+   * round down to 121.57 while every Brazilian payroll rounds to 121.58.
+   * Re-parsing through decimal exponent notation removes that binary drift
+   * before the rounding decision is made.
+   */
+  function round2(n) {
+    var v = Number(n);
+    if (!isFinite(v)) return 0;
+    var sinal = v < 0 ? -1 : 1;
+    var escalado = Math.abs(v) * 100;
+    // Nudge by a relative epsilon: a product that should sit exactly on a
+    // half-cent in decimal can land a few ULPs below it in binary, and
+    // would otherwise round down. The nudge is ~1e-9 of the value itself,
+    // far too small to move any figure that is not already on the boundary.
+    return sinal * Math.round(escalado + escalado * 1e-9) / 100;
+  }
+
+  function positivo(n) {
+    var v = Number(n);
+    return isFinite(v) && v > 0 ? v : 0;
+  }
+
+  /* ---------- INSS ---------- */
+  /**
+   * Progressive INSS contribution for a CLT employee.
+   * Each bracket's rate applies only to the slice of salary inside it.
+   */
+  function calcularINSS(salario) {
+    var bruto = positivo(salario);
+    var faixas = TABELAS.inss.faixas;
+    var total = 0;
+    var piso = 0;
+    var detalhe = [];
+
+    for (var i = 0; i < faixas.length; i++) {
+      var faixa = faixas[i];
+      if (bruto <= piso) break;
+
+      var baseFaixa = Math.min(bruto, faixa.ate) - piso;
+      var valorFaixa = baseFaixa * faixa.aliquota;
+      total += valorFaixa;
+
+      detalhe.push({
+        de: piso,
+        ate: faixa.ate,
+        aliquota: faixa.aliquota,
+        base: round2(baseFaixa),
+        valor: round2(valorFaixa)
+      });
+
+      piso = faixa.ate;
+    }
+
+    var valor = round2(total);
+    return {
+      valor: valor,
+      teto: bruto >= TABELAS.inss.teto,
+      aliquotaEfetiva: bruto > 0 ? valor / bruto : 0,
+      detalhe: detalhe
+    };
+  }
+
+  /* ---------- IRRF ---------- */
+  function impostoPelaTabela(base) {
+    var faixas = TABELAS.irrf.faixas;
+    for (var i = 0; i < faixas.length; i++) {
+      if (base <= faixas[i].ate) {
+        return {
+          imposto: Math.max(0, base * faixas[i].aliquota - faixas[i].deduzir),
+          aliquota: faixas[i].aliquota
+        };
+      }
+    }
+    return { imposto: 0, aliquota: 0 };
+  }
+
+  /**
+   * Reduction introduced by Lei 15.270/2025, applied *after* the
+   * progressive table. It is what makes income up to R$ 5.000 exempt
+   * and phases out linearly to zero at R$ 7.350.
+   */
+  function calcularRedutor(rendimentoBruto) {
+    var r = TABELAS.irrf.redutor;
+    if (rendimentoBruto > r.limite) return 0;
+    return Math.max(0, round2(r.constante - r.indice * rendimentoBruto));
+  }
+
+  /**
+   * IRRF withheld at source.
+   * Compares the legal-deduction base against the simplified discount
+   * and keeps whichever produces the lower tax, as allowed by
+   * IN RFB 2.141/2023.
+   */
+  function calcularIRRF(opcoes) {
+    var o = opcoes || {};
+    var bruto = positivo(o.bruto);
+    var inss = positivo(o.inss);
+    var dependentes = Math.max(0, parseInt(o.dependentes, 10) || 0);
+    var pensao = positivo(o.pensao);
+
+    var baseLegal = Math.max(
+      0,
+      bruto - inss - dependentes * TABELAS.irrf.deducaoDependente - pensao
+    );
+    var baseSimplificada = Math.max(0, bruto - TABELAS.irrf.descontoSimplificado);
+
+    var porLegal = impostoPelaTabela(baseLegal);
+    var porSimplificada = impostoPelaTabela(baseSimplificada);
+
+    var usouSimplificado = porSimplificada.imposto < porLegal.imposto;
+    var escolhida = usouSimplificado ? porSimplificada : porLegal;
+    var base = usouSimplificado ? baseSimplificada : baseLegal;
+
+    var redutor = calcularRedutor(bruto);
+    var impostoBruto = round2(escolhida.imposto);
+    var valor = round2(Math.max(0, impostoBruto - redutor));
+
+    return {
+      valor: valor,
+      base: round2(base),
+      aliquota: escolhida.aliquota,
+      impostoAntesDoRedutor: impostoBruto,
+      redutor: Math.min(redutor, impostoBruto),
+      usouDescontoSimplificado: usouSimplificado,
+      isento: valor === 0
+    };
+  }
+
+  /* ---------- NET SALARY ---------- */
+  /**
+   * Net CLT salary. `outrosDescontos` covers things this calculator
+   * cannot know (health plan, transport voucher, union dues).
+   */
+  function salarioLiquido(opcoes) {
+    var o = opcoes || {};
+    var bruto = positivo(o.bruto);
+    var outros = positivo(o.outrosDescontos);
+
+    var inss = calcularINSS(bruto);
+    var irrf = calcularIRRF({
+      bruto: bruto,
+      inss: inss.valor,
+      dependentes: o.dependentes,
+      pensao: o.pensao
+    });
+
+    var pensao = positivo(o.pensao);
+    var totalDescontos = round2(inss.valor + irrf.valor + pensao + outros);
+    var liquido = round2(bruto - totalDescontos);
+
+    return {
+      bruto: round2(bruto),
+      inss: inss,
+      irrf: irrf,
+      pensao: round2(pensao),
+      outrosDescontos: round2(outros),
+      totalDescontos: totalDescontos,
+      liquido: liquido,
+      fgtsMensal: round2(bruto * TABELAS.fgts.aliquota),
+      percentualDescontado: bruto > 0 ? totalDescontos / bruto : 0
+    };
+  }
+
+  /* ---------- TERMINATION ---------- */
+  /**
+   * Estimate of CLT termination pay.
+   *
+   * Deliberately scoped: covers the standard cases (dismissal without
+   * cause, resignation, mutual agreement, end of fixed-term contract).
+   * It does not model unstable employment, court-ordered adjustments,
+   * or collective-agreement extras.
+   *
+   * `mesesTrabalhados` drives proportional 13th/vacation. A month counts
+   * when at least 15 days were worked — the caller passes the already
+   * counted number.
+   */
+  function rescisao(opcoes) {
+    var o = opcoes || {};
+    var salario = positivo(o.salario);
+    var tipo = o.tipo || 'sem-justa-causa';
+    var diasTrabalhadosNoMes = Math.min(30, Math.max(0, parseInt(o.diasTrabalhadosNoMes, 10) || 0));
+    var anosCompletos = Math.max(0, parseInt(o.anosCompletos, 10) || 0);
+    var mesesPara13 = Math.min(12, Math.max(0, parseInt(o.mesesPara13, 10) || 0));
+    var mesesParaFerias = Math.min(12, Math.max(0, parseInt(o.mesesParaFerias, 10) || 0));
+    var feriasVencidas = !!o.feriasVencidas;
+    var saldoFGTS = positivo(o.saldoFGTS);
+    var dependentes = Math.max(0, parseInt(o.dependentes, 10) || 0);
+
+    var regras = {
+      'sem-justa-causa': { avisoRecebe: true,  avisoDesconta: false, multaFGTS: 0.40, sacaFGTS: 1.00, temSeguroDesemprego: true },
+      'pedido-demissao': { avisoRecebe: false, avisoDesconta: true,  multaFGTS: 0,    sacaFGTS: 0,    temSeguroDesemprego: false },
+      'acordo':          { avisoRecebe: true,  avisoDesconta: false, multaFGTS: 0.20, sacaFGTS: 0.80, temSeguroDesemprego: false, avisoMetade: true },
+      'fim-contrato':    { avisoRecebe: false, avisoDesconta: false, multaFGTS: 0,    sacaFGTS: 1.00, temSeguroDesemprego: false },
+      'justa-causa':     { avisoRecebe: false, avisoDesconta: false, multaFGTS: 0,    sacaFGTS: 0,    temSeguroDesemprego: false, semFerias: true, sem13: true }
+    };
+    var regra = regras[tipo] || regras['sem-justa-causa'];
+
+    // Notice period: 30 days + 3 per completed year, capped at 90.
+    var diasAviso = Math.min(90, 30 + anosCompletos * 3);
+    var valorAvisoIntegral = round2((salario / 30) * diasAviso);
+
+    var avisoIndenizado = 0;
+    var descontoAviso = 0;
+    if (regra.avisoRecebe) {
+      avisoIndenizado = regra.avisoMetade ? round2(valorAvisoIntegral / 2) : valorAvisoIntegral;
+    } else if (regra.avisoDesconta && o.avisoCumprido === false) {
+      // Resignation without working the notice: employer may deduct 30 days.
+      descontoAviso = round2(salario);
+    }
+
+    // Salary balance for days worked in the final month — taxed.
+    var saldoSalario = round2((salario / 30) * diasTrabalhadosNoMes);
+
+    // Proportional 13th — taxed separately from the monthly salary.
+    var decimoTerceiro = regra.sem13 ? 0 : round2((salario / 12) * mesesPara13);
+
+    // Vacation: indemnified vacation and its 1/3 are exempt from INSS/IRRF.
+    var feriasProporcionais = regra.semFerias ? 0 : round2((salario / 12) * mesesParaFerias);
+    var tercoProporcionais = round2(feriasProporcionais / 3);
+    var valorFeriasVencidas = feriasVencidas && !regra.semFerias ? round2(salario) : 0;
+    var tercoVencidas = round2(valorFeriasVencidas / 3);
+
+    // Taxes. Salary balance and 13th are taxed on separate bases.
+    var inssSaldo = calcularINSS(saldoSalario);
+    var irrfSaldo = calcularIRRF({
+      bruto: saldoSalario,
+      inss: inssSaldo.valor,
+      dependentes: dependentes
+    });
+
+    var inss13 = calcularINSS(decimoTerceiro);
+    var irrf13 = calcularIRRF({
+      bruto: decimoTerceiro,
+      inss: inss13.valor,
+      dependentes: dependentes
+    });
+
+    var multaFGTS = round2(saldoFGTS * regra.multaFGTS);
+    var fgtsSacavel = round2(saldoFGTS * regra.sacaFGTS);
+
+    var proventos = round2(
+      saldoSalario + avisoIndenizado + decimoTerceiro +
+      feriasProporcionais + tercoProporcionais +
+      valorFeriasVencidas + tercoVencidas + multaFGTS
+    );
+
+    var descontos = round2(
+      inssSaldo.valor + irrfSaldo.valor + inss13.valor + irrf13.valor + descontoAviso
+    );
+
+    return {
+      tipo: tipo,
+      proventos: {
+        saldoSalario: saldoSalario,
+        avisoPrevioIndenizado: avisoIndenizado,
+        decimoTerceiroProporcional: decimoTerceiro,
+        feriasProporcionais: feriasProporcionais,
+        tercoFeriasProporcionais: tercoProporcionais,
+        feriasVencidas: valorFeriasVencidas,
+        tercoFeriasVencidas: tercoVencidas,
+        multaFGTS: multaFGTS
+      },
+      descontos: {
+        inssSaldoSalario: inssSaldo.valor,
+        irrfSaldoSalario: irrfSaldo.valor,
+        inssDecimoTerceiro: inss13.valor,
+        irrfDecimoTerceiro: irrf13.valor,
+        avisoPrevioNaoCumprido: descontoAviso
+      },
+      diasAviso: regra.avisoRecebe || regra.avisoDesconta ? diasAviso : 0,
+      fgtsSacavel: fgtsSacavel,
+      totalProventos: proventos,
+      totalDescontos: descontos,
+      liquido: round2(proventos - descontos),
+      temSeguroDesemprego: !!regra.temSeguroDesemprego
+    };
+  }
+
+  /* ---------- 13TH SALARY ---------- */
+  /**
+   * Christmas bonus (13º salário).
+   *
+   * Paid in two instalments: the first is half the gross with no
+   * deductions at all, and the whole tax bill lands on the second.
+   * INSS and IRRF are calculated on a base of their own — the bonus is
+   * never added to the month's salary for bracket purposes.
+   */
+  function decimoTerceiro(opcoes) {
+    var o = opcoes || {};
+    var salario = positivo(o.salario);
+    var meses = Math.min(12, Math.max(0, parseInt(o.meses, 10) || 0));
+    var adiantamentoJaRecebido = positivo(o.adiantamentoJaRecebido);
+
+    var bruto = round2((salario / 12) * meses);
+
+    // First instalment: 50% of gross, untaxed.
+    var primeira = round2(bruto / 2);
+    var jaPago = adiantamentoJaRecebido > 0 ? adiantamentoJaRecebido : primeira;
+
+    var inss = calcularINSS(bruto);
+    var irrf = calcularIRRF({
+      bruto: bruto,
+      inss: inss.valor,
+      dependentes: o.dependentes,
+      pensao: o.pensao
+    });
+
+    var descontos = round2(inss.valor + irrf.valor);
+    var liquido = round2(bruto - descontos);
+    var segunda = round2(liquido - jaPago);
+
+    return {
+      bruto: bruto,
+      meses: meses,
+      primeiraParcela: primeira,
+      jaPago: round2(jaPago),
+      segundaParcela: segunda,
+      inss: inss,
+      irrf: irrf,
+      totalDescontos: descontos,
+      liquido: liquido,
+      fgts: round2(bruto * TABELAS.fgts.aliquota),
+      integral: meses === 12
+    };
+  }
+
+  /* ---------- VACATION ---------- */
+  /**
+   * Vacation pay.
+   *
+   * The constitutional extra third is taxed together with the vacation
+   * days. Selling days back (abono pecuniário, up to a third of the
+   * period) is indemnity in nature: it carries its own extra third and
+   * neither part is taxed.
+   */
+  function ferias(opcoes) {
+    var o = opcoes || {};
+    var salario = positivo(o.salario);
+    var dias = Math.min(30, Math.max(1, parseInt(o.dias, 10) || 30));
+    // Legal cap on selling days is a third of the entitled period.
+    var diasVendidos = Math.min(
+      Math.floor(dias / 3),
+      Math.max(0, parseInt(o.diasVendidos, 10) || 0)
+    );
+    var diasGozados = dias - diasVendidos;
+
+    var valorFerias = round2((salario / 30) * diasGozados);
+    var terco = round2(valorFerias / 3);
+    var baseTributavel = round2(valorFerias + terco);
+
+    var abono = round2((salario / 30) * diasVendidos);
+    var tercoAbono = round2(abono / 3);
+    var totalAbono = round2(abono + tercoAbono);
+
+    var inss = calcularINSS(baseTributavel);
+    var irrf = calcularIRRF({
+      bruto: baseTributavel,
+      inss: inss.valor,
+      dependentes: o.dependentes,
+      pensao: o.pensao
+    });
+
+    // Optional: ask for the first half of the 13th along with vacation.
+    var adiantamento13 = o.adiantar13 ? round2(salario / 2) : 0;
+
+    var descontos = round2(inss.valor + irrf.valor);
+    var liquido = round2(baseTributavel - descontos + totalAbono + adiantamento13);
+
+    return {
+      dias: dias,
+      diasGozados: diasGozados,
+      diasVendidos: diasVendidos,
+      valorFerias: valorFerias,
+      terco: terco,
+      baseTributavel: baseTributavel,
+      abono: abono,
+      tercoAbono: tercoAbono,
+      totalAbono: totalAbono,
+      adiantamento13: adiantamento13,
+      inss: inss,
+      irrf: irrf,
+      totalDescontos: descontos,
+      liquido: liquido
+    };
+  }
+
+  /* ---------- UNEMPLOYMENT BENEFIT ---------- */
+  /**
+   * Seguro-desemprego.
+   *
+   * The instalment is derived from the average of the last three salaries,
+   * then floored at the minimum wage and capped at the published ceiling.
+   * How many instalments you get depends on how long you worked *and* on
+   * how many times you have claimed before — the two interact, which is
+   * the part most people get wrong.
+   */
+  function seguroDesemprego(opcoes) {
+    var o = opcoes || {};
+    var t = TABELAS.seguroDesemprego;
+
+    var media;
+    if (Array.isArray(o.salarios) && o.salarios.length) {
+      var validos = o.salarios.map(positivo).filter(function (s) { return s > 0; });
+      media = validos.length
+        ? validos.reduce(function (a, b) { return a + b; }, 0) / validos.length
+        : 0;
+    } else {
+      media = positivo(o.media);
+    }
+    media = round2(media);
+
+    var mesesTrabalhados = Math.max(0, parseInt(o.mesesTrabalhados, 10) || 0);
+    var solicitacao = Math.max(1, parseInt(o.solicitacao, 10) || 1);
+
+    // Instalment value.
+    var parcela;
+    if (media <= t.limiteFaixa1) {
+      parcela = media * t.fator1;
+    } else if (media <= t.limiteFaixa2) {
+      parcela = t.baseFaixa2 + (media - t.limiteFaixa1) * t.fator2;
+    } else {
+      parcela = t.teto;
+    }
+    parcela = round2(parcela);
+
+    var piso = TABELAS.inss.salarioMinimo;
+    var abaixoDoPiso = parcela < piso;
+    if (abaixoDoPiso) parcela = piso;
+    if (parcela > t.teto) parcela = t.teto;
+
+    // Minimum months required, by how many times the worker has claimed.
+    var minimoExigido = solicitacao === 1 ? 12 : (solicitacao === 2 ? 9 : 6);
+    var elegivel = mesesTrabalhados >= minimoExigido;
+
+    var numeroParcelas = 0;
+    if (elegivel) {
+      if (mesesTrabalhados >= 24) numeroParcelas = 5;
+      else if (mesesTrabalhados >= 12) numeroParcelas = 4;
+      else numeroParcelas = 3;
+
+      // A first claim never pays only three.
+      if (solicitacao === 1 && numeroParcelas < 4) numeroParcelas = 4;
+    }
+
+    return {
+      media: media,
+      valorParcela: elegivel ? parcela : 0,
+      numeroParcelas: numeroParcelas,
+      total: round2(elegivel ? parcela * numeroParcelas : 0),
+      elegivel: elegivel,
+      minimoExigido: minimoExigido,
+      solicitacao: solicitacao,
+      ajustadoAoPiso: elegivel && abaixoDoPiso,
+      noTeto: elegivel && parcela >= t.teto
+    };
+  }
+
+  /* ---------- OVERTIME ---------- */
+  /**
+   * Overtime and night-shift pay.
+   *
+   * `dsr` is the weekly-rest reflex: overtime worked during the week also
+   * raises the paid rest days, and it is the line most often missing from
+   * a payslip.
+   */
+  function horasExtras(opcoes) {
+    var o = opcoes || {};
+    var t = TABELAS.jornada;
+
+    var salario = positivo(o.salario);
+    var jornadaMensal = positivo(o.jornadaMensal) || 220;
+    var valorHora = round2(salario / jornadaMensal);
+
+    var horas50 = positivo(o.horas50);
+    var horas100 = positivo(o.horas100);
+    var horasNoturnas = positivo(o.horasNoturnas);
+
+    var valor50 = round2(horas50 * valorHora * (1 + t.adicionalExtraComum));
+    var valor100 = round2(horas100 * valorHora * (1 + t.adicionalExtraDomingo));
+
+    // Night premium pays only the 20% on top of the normal hour — the hour
+    // itself is already inside the monthly salary.
+    var valorNoturno = round2(horasNoturnas * valorHora * t.adicionalNoturno);
+
+    // With the reduced night hour, 52'30" counts as a full hour, so seven
+    // clock hours are paid as eight.
+    var horasNoturnasEquivalentes = round2(horasNoturnas * (60 / t.minutosHoraNoturna));
+    var valorHoraReduzida = o.horaNoturnaReduzida
+      ? round2((horasNoturnasEquivalentes - horasNoturnas) * valorHora)
+      : 0;
+
+    var diasUteis = Math.max(1, parseInt(o.diasUteis, 10) || 25);
+    var descansos = Math.max(0, parseInt(o.domingosFeriados, 10) || 5);
+    var totalExtras = round2(valor50 + valor100);
+    var dsr = o.calcularDSR === false ? 0 : round2((totalExtras / diasUteis) * descansos);
+
+    var total = round2(totalExtras + valorNoturno + valorHoraReduzida + dsr);
+
+    return {
+      valorHora: valorHora,
+      jornadaMensal: jornadaMensal,
+      horas50: horas50,
+      horas100: horas100,
+      valor50: valor50,
+      valor100: valor100,
+      valorNoturno: valorNoturno,
+      horasNoturnasEquivalentes: horasNoturnasEquivalentes,
+      valorHoraReduzida: valorHoraReduzida,
+      dsr: dsr,
+      totalExtras: totalExtras,
+      total: total,
+      salarioComExtras: round2(salario + total)
+    };
+  }
+
+  /* ---------- SIMPLES NACIONAL ---------- */
+  /**
+   * Effective tax rate under Simples Nacional.
+   * The headline rate is nominal; what you actually pay is
+   * [(RBT12 * aliquota) - deducao] / RBT12, which is always lower from
+   * the second bracket on.
+   */
+  function aliquotaSimples(receitaAnual, anexo) {
+    var tabela = anexo === 'V' ? TABELAS.simples.anexoV : TABELAS.simples.anexoIII;
+    var receita = positivo(receitaAnual);
+
+    if (receita <= 0) return { efetiva: tabela[0].aliquota, faixa: 1, foraDoModelo: false };
+
+    for (var i = 0; i < tabela.length; i++) {
+      if (receita <= tabela[i].ate) {
+        var efetiva = (receita * tabela[i].aliquota - tabela[i].deducao) / receita;
+        return { efetiva: efetiva, faixa: i + 1, foraDoModelo: false };
+      }
+    }
+
+    // Beyond what we verified — say so instead of inventing a number.
+    var ultima = tabela[tabela.length - 1];
+    return {
+      efetiva: (TABELAS.simples.limiteModelado * ultima.aliquota - ultima.deducao) /
+               TABELAS.simples.limiteModelado,
+      faixa: tabela.length,
+      foraDoModelo: true
+    };
+  }
+
+  /* ---------- CLT vs PJ ---------- */
+  /**
+   * Compare a CLT package against working as a PJ.
+   *
+   * The headline number is not "which is bigger" but how much a PJ has to
+   * invoice to come out even — because a CLT salary quietly carries 13th,
+   * the vacation third and FGTS, while a PJ has to fund all of that from
+   * the invoice and still pay tax and an accountant.
+   */
+  function cltVsPj(opcoes) {
+    var o = opcoes || {};
+    var salario = positivo(o.salario);
+    var dependentes = Math.max(0, parseInt(o.dependentes, 10) || 0);
+    var beneficios = positivo(o.beneficios);        // monthly, untaxed
+    var contador = positivo(o.contadorMensal);
+    var proLabore = positivo(o.proLabore) || TABELAS.inss.salarioMinimo;
+    var anexo = o.anexo === 'V' ? 'V' : 'III';
+
+    /* --- CLT side --- */
+    var mensal = salarioLiquido({ bruto: salario, dependentes: dependentes });
+    var d13 = decimoTerceiro({ salario: salario, meses: 12, dependentes: dependentes });
+    var fer = ferias({ salario: salario, dias: 30, dependentes: dependentes });
+
+    // FGTS accrues on the 12 salaries plus the 13th.
+    var fgtsAno = round2(salario * TABELAS.fgts.aliquota * 13);
+
+    // A vacation month replaces a normal month, so only the extra third is
+    // incremental. Expressing it as (férias líquidas - um mês líquido)
+    // captures that exactly, taxes included.
+    var ganhoFerias = round2(fer.liquido - mensal.liquido);
+
+    var anualCLT = round2(
+      mensal.liquido * 12 +
+      d13.liquido +
+      ganhoFerias +
+      beneficios * 12 +
+      fgtsAno
+    );
+    var mensalEquivalenteCLT = round2(anualCLT / 12);
+
+    /* --- PJ side: what invoice matches it --- */
+    // INSS on pró-labore is 11%, and the pró-labore is also what keeps the
+    // Fator R above 28% and the company inside Anexo III.
+    var inssProLabore = round2(proLabore * 0.11);
+    var custoFixoPJ = round2(contador + inssProLabore);
+
+    // Solve F - F*aliq - custos = alvo. The rate depends on F, so iterate:
+    // it converges in a handful of passes.
+    var faturamento = mensalEquivalenteCLT + custoFixoPJ;
+    var aliq = aliquotaSimples(faturamento * 12, anexo);
+    for (var i = 0; i < 12; i++) {
+      aliq = aliquotaSimples(faturamento * 12, anexo);
+      var novo = (mensalEquivalenteCLT + custoFixoPJ) / (1 - aliq.efetiva);
+      if (Math.abs(novo - faturamento) < 0.01) { faturamento = novo; break; }
+      faturamento = novo;
+    }
+    faturamento = round2(faturamento);
+
+    var impostoPJ = round2(faturamento * aliq.efetiva);
+    var liquidoPJ = round2(faturamento - impostoPJ - custoFixoPJ);
+
+    // Fator R: payroll over revenue. Below 28% the company falls to Anexo V.
+    var fatorR = faturamento > 0 ? (proLabore * 12) / (faturamento * 12) : 0;
+
+    return {
+      clt: {
+        bruto: round2(salario),
+        liquidoMensal: mensal.liquido,
+        decimoTerceiro: d13.liquido,
+        ganhoFerias: ganhoFerias,
+        beneficiosAno: round2(beneficios * 12),
+        fgtsAno: fgtsAno,
+        totalAno: anualCLT,
+        mensalEquivalente: mensalEquivalenteCLT
+      },
+      pj: {
+        faturamentoEquivalente: faturamento,
+        aliquotaEfetiva: aliq.efetiva,
+        faixa: aliq.faixa,
+        anexo: anexo,
+        imposto: impostoPJ,
+        contador: round2(contador),
+        proLabore: round2(proLabore),
+        inssProLabore: inssProLabore,
+        liquido: liquidoPJ,
+        fatorR: fatorR,
+        perdeAnexoIII: fatorR < TABELAS.simples.fatorRMinimo,
+        foraDoModelo: aliq.foraDoModelo
+      },
+      // How much more the invoice has to be, in percent, just to break even.
+      premioNecessario: salario > 0 ? (faturamento - salario) / salario : 0
+    };
+  }
+
+  /* ---------- COMPOUND INTEREST ---------- */
+  /**
+   * Future value with an initial deposit plus monthly contributions
+   * made at the end of each period.
+   */
+  function jurosCompostos(opcoes) {
+    var o = opcoes || {};
+    var inicial = positivo(o.inicial);
+    var mensal = positivo(o.aporteMensal);
+    var meses = Math.max(0, parseInt(o.meses, 10) || 0);
+    var taxa = Number(o.taxaMensal) || 0; // decimal, e.g. 0.008 for 0.8% a.m.
+
+    var saldo = inicial;
+    var investido = inicial;
+    var evolucao = [{ mes: 0, saldo: round2(saldo), investido: round2(investido), juros: 0 }];
+
+    for (var m = 1; m <= meses; m++) {
+      saldo = saldo * (1 + taxa) + mensal;
+      investido += mensal;
+      evolucao.push({
+        mes: m,
+        saldo: round2(saldo),
+        investido: round2(investido),
+        juros: round2(saldo - investido)
+      });
+    }
+
+    return {
+      montante: round2(saldo),
+      totalInvestido: round2(investido),
+      totalJuros: round2(saldo - investido),
+      evolucao: evolucao
+    };
+  }
+
+  /** Convert an annual rate to its equivalent monthly rate. */
+  function anualParaMensal(taxaAnual) {
+    return Math.pow(1 + taxaAnual, 1 / 12) - 1;
+  }
+
+  /* ---------- LOAN AMORTIZATION ---------- */
+  /**
+   * Price (fixed instalment) and SAC (fixed amortization) schedules.
+   */
+  function financiamento(opcoes) {
+    var o = opcoes || {};
+    var valor = positivo(o.valor);
+    var entrada = Math.min(positivo(o.entrada), valor);
+    var meses = Math.max(1, parseInt(o.meses, 10) || 1);
+    var taxa = Number(o.taxaMensal) || 0;
+    var principal = round2(valor - entrada);
+
+    function vazio() {
+      return { parcelas: [], primeira: 0, ultima: 0, totalPago: 0, totalJuros: 0 };
+    }
+    if (principal <= 0) return { principal: 0, price: vazio(), sac: vazio() };
+
+    // Price
+    var parcelaPrice;
+    if (taxa === 0) {
+      parcelaPrice = principal / meses;
+    } else {
+      var fator = Math.pow(1 + taxa, meses);
+      parcelaPrice = principal * (taxa * fator) / (fator - 1);
+    }
+
+    var price = [];
+    var saldoPrice = principal;
+    var totalPrice = 0;
+    for (var i = 1; i <= meses; i++) {
+      var jurosP = saldoPrice * taxa;
+      var amortP = parcelaPrice - jurosP;
+      saldoPrice -= amortP;
+      totalPrice += parcelaPrice;
+      price.push({
+        n: i,
+        parcela: round2(parcelaPrice),
+        juros: round2(jurosP),
+        amortizacao: round2(amortP),
+        saldo: round2(Math.max(0, saldoPrice))
+      });
+    }
+
+    // SAC
+    var amortSac = principal / meses;
+    var sac = [];
+    var saldoSac = principal;
+    var totalSac = 0;
+    for (var j = 1; j <= meses; j++) {
+      var jurosS = saldoSac * taxa;
+      var parcelaS = amortSac + jurosS;
+      saldoSac -= amortSac;
+      totalSac += parcelaS;
+      sac.push({
+        n: j,
+        parcela: round2(parcelaS),
+        juros: round2(jurosS),
+        amortizacao: round2(amortSac),
+        saldo: round2(Math.max(0, saldoSac))
+      });
+    }
+
+    return {
+      principal: principal,
+      price: {
+        parcelas: price,
+        primeira: price[0].parcela,
+        ultima: price[price.length - 1].parcela,
+        totalPago: round2(totalPrice),
+        totalJuros: round2(totalPrice - principal)
+      },
+      sac: {
+        parcelas: sac,
+        primeira: sac[0].parcela,
+        ultima: sac[sac.length - 1].parcela,
+        totalPago: round2(totalSac),
+        totalJuros: round2(totalSac - principal)
+      }
+    };
+  }
+
+  /* ---------- FORMATTING ---------- */
+  var formatadorBRL = typeof Intl !== 'undefined'
+    ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' })
+    : null;
+
+  function brl(n) {
+    var v = Number(n) || 0;
+    return formatadorBRL ? formatadorBRL.format(v) : 'R$ ' + v.toFixed(2);
+  }
+
+  function pct(n, casas) {
+    var v = (Number(n) || 0) * 100;
+    return v.toFixed(casas === undefined ? 2 : casas).replace('.', ',') + '%';
+  }
+
+  var API = {
+    TABELAS: TABELAS,
+    round2: round2,
+    calcularINSS: calcularINSS,
+    calcularIRRF: calcularIRRF,
+    calcularRedutor: calcularRedutor,
+    salarioLiquido: salarioLiquido,
+    rescisao: rescisao,
+    decimoTerceiro: decimoTerceiro,
+    ferias: ferias,
+    seguroDesemprego: seguroDesemprego,
+    horasExtras: horasExtras,
+    aliquotaSimples: aliquotaSimples,
+    cltVsPj: cltVsPj,
+    jurosCompostos: jurosCompostos,
+    anualParaMensal: anualParaMensal,
+    financiamento: financiamento,
+    brl: brl,
+    pct: pct
+  };
+
+  root.FerramentasBR = API;
+  if (typeof module !== 'undefined' && module.exports) module.exports = API;
+})(typeof globalThis !== 'undefined' ? globalThis : this);

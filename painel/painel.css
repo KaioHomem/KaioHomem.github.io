@@ -1,0 +1,341 @@
+/* ===================================================
+   PAINEL — STYLES
+   Layers on top of ferramentas/tools.css, which supplies
+   the design tokens.
+   =================================================== */
+
+.p-body { background: var(--bg); }
+.p-wrap { max-width: 1040px; margin: 0 auto; padding: 0 1.25rem; width: 100%; }
+
+/* ---------- HEADER ---------- */
+.p-topo {
+  border-bottom: 1px solid var(--border);
+  background: rgba(13, 17, 23, 0.88);
+  backdrop-filter: blur(10px);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+.p-topo-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.9rem 1.25rem;
+  flex-wrap: wrap;
+}
+.p-marca { font-weight: 700; font-size: 1.05rem; color: var(--text); }
+.p-marca span { color: var(--accent); }
+.p-dono {
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  color: var(--text-3);
+  margin-left: 0.6rem;
+}
+
+.p-abas { display: flex; gap: 0.35rem; }
+.p-abas button {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-2);
+  font-size: 0.86rem;
+  padding: 0.4rem 0.9rem;
+  border-radius: var(--radius);
+  transition: color var(--ease), background-color var(--ease), border-color var(--ease);
+}
+.p-abas button:hover { color: var(--text); background: var(--bg-3); }
+.p-abas button.ativo {
+  color: var(--accent);
+  border-color: var(--border);
+  background: var(--bg-2);
+}
+
+.p-main { padding: 2rem 1.25rem 4rem; }
+
+/* ---------- SECTION HEADINGS ---------- */
+.p-titulo {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 2.2rem 0 0.3rem;
+  color: var(--text);
+}
+.p-titulo:first-child { margin-top: 0; }
+.p-sub {
+  color: var(--text-2);
+  font-size: 0.87rem;
+  margin-bottom: 1.1rem;
+  max-width: 70ch;
+}
+.p-sub code, .p-rodape code {
+  font-family: var(--font-mono);
+  font-size: 0.82em;
+  background: var(--bg-3);
+  padding: 0.1em 0.4em;
+  border-radius: 4px;
+  color: var(--text-2);
+}
+
+/* ---------- CARDS ---------- */
+.p-grade {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(238px, 1fr));
+  gap: 0.9rem;
+}
+
+.p-cartao {
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-left-width: 3px;
+  border-radius: var(--radius-lg);
+  padding: 1.1rem 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.p-cartao.ok      { border-left-color: var(--green); }
+.p-cartao.atencao { border-left-color: var(--amber); }
+.p-cartao.alerta  { border-left-color: var(--red); }
+.p-cartao.travado { border-left-color: var(--border); opacity: 0.75; }
+
+.p-cartao-topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+}
+.p-cartao-rotulo {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-2);
+}
+.p-cartao-valor {
+  font-family: var(--font-mono);
+  font-size: 1.55rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.2;
+}
+.p-cartao-valor.p-travado { color: var(--text-3); font-size: 1.1rem; }
+.p-cartao-nota { font-size: 0.8rem; color: var(--text-2); margin: 0; line-height: 1.55; }
+
+.p-carregando { color: var(--text-3); font-size: 0.9rem; font-weight: 400; }
+
+/* ---------- BADGES ---------- */
+.p-selo {
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-3);
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  padding: 0.15rem 0.6rem;
+  white-space: nowrap;
+}
+.p-selo.bom   { color: var(--green); border-color: rgba(63, 185, 80, 0.4); }
+.p-selo.medio { color: var(--amber); border-color: rgba(210, 153, 34, 0.4); }
+.p-selo.ruim  { color: var(--red);   border-color: rgba(248, 81, 73, 0.4); }
+
+.p-tag {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--accent);
+  background: var(--accent-dim);
+  border-radius: 100px;
+  padding: 0.15rem 0.55rem;
+  margin-left: 0.55rem;
+  vertical-align: middle;
+}
+
+.p-badge {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border-radius: 100px;
+  padding: 0.1rem 0.5rem;
+  margin-left: 0.5rem;
+}
+.p-badge.publico { color: var(--text-3); border: 1px solid var(--border); }
+.p-badge.secreto { color: var(--amber); border: 1px solid rgba(210, 153, 34, 0.4); }
+
+/* ---------- NEXT STEP ---------- */
+.p-proximo {
+  margin-top: 2.4rem;
+  background: linear-gradient(135deg, var(--accent-dim), transparent);
+  border: 1px solid rgba(88, 166, 255, 0.32);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem 1.6rem;
+}
+.p-proximo.ok {
+  background: linear-gradient(135deg, var(--green-dim), transparent);
+  border-color: rgba(63, 185, 80, 0.32);
+}
+.p-proximo-rotulo {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-2);
+  margin-bottom: 0.4rem;
+}
+.p-proximo h3 { font-size: 1.2rem; font-weight: 600; color: var(--text); margin: 0 0 0.4rem; }
+.p-proximo p { color: var(--text-2); font-size: 0.9rem; margin: 0 0 1rem; max-width: 66ch; }
+
+/* ---------- BUTTONS ---------- */
+.p-btn {
+  background: var(--accent);
+  color: var(--bg);
+  border: 1.5px solid var(--accent);
+  border-radius: var(--radius);
+  font-size: 0.87rem;
+  font-weight: 500;
+  padding: 0.55rem 1.2rem;
+  transition: background-color var(--ease), transform 0.3s var(--ease-spring);
+}
+.p-btn:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+.p-btn:active { transform: scale(0.98); }
+
+.p-btn-perigo {
+  background: transparent;
+  color: var(--red);
+  border-color: rgba(248, 81, 73, 0.4);
+}
+.p-btn-perigo:hover { background: rgba(248, 81, 73, 0.1); border-color: var(--red); }
+
+.p-btn-link {
+  background: none;
+  border: none;
+  color: var(--accent);
+  font-size: 0.82rem;
+  padding: 0.3rem 0;
+  text-align: left;
+  margin-top: auto;
+}
+.p-btn-link:hover { color: var(--accent-hover); }
+
+/* ---------- CONNECTIONS ---------- */
+.p-aviso-seg {
+  background: var(--amber-dim);
+  border: 1px solid rgba(210, 153, 34, 0.3);
+  border-left-width: 3px;
+  border-radius: var(--radius);
+  padding: 1rem 1.2rem;
+  font-size: 0.86rem;
+  color: var(--text-2);
+  line-height: 1.65;
+  margin-bottom: 1.8rem;
+  max-width: 78ch;
+}
+.p-aviso-seg strong { color: var(--amber); }
+
+.p-conexao {
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 1.1rem;
+  overflow: hidden;
+}
+.p-conexao-topo {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.2rem 1.4rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-3);
+}
+.p-conexao-topo h3 { font-size: 1.02rem; font-weight: 600; color: var(--text); margin: 0; }
+.p-conexao-resumo { font-size: 0.85rem; color: var(--text-2); margin: 0.3rem 0 0; max-width: 62ch; }
+
+.p-conexao-corpo { padding: 1.3rem 1.4rem; }
+.p-conexao-corpo h4 {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-3);
+  margin: 1.4rem 0 0.5rem;
+  font-weight: 500;
+}
+.p-conexao-corpo h4:first-child { margin-top: 0; }
+.p-conexao-corpo p { font-size: 0.88rem; color: var(--text-2); margin: 0 0 0.5rem; max-width: 72ch; line-height: 1.65; }
+
+.p-lista { margin: 0; }
+.p-lista li {
+  font-size: 0.86rem;
+  color: var(--text-2);
+  padding-left: 1.1rem;
+  position: relative;
+  margin-bottom: 0.3rem;
+}
+.p-lista li::before { content: '▸'; position: absolute; left: 0; color: var(--accent); }
+
+.p-passos { margin: 0; padding-left: 1.3rem; }
+.p-passos li {
+  font-size: 0.86rem;
+  color: var(--text-2);
+  margin-bottom: 0.45rem;
+  line-height: 1.6;
+  padding-left: 0.2rem;
+}
+.p-passos li::marker { color: var(--accent); font-family: var(--font-mono); font-size: 0.8rem; }
+
+.p-nota-tempo { font-size: 0.84rem; color: var(--text-3); margin-top: 1rem; }
+
+.p-aviso {
+  background: var(--amber-dim);
+  border-left: 3px solid rgba(210, 153, 34, 0.5);
+  border-radius: var(--radius);
+  padding: 0.8rem 1rem;
+  font-size: 0.84rem;
+  color: var(--text-2);
+  margin-top: 1rem;
+  line-height: 1.6;
+  max-width: 74ch;
+}
+
+/* ---------- FIELDS ---------- */
+.p-campo { display: flex; flex-direction: column; gap: 0.3rem; margin-bottom: 0.9rem; max-width: 560px; }
+.p-campo label { font-size: 0.82rem; color: var(--text-2); font-weight: 500; }
+.p-entrada {
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 0.88rem;
+  padding: 0.55rem 0.7rem;
+  width: 100%;
+  transition: border-color var(--ease);
+}
+.p-entrada:focus { outline: none; border-color: var(--accent); background: var(--bg-3); }
+.p-dica { font-size: 0.75rem; color: var(--text-3); line-height: 1.5; }
+
+.p-acoes { display: flex; align-items: center; gap: 0.8rem; margin-top: 0.4rem; flex-wrap: wrap; }
+.p-acoes-fim { margin-top: 2rem; }
+.p-salvo { font-size: 0.8rem; color: var(--text-3); }
+.p-salvo.bom { color: var(--green); }
+.p-salvo.ruim { color: var(--red); }
+
+/* ---------- FOOTER ---------- */
+.p-rodape {
+  border-top: 1px solid var(--border);
+  padding: 1.8rem 0 2.4rem;
+}
+.p-rodape p {
+  font-size: 0.8rem;
+  color: var(--text-3);
+  margin-bottom: 0.5rem;
+  max-width: 78ch;
+  line-height: 1.65;
+}
+
+@media (max-width: 560px) {
+  .p-topo-inner { padding: 0.8rem 1.25rem; }
+  .p-cartao-valor { font-size: 1.35rem; }
+}

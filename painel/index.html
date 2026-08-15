@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Painel do proprietário</title>
+<meta name="description" content="Painel de operação, tráfego e receita do site.">
+
+<!-- This page is an operations console, not content. Keep it out of search. -->
+<meta name="robots" content="noindex, nofollow">
+
+<meta http-equiv="Content-Security-Policy" content="
+  default-src 'self';
+  script-src 'self';
+  style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+  font-src https://fonts.gstatic.com;
+  img-src 'self' data:;
+  connect-src 'self' https://api.github.com https://searchconsole.googleapis.com https://analyticsdata.googleapis.com https://adsense.googleapis.com https://oauth2.googleapis.com;
+  object-src 'none'; base-uri 'self'; form-action 'none';
+">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎛️</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../ferramentas/tools.css">
+<link rel="stylesheet" href="painel.css">
+</head>
+<body class="p-body">
+
+<header class="p-topo">
+  <div class="p-wrap p-topo-inner">
+    <div>
+      <span class="p-marca">painel<span>.</span></span>
+      <span class="p-dono">kaiohomem.github.io</span>
+    </div>
+    <nav class="p-abas">
+      <button data-aba="visao" class="ativo">Visão geral</button>
+      <button data-aba="conexoes">Conexões</button>
+    </nav>
+  </div>
+</header>
+
+<main class="p-wrap p-main">
+  <div id="aba-visao"></div>
+  <div id="aba-conexoes" hidden></div>
+</main>
+
+<footer class="p-rodape">
+  <div class="p-wrap">
+    <p>
+      Este painel roda inteiramente no seu navegador. Ele não tem servidor, não guarda nada
+      fora daqui e não envia seus dados para lugar nenhum.
+    </p>
+    <p>
+      A página está marcada como <code>noindex</code>, mas o repositório é público — então
+      qualquer pessoa que descubra a URL vê a interface vazia. Ela nunca vê seus números,
+      porque eles não moram no site: moram no seu <code>localStorage</code>.
+    </p>
+  </div>
+</footer>
+
+<script src="../ferramentas/nucleo.js"></script>
+<script src="conexoes.js"></script>
+<script src="painel.js"></script>
+</body>
+</html>

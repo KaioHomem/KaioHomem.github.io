@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Calculadora de Juros Compostos com Aportes Mensais</title>
+<meta name="description" content="Simule quanto seu dinheiro rende com juros compostos e aportes mensais. Veja o gráfico de evolução, o total investido e quanto veio só de juros.">
+<link rel="canonical" href="https://kaiohomem.github.io/ferramentas/juros-compostos.html">
+
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://kaiohomem.github.io/ferramentas/juros-compostos.html">
+<meta property="og:title" content="Calculadora de Juros Compostos">
+<meta property="og:description" content="Simule aportes mensais e veja o efeito dos juros sobre juros ao longo do tempo.">
+<meta property="og:locale" content="pt_BR">
+<meta name="twitter:card" content="summary">
+
+<meta http-equiv="Content-Security-Policy" content="
+  default-src 'self';
+  script-src 'self' https://pagead2.googlesyndication.com https://*.googlesyndication.com https://*.doubleclick.net https://*.google.com https://*.gstatic.com;
+  style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+  font-src https://fonts.gstatic.com;
+  img-src 'self' data: https:;
+  frame-src https://*.googlesyndication.com https://*.doubleclick.net;
+  connect-src 'self' https://*.google.com https://*.doubleclick.net;
+  object-src 'none'; base-uri 'self'; form-action 'self';
+">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📈</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tools.css">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Calculadora de Juros Compostos",
+  "url": "https://kaiohomem.github.io/ferramentas/juros-compostos.html",
+  "applicationCategory": "FinanceApplication",
+  "operatingSystem": "Any",
+  "inLanguage": "pt-BR",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "BRL" }
+}
+</script>
+</head>
+<body data-ferramenta="juros-compostos">
+
+<header class="topo" id="topo"></header>
+
+<main class="wrap">
+
+  <div class="cabecalho">
+    <div class="trilha"><a href="index.html">ferramentas</a> / juros compostos</div>
+    <h1>Calculadora de juros compostos</h1>
+    <p class="resumo">
+      Simule o crescimento de um investimento com aportes mensais e veja quanto do
+      resultado final veio do seu bolso e quanto veio dos juros.
+    </p>
+  </div>
+
+  <div class="espaco-anuncio" data-slot="topo"></div>
+
+  <section class="cartao">
+    <form id="formulario" autocomplete="off">
+      <div class="grade">
+
+        <div class="campo">
+          <label for="inicial">Valor inicial (R$)</label>
+          <input class="entrada" type="text" id="inicial" inputmode="decimal" placeholder="1.000,00" value="1.000,00">
+        </div>
+
+        <div class="campo">
+          <label for="aporte">Aporte mensal (R$)</label>
+          <input class="entrada" type="text" id="aporte" inputmode="decimal" placeholder="500,00" value="500,00">
+        </div>
+
+        <div class="campo">
+          <label for="taxa">Taxa de juros (%)</label>
+          <input class="entrada" type="text" id="taxa" inputmode="decimal" placeholder="10" value="10">
+        </div>
+
+        <div class="campo">
+          <label for="periodoTaxa">Período da taxa</label>
+          <select class="entrada" id="periodoTaxa">
+            <option value="ano">ao ano</option>
+            <option value="mes">ao mês</option>
+          </select>
+        </div>
+
+        <div class="campo">
+          <label for="prazo">Prazo</label>
+          <input class="entrada" type="number" id="prazo" min="1" max="960" step="1" value="10">
+        </div>
+
+        <div class="campo">
+          <label for="periodoPrazo">Unidade do prazo</label>
+          <select class="entrada" id="periodoPrazo">
+            <option value="anos">anos</option>
+            <option value="meses">meses</option>
+          </select>
+        </div>
+
+      </div>
+
+      <div class="botoes">
+        <button type="button" class="btn" id="calcular">Simular</button>
+        <button type="button" class="btn btn-vazado" id="limpar">Limpar</button>
+      </div>
+    </form>
+
+    <div class="resultado" id="resultado" aria-live="polite"></div>
+  </section>
+
+  <div class="espaco-anuncio" data-slot="resultado"></div>
+  <div class="bloco-afiliados"></div>
+
+  <article class="conteudo">
+
+    <h2>Por que os juros compostos mudam tudo</h2>
+    <p>
+      No juro simples, o rendimento incide sempre sobre o valor inicial. No composto,
+      ele incide sobre o montante acumulado — inclusive sobre os juros que já foram
+      creditados. É o famoso "juros sobre juros", e o efeito é discreto no começo e
+      brutal no longo prazo.
+    </p>
+    <p>
+      Um aporte de R$ 500 por mês a 10% ao ano vira aproximadamente R$ 103 mil em
+      10 anos, sendo cerca de R$ 60 mil de aportes e R$ 43 mil de juros. Nos 10 anos
+      seguintes, mantendo tudo igual, os juros passam a superar os aportes com folga —
+      a curva deixa de ser reta.
+    </p>
+
+    <h3>Tempo pesa mais que valor</h3>
+    <p>
+      Entre dobrar o aporte e começar dez anos antes, começar antes quase sempre vence.
+      O tempo entra na fórmula como expoente, o aporte entra como multiplicador — e
+      expoente cresce mais rápido que multiplicador.
+    </p>
+
+    <h3>Cuidado com a taxa real</h3>
+    <p>
+      Uma aplicação que rende 10% ao ano com inflação de 5% entregou 4,76% de ganho
+      real, não 5%. Ao comparar investimentos, desconte a inflação e, quando houver,
+      o Imposto de Renda sobre o rendimento. Esta calculadora trabalha com a taxa
+      nominal que você informar.
+    </p>
+
+    <div class="aviso">
+      <p>
+        <strong>Simulação, não promessa.</strong> Rentabilidade passada não garante
+        rentabilidade futura, e a maioria dos investimentos não rende a mesma taxa todo
+        mês. Use o resultado para entender a ordem de grandeza, não como projeção exata.
+        Aqui não há incidência de impostos nem taxas de administração.
+      </p>
+    </div>
+
+    <h2>Perguntas frequentes</h2>
+
+    <details>
+      <summary>Como converter taxa anual em mensal?</summary>
+      <p>
+        Não é dividir por 12. A conversão correta é exponencial: a taxa mensal
+        equivalente a 12% ao ano é de aproximadamente 0,9489% ao mês, e não 1%. A
+        calculadora faz essa conversão automaticamente quando você escolhe "ao ano".
+      </p>
+    </details>
+
+    <details>
+      <summary>Em que momento o aporte é considerado?</summary>
+      <p>
+        No fim de cada mês, depois de aplicado o rendimento do período. É a convenção
+        mais conservadora e a que mais se aproxima de quem investe ao receber o salário.
+      </p>
+    </details>
+
+    <details>
+      <summary>Vale mais aportar todo mês ou de uma vez?</summary>
+      <p>
+        Matematicamente, quanto antes o dinheiro entra, mais tempo ele rende. Na
+        prática, o aporte mensal costuma vencer por outro motivo: é o que a maioria
+        das pessoas consegue sustentar por anos sem interromper.
+      </p>
+    </details>
+
+  </article>
+
+  <div class="espaco-anuncio" data-slot="rodape"></div>
+
+</main>
+
+<footer class="rodape" id="rodape"></footer>
+
+<script src="nucleo.js"></script>
+<script src="app.js"></script>
+<script src="consentimento.js"></script>
+<script src="monetizacao.js"></script>
+<script src="pg-juros.js"></script>
+</body>
+</html>
