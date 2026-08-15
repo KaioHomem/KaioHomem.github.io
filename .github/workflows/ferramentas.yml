@@ -38,6 +38,12 @@ jobs:
       - name: Verificar consistência entre navegação, hub e sitemap
         run: node ferramentas/verificar-consistencia.js
 
+      # Gate: link quebrado, imagem sem alt, recurso http:// e página
+      # obesa passam despercebidos até alguém reclamar — ou até o Google
+      # rebaixar a página.
+      - name: Auditoria de links, acessibilidade e peso
+        run: node ferramentas/auditoria.js
+
   manutencao:
     name: Manutenção mensal
     runs-on: ubuntu-latest
@@ -58,6 +64,9 @@ jobs:
 
       - name: Verificar consistência
         run: node ferramentas/verificar-consistencia.js
+
+      - name: Auditoria
+        run: node ferramentas/auditoria.js
 
       - name: Regenerar sitemap
         run: node ferramentas/gerar-sitemap.js

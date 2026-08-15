@@ -129,6 +129,21 @@ is wrong — and scans for committed secrets. Publisher ids and OAuth client ids
 are deliberately *not* flagged: they are public by design, and warning on
 correct configuration teaches people to ignore warnings.
 
+```bash
+node ferramentas/auditoria.js
+```
+
+A third gate, 213 checks, no browser and no network — cheap enough to run on
+every push. It catches what silently rots on a static site: links that stop
+resolving, `<img>` without alt, resources loaded over `http://`, external
+links missing `rel="noopener"`, and sitemap entries pointing at files that no
+longer exist.
+
+Weight is measured **per page** — the scripts and stylesheets that page
+actually references — not by summing every file in the repository. The first
+version did the latter and reported 150KB of JavaScript, which was simply
+wrong: no browser downloads the test suite. The real worst page is ~84KB.
+
 ## Automated maintenance
 
 `.github/workflows/ferramentas.yml` runs on the 1st of each month:
