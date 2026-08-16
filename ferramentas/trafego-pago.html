@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Calculadora de ROAS e CPA — descubra seu breakeven antes de subir campanha</title>
+<meta name="description" content="Calcule o ROAS de breakeven, o CPA máximo e a regra de corte da sua campanha. Descubra se o gargalo é criativo, página, oferta ou margem — com número, não com achismo.">
+<link rel="canonical" href="https://kaiohomem.github.io/ferramentas/trafego-pago.html">
+
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://kaiohomem.github.io/ferramentas/trafego-pago.html">
+<meta property="og:title" content="Calculadora de ROAS de breakeven e CPA máximo">
+<meta property="og:description" content="ROAS 3x pode ser prejuízo. Descubra o seu ponto de equilíbrio antes de gastar.">
+<meta property="og:locale" content="pt_BR">
+<meta name="twitter:card" content="summary">
+
+<meta http-equiv="Content-Security-Policy" content="
+  default-src 'self';
+  script-src 'self' https://pagead2.googlesyndication.com https://*.googlesyndication.com https://*.doubleclick.net https://*.google.com https://*.gstatic.com;
+  style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+  font-src https://fonts.gstatic.com;
+  img-src 'self' data: https:;
+  frame-src https://*.googlesyndication.com https://*.doubleclick.net;
+  connect-src 'self' https://*.google.com https://*.doubleclick.net;
+  object-src 'none'; base-uri 'self'; form-action 'self';
+">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎯</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tools.css">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Calculadora de ROAS e CPA",
+  "url": "https://kaiohomem.github.io/ferramentas/trafego-pago.html",
+  "applicationCategory": "BusinessApplication",
+  "operatingSystem": "Any",
+  "inLanguage": "pt-BR",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "BRL" }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Como calcular o ROAS de breakeven?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "ROAS de breakeven é 1 dividido pela margem de contribuição. Se a margem é de 25%, o breakeven é 4x — o que significa que um ROAS de 3x, que parece saudável, está dando prejuízo. É a conta que mais gente erra ao começar a anunciar."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Qual o CPA máximo que posso pagar?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "O CPA máximo é igual à sua margem de contribuição em reais: ticket menos custo do produto menos custos operacionais. Pagar exatamente isso significa empatar. Se o cliente costuma comprar mais de uma vez, o CPA aceitável sobe na proporção do número de compras."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Meu CTR está bom mas não vendo. O que está errado?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "CTR bom com conversão baixa aponta para a página de destino, a oferta ou o preço — não para o criativo. O anúncio cumpriu a função de trazer a pessoa; o que quebrou foi o que ela encontrou depois."
+      }
+    }
+  ]
+}
+</script>
+</head>
+<body data-ferramenta="trafego-pago">
+
+<header class="topo" id="topo"></header>
+
+<main class="wrap">
+
+  <div class="cabecalho">
+    <div class="trilha"><a href="index.html">ferramentas</a> / tráfego pago</div>
+    <h1>Calculadora de ROAS e CPA</h1>
+    <p class="resumo">
+      Descubra seu ponto de equilíbrio <strong>antes</strong> de subir a campanha — e onde
+      está o gargalo quando o número não fecha.
+    </p>
+  </div>
+
+  <div class="espaco-anuncio" data-slot="topo"></div>
+
+  <section class="cartao">
+    <form id="formulario" autocomplete="off">
+      <div class="grade">
+
+        <div class="campo">
+          <label for="ticket">Preço de venda (R$)</label>
+          <input class="entrada" type="text" id="ticket" inputmode="decimal" placeholder="100,00" value="100,00">
+        </div>
+
+        <div class="campo">
+          <label for="custoProduto">Custo do produto (R$)</label>
+          <input class="entrada" type="text" id="custoProduto" inputmode="decimal" placeholder="40,00" value="40,00">
+        </div>
+
+        <div class="campo">
+          <label for="custoOperacional">Outros custos por venda (R$)</label>
+          <input class="entrada" type="text" id="custoOperacional" inputmode="decimal" placeholder="10,00" value="10,00">
+          <span class="dica">Frete, taxa de marketplace, gateway, embalagem.</span>
+        </div>
+
+        <div class="campo">
+          <label for="recompras">Compras por cliente</label>
+          <input class="entrada" type="text" id="recompras" inputmode="decimal" placeholder="1" value="1">
+          <span class="dica">1 se não há recompra. Eleva o CPA aceitável.</span>
+        </div>
+
+        <div class="campo col-2">
+          <label>Números da campanha <span class="dica" style="display:inline">— opcional, para projetar o CPA</span></label>
+        </div>
+
+        <div class="campo">
+          <label for="cpm">CPM (R$)</label>
+          <input class="entrada" type="text" id="cpm" inputmode="decimal" placeholder="30,00" value="30,00">
+          <span class="dica">Custo por mil impressões.</span>
+        </div>
+
+        <div class="campo">
+          <label for="ctr">CTR (%)</label>
+          <input class="entrada" type="text" id="ctr" inputmode="decimal" placeholder="2" value="2">
+        </div>
+
+        <div class="campo col-2">
+          <label for="conversao">Taxa de conversão da página (%)</label>
+          <input class="entrada" type="text" id="conversao" inputmode="decimal" placeholder="3" value="5">
+        </div>
+
+      </div>
+
+      <div class="botoes">
+        <button type="button" class="btn" id="calcular">Calcular</button>
+        <button type="button" class="btn btn-vazado" id="limpar">Limpar</button>
+      </div>
+    </form>
+
+    <div class="resultado" id="resultado" aria-live="polite"></div>
+  </section>
+
+  <div class="espaco-anuncio" data-slot="resultado"></div>
+  <div class="bloco-afiliados"></div>
+
+  <article class="conteudo">
+
+    <h2>A conta que derruba a maioria</h2>
+    <p>
+      <strong>ROAS de breakeven = 1 ÷ margem de contribuição.</strong> Se sua margem é de
+      25%, você precisa de 4x só para empatar. Um ROAS de 3x parece ótimo no painel e
+      está <strong>queimando dinheiro</strong>.
+    </p>
+    <p>
+      Margem de contribuição não é o lucro do produto: é o que sobra do preço depois de
+      tirar o custo da mercadoria <em>e</em> todos os custos que só existem porque a venda
+      aconteceu — frete, comissão de marketplace, taxa de gateway, embalagem.
+    </p>
+
+    <h3>O CPA máximo é a sua margem</h3>
+    <p>
+      Se sobram R$ 50 por venda, o CPA de equilíbrio é R$ 50. Pagar exatamente isso é
+      trabalhar de graça. O lucro é a distância entre o CPA real e esse teto.
+    </p>
+    <p>
+      Recompra muda tudo: se o cliente compra 3 vezes na vida, você pode pagar até 3x mais
+      pela primeira venda. É por isso que negócios com recompra conseguem pagar mais caro
+      pelo clique e ainda assim vencer o leilão.
+    </p>
+
+    <h3>Onde está o gargalo</h3>
+    <div class="tabela-rolagem">
+      <table>
+        <thead>
+          <tr><th>Sintoma</th><th>Culpado provável</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>CTR baixo</td><td>Criativo ou público</td></tr>
+          <tr><td>CTR bom, conversão baixa</td><td>Página, oferta ou preço</td></tr>
+          <tr><td>Conversão boa, CPA alto</td><td>CPM, concorrência ou escala mal feita</td></tr>
+          <tr><td>Tudo bom, sem lucro</td><td>Margem ou ticket — não é marketing</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>
+      A última linha é a mais importante e a mais ignorada. Quando a métrica está toda
+      saudável e ainda assim não sobra dinheiro, o problema está no negócio, não na
+      campanha. Trocar criativo não resolve margem.
+    </p>
+
+    <h3>Defina a regra de corte antes de subir</h3>
+    <p>
+      Decisão tomada no calor do momento é decisão ruim. A regra padrão é
+      <strong>matar o criativo que gastar 2x o CPA alvo sem venda</strong>. Escreva isso
+      antes de ligar a campanha, quando você ainda está frio, e obedeça depois.
+    </p>
+
+    <h3>Verba de teste é compra de informação</h3>
+    <p>
+      Abaixo de 3 conversões, o resultado é ruído, não sinal. Se o CPA alvo é R$ 30, cada
+      criativo precisa de uns R$ 90 para dizer alguma coisa. Quem trava com R$ 200
+      perdidos nunca descobre qual anúncio funciona — e a taxa de acerto é baixa para
+      todo mundo, inclusive para quem é bom. A diferença é o número de tentativas.
+    </p>
+
+    <div class="aviso">
+      <p>
+        <strong>Isto é uma projeção, não uma previsão.</strong> CPM sobe em datas
+        comerciais, CTR cai com a fadiga do criativo e a conversão varia com a época. Use
+        para decidir se vale tentar e onde mexer — não como promessa de resultado.
+      </p>
+    </div>
+
+    <h2>Perguntas frequentes</h2>
+
+    <details>
+      <summary>Anúncio consegue salvar um produto com margem ruim?</summary>
+      <p>
+        Não. Anúncio bom com oferta ruim perde para anúncio medíocre com oferta boa,
+        sempre. Se a margem não paga o clique, nenhum criativo conserta — o caminho é
+        mexer em preço, custo, bônus ou recompra.
+      </p>
+    </details>
+
+    <details>
+      <summary>Posso anunciar para um site que ganha com AdSense?</summary>
+      <p>
+        Matematicamente não fecha. Uma visita em conteúdo rende centavos e um clique
+        custa reais — a diferença é de duas ordens de grandeza. Sites de conteúdo vivem
+        de busca orgânica; tráfego pago só se sustenta quando existe um produto com
+        margem por trás.
+      </p>
+    </details>
+
+    <details>
+      <summary>Com que frequência devo mexer na campanha?</summary>
+      <p>
+        Olhar todo dia, mexer toda semana. Alteração diária reinicia o aprendizado do
+        algoritmo e destrói justamente o dado que você está pagando para coletar. O
+        diário é 15 minutos só para ver se algo quebrou.
+      </p>
+    </details>
+
+  </article>
+
+  <div class="espaco-anuncio" data-slot="rodape"></div>
+
+</main>
+
+<footer class="rodape" id="rodape"></footer>
+
+<script src="nucleo.js"></script>
+<script src="app.js"></script>
+<script src="consentimento.js"></script>
+<script src="monetizacao.js"></script>
+<script src="pg-trafego.js"></script>
+</body>
+</html>

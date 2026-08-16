@@ -412,6 +412,76 @@ verdadeiro('cair no Anexo V exige faturar bem mais',
 verdadeiro('pró-labore alto mantém o Anexo III',
   F.cltVsPj({ salario: 5000, proLabore: 6000 }).pj.perdeAnexoIII === false);
 
+/* ---------- PAID TRAFFIC ---------- */
+console.log('\nTRÁFEGO PAGO');
+
+(function () {
+  var r = F.trafegoPago({ ticket: 100, custoProduto: 40, custoOperacional: 10 });
+  eq('margem de contribuição de 50%', r.margem * 100, 50);
+  eq('ROAS de breakeven = 1 / margem', r.roasBreakeven, 2);
+  eq('CPA máximo = a contribuição inteira', r.cpaMaximo, 50);
+  eq('regra de corte em 2x o CPA alvo', r.regraDeCorte, 100);
+})();
+
+// The classic trap: 25% margin means break-even at 4x, so a 3x ROAS —
+// which looks healthy — is losing money.
+(function () {
+  var r = F.trafegoPago({ ticket: 100, custoProduto: 75 });
+  eq('margem de 25% → breakeven 4x', r.roasBreakeven, 4);
+  verdadeiro('ROAS 3x com margem de 25% é prejuízo', 3 < r.roasBreakeven);
+})();
+
+(function () {
+  var r = F.trafegoPago({
+    ticket: 100, custoProduto: 40, custoOperacional: 10,
+    cpm: 30, ctr: 0.02, taxaConversao: 0.05
+  });
+  eq('CPC vem do CPM e do CTR', r.cpc, 1.50);
+  eq('CPA vem do CPC e da conversão', r.cpaProjetado, 30);
+  eq('lucro por venda = contribuição - CPA', r.lucroPorVenda, 20);
+  eq('ROAS projetado', r.roasProjetado, 3.333, 0.01);
+  verdadeiro('acima do breakeven → viável', r.viavel === true);
+  eq('diagnóstico aponta viabilidade', r.diagnostico === 'viavel' ? 1 : 0, 1, 0);
+  eq('verba de teste cobre 3 conversões', r.verbaTestePorCriativo, 90);
+})();
+
+// Exactly at break-even is not viable: it pays for the traffic and nothing else.
+verdadeiro('empatar não é viável',
+  F.trafegoPago({ ticket: 100, custoProduto: 50, cpm: 30, ctr: 0.02, taxaConversao: 0.03 })
+    .viavel === false);
+
+/* Diagnosis routes to the lever that is actually broken. */
+eq('sem ticket → não é problema de marketing',
+  F.trafegoPago({ ticket: 0 }).diagnostico === 'sem-ticket' ? 1 : 0, 1, 0);
+eq('custo acima do ticket → margem, não criativo',
+  F.trafegoPago({ ticket: 100, custoProduto: 120 }).diagnostico === 'sem-margem' ? 1 : 0, 1, 0);
+eq('CTR abaixo de 1% → criativo ou público',
+  F.trafegoPago({ ticket: 100, custoProduto: 40, cpm: 30, ctr: 0.005, taxaConversao: 0.05 })
+    .diagnostico === 'criativo' ? 1 : 0, 1, 0);
+eq('conversão abaixo de 1% → página ou oferta',
+  F.trafegoPago({ ticket: 100, custoProduto: 40, cpm: 30, ctr: 0.02, taxaConversao: 0.005 })
+    .diagnostico === 'pagina-ou-oferta' ? 1 : 0, 1, 0);
+
+// Recompra raises what a customer is worth, so it raises what you may pay.
+(function () {
+  var r = F.trafegoPago({ ticket: 100, custoProduto: 50, comprasPorCliente: 3 });
+  eq('LTV multiplica o CPA aceitável', r.cpaMaximoComLTV, 150);
+  verdadeiro('CPA com LTV é maior que o da primeira compra',
+    r.cpaMaximoComLTV > r.cpaMaximo);
+})();
+
+// The reason paid traffic cannot fund an AdSense content site: a visit is
+// worth cents and a click costs reais.
+(function () {
+  var r = F.trafegoPago({
+    ticket: 0.01,          // receita por visita no AdSense
+    cpm: 30, ctr: 0.02, taxaConversao: 1
+  });
+  verdadeiro('site de AdSense não sustenta tráfego pago', r.viavel === false);
+  verdadeiro('o prejuízo por visita é de ordens de grandeza',
+    r.cpaProjetado > r.cpaMaximo * 100);
+})();
+
 /* ---------- COMPOUND INTEREST ---------- */
 console.log('\nJUROS COMPOSTOS');
 
