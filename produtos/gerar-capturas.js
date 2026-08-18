@@ -35,10 +35,14 @@ var EQUIPE = [
   // O idioma dos widgets nativos (<input type="month">) vem do LANG do
   // processo, não do `locale` do contexto. Sem isto a captura sai com
   // "August 2026" numa tela de um produto em português.
-  var browser = await chromium.launch({
+  // CHROMIUM_PATH, igual ao verificar-paginas.js: ambientes que já têm o
+  // navegador em outro lugar e não podem baixar o que o Playwright espera.
+  var opcoes = {
     args: ['--lang=pt-BR', '--accept-lang=pt-BR'],
     env: Object.assign({}, process.env, { LANG: 'pt_BR.UTF-8', LANGUAGE: 'pt_BR' })
-  });
+  };
+  if (process.env.CHROMIUM_PATH) opcoes.executablePath = process.env.CHROMIUM_PATH;
+  var browser = await chromium.launch(opcoes);
 
   var page = await browser.newPage({
     viewport: { width: 1280, height: 900 },
@@ -66,6 +70,16 @@ var EQUIPE = [
 
   console.log('resumo:', (await page.textContent('#resumo')).replace(/\s+/g, ' ').trim());
   await page.locator('main').screenshot({ path: path.join(SAIDA, 'tela-folha.png') });
+
+  // O 13º é o argumento que a página de venda passou a fazer, então
+  // precisa de imagem própria: dizer que calcula e não mostrar é o mesmo
+  // problema que a página tinha antes de ter qualquer captura.
+  await page.selectOption('#modo', 'decimo');
+  await page.waitForTimeout(400);
+  console.log('13º:', (await page.textContent('#resumo')).replace(/\s+/g, ' ').trim());
+  await page.locator('main').screenshot({ path: path.join(SAIDA, 'tela-decimo.png') });
+  await page.selectOption('#modo', 'mensal');
+  await page.waitForTimeout(300);
 
   // Os holerites só existem no DOM na hora de imprimir, e o CSS de
   // impressão esconde o resto da página.

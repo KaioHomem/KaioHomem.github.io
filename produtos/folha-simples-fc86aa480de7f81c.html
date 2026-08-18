@@ -31,6 +31,8 @@ body{font-family:var(--sans);background:var(--bg);color:var(--tx);line-height:1.
 header{border-bottom:1px solid var(--bd);background:rgba(13,17,23,.9);position:sticky;top:0;z-index:40;backdrop-filter:blur(8px)}
 .hd{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.9rem 0;flex-wrap:wrap}
 .marca{font-weight:700;font-size:1.05rem}.marca span{color:var(--ac)}
+.meses-edit{background:var(--bg);color:var(--tx);border:1px solid var(--bd);border-radius:6px;
+  padding:.2rem .35rem;font-family:var(--mono);font-size:.8rem;text-align:center}
 .marca-demo{margin-top:10px;padding:6px 0;border-top:1px dashed #999;color:#666;
   font-size:11px;letter-spacing:.14em;text-align:center;text-transform:uppercase}
 .acoes{display:flex;gap:.5rem;flex-wrap:wrap}
@@ -117,6 +119,11 @@ dialog::backdrop{background:rgba(0,0,0,.7)}
     <div class="campo"><label for="empNome">Razão social</label><input id="empNome" placeholder="Minha Empresa LTDA"></div>
     <div class="campo"><label for="empCnpj">CNPJ</label><input id="empCnpj" placeholder="00.000.000/0001-00"></div>
     <div class="campo"><label for="competencia">Competência</label><input id="competencia" type="month"></div>
+    <div class="campo"><label for="modo">O que calcular</label>
+      <select id="modo">
+        <option value="mensal">Folha mensal</option>
+        <option value="decimo">13º salário</option>
+      </select></div>
   </div></div>
 
   <h2>Funcionários</h2>
@@ -129,6 +136,9 @@ dialog::backdrop{background:rgba(0,0,0,.7)}
       <div class="campo"><label for="fVt">Vale-transporte (R$)</label><input id="fVt" inputmode="decimal" placeholder="0,00">
         <span class="dica">Limite legal: 6% do salário.</span></div>
       <div class="campo"><label for="fOutros">Outros descontos (R$)</label><input id="fOutros" inputmode="decimal" placeholder="0,00"></div>
+      <div class="campo" id="campoMeses"><label for="fMeses">Meses trabalhados no ano</label>
+        <input id="fMeses" type="number" min="0" max="12" value="12">
+        <span class="dica">Mês com 15 dias ou mais conta inteiro.</span></div>
     </div>
     <div style="margin-top:1rem;display:flex;gap:.6rem">
       <button class="b1" id="btAdd">Adicionar</button>
@@ -139,12 +149,7 @@ dialog::backdrop{background:rgba(0,0,0,.7)}
   <div class="resumo" id="resumo"></div>
   <div class="tabela"><table id="tabela"></table></div>
 
-  <div class="aviso">
-    <strong>Estimativa de apoio.</strong> Os cálculos seguem as tabelas oficiais de 2026 de
-    INSS e IRRF, incluindo a isenção da Lei 15.270/2025. Adicionais, horas extras, faltas,
-    acordos coletivos e verbas específicas do contrato não entram automaticamente — lance
-    em "outros descontos" ou ajuste o salário. Isto não substitui contador.
-  </div>
+  <div class="aviso" id="avisoGeral"></div>
 
   <p style="font-size:.82rem;color:var(--t3)">
     Seus dados ficam apenas neste navegador, neste computador. Não há servidor e nada é
@@ -249,6 +254,36 @@ function folhaDe(f){
   };
 }
 
+/* O 13º nunca se soma ao salário do mês: INSS e IRRF são calculados
+   sobre uma base própria. Somar as duas coisas joga o funcionário numa
+   faixa que ele não está e desconta a mais — é o erro mais comum de
+   quem faz 13º na planilha.
+
+   Também não tem vale-transporte: o funcionário não se desloca por
+   causa do 13º.
+
+   A primeira parcela é metade do BRUTO e sai sem desconto nenhum, até
+   30 de novembro. A conta inteira cai na segunda, até 20 de dezembro —
+   por isso a segunda parcela é sempre bem menor que a primeira. */
+function decimoTerceiroDe(f){
+  var salario=pos(f.salario);
+  var meses=Math.min(12, Math.max(0, parseInt(f.meses,10)||0));
+  var bruto=round2((salario/12)*meses);
+
+  var primeira=round2(bruto/2);
+  var inss=calcINSS(bruto);
+  var irrf=calcIRRF(bruto, inss, f.dependentes);
+  var descontos=round2(inss+irrf.valor);
+  var liquido=round2(bruto-descontos);
+
+  return {
+    bruto:bruto, meses:meses,
+    primeira:primeira, segunda:round2(liquido-primeira),
+    inss:inss, irrf:irrf, descontos:descontos, liquido:liquido,
+    fgts:round2(bruto*TABELAS.fgts.aliquota)
+  };
+}
+
 /* ---------- FORMATO E ENTRADA ---------- */
 var fmt = new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'});
 function brl(n){ return fmt.format(Number(n)||0); }
@@ -273,7 +308,8 @@ var DEMO=null; /* gancho-demo */
 
 /* ---------- ESTADO ---------- */
 var CHAVE=DEMO?'folhasimples.demo.v1':'folhasimples.v1';
-var dados={ empresa:{nome:'',cnpj:'',competencia:''}, funcionarios:[] };
+var dados={ empresa:{nome:'',cnpj:'',competencia:'',modo:'mensal'}, funcionarios:[] };
+function modoAtual(){ return dados.empresa.modo==='decimo' ? 'decimo' : 'mensal'; }
 
 function carregar(){
   try{ var d=JSON.parse(localStorage.getItem(CHAVE)||'null');
@@ -288,6 +324,7 @@ function v(id){ return el(id).value; }
 
 /* ---------- RENDER ---------- */
 function render(){
+  if(modoAtual()==='decimo'){ renderDecimo(); return; }
   var linhas='', tot={bruto:0,inss:0,irrf:0,vt:0,outros:0,liq:0,fgts:0};
   var algumVtLimitado=false;
 
@@ -346,7 +383,70 @@ function render(){
   montarHolerites();
 }
 
+function renderDecimo(){
+  var linhas='', tot={bruto:0,inss:0,irrf:0,p1:0,p2:0,liq:0,fgts:0};
+
+  dados.funcionarios.forEach(function(f,i){
+    var c=decimoTerceiroDe(f);
+    tot.bruto+=c.bruto; tot.inss+=c.inss; tot.irrf+=c.irrf.valor;
+    tot.p1+=c.primeira; tot.p2+=c.segunda; tot.liq+=c.liquido; tot.fgts+=c.fgts;
+
+    linhas+='<tr>'+
+      '<td>'+esc(f.nome)+(f.cargo?'<br><span style="font-size:.75rem;color:var(--t3)">'+esc(f.cargo)+'</span>':'')+'</td>'+
+      '<td><input class="meses-edit" type="number" min="0" max="12" value="'+c.meses+
+        '" data-meses="'+i+'" style="width:3.4rem"></td>'+
+      '<td>'+brl(c.bruto)+'</td>'+
+      '<td class="neg">'+brl(c.inss)+'</td>'+
+      '<td class="'+(c.irrf.valor?'neg':'')+'">'+(c.irrf.isento?'isento':brl(c.irrf.valor))+'</td>'+
+      '<td>'+brl(c.primeira)+'</td>'+
+      '<td class="pos">'+brl(c.segunda)+'</td>'+
+      '<td>'+brl(c.fgts)+'</td>'+
+      '<td class="naoimprime"><button class="b3" data-rem="'+i+'">remover</button></td></tr>';
+  });
+
+  el('tabela').innerHTML = dados.funcionarios.length
+    ? '<thead><tr><th>Funcionário</th><th>Meses</th><th>Bruto</th><th>INSS</th><th>IRRF</th>'+
+      '<th>1ª parcela</th><th>2ª parcela</th><th>FGTS</th><th></th></tr></thead><tbody>'+linhas+'</tbody>'+
+      '<tfoot><tr><td>Total ('+dados.funcionarios.length+')</td><td></td><td>'+brl(tot.bruto)+'</td>'+
+      '<td class="neg">'+brl(tot.inss)+'</td><td class="neg">'+brl(tot.irrf)+'</td>'+
+      '<td>'+brl(tot.p1)+'</td><td class="pos">'+brl(tot.p2)+'</td>'+
+      '<td>'+brl(tot.fgts)+'</td><td></td></tr></tfoot>'
+    : '<tbody><tr><td class="vazio" colspan="9">Nenhum funcionário ainda. Preencha acima e clique em Adicionar.</td></tr></tbody>';
+
+  el('resumo').innerHTML = dados.funcionarios.length ? [
+    ['Custo total do 13º', brl(tot.bruto + tot.fgts), 'a', 'bruto + FGTS'],
+    ['1ª parcela — até 30/11', brl(tot.p1), 'v', 'metade do bruto, sem desconto'],
+    ['2ª parcela — até 20/12', brl(tot.p2), 'v', 'líquido menos a primeira'],
+    ['INSS a recolher', brl(tot.inss), '', 'base própria, não soma ao mês']
+  ].map(function(k){
+    return '<div class="kpi '+k[2]+'"><div class="n">'+k[1]+'</div><div class="l">'+k[0]+
+           '<br><span style="color:var(--t3);font-size:.72rem">'+k[3]+'</span></div></div>';
+  }).join('') : '';
+
+  var a=el('avisoVt'); if(a) a.remove();
+
+  Array.prototype.forEach.call(document.querySelectorAll('[data-rem]'), function(b){
+    b.onclick=function(){
+      var i=+b.getAttribute('data-rem');
+      if(confirm('Remover '+dados.funcionarios[i].nome+'?')){
+        dados.funcionarios.splice(i,1); salvar(); render();
+      }
+    };
+  });
+
+  Array.prototype.forEach.call(document.querySelectorAll('[data-meses]'), function(inp){
+    inp.onchange=function(){
+      var i=+inp.getAttribute('data-meses');
+      dados.funcionarios[i].meses=Math.min(12,Math.max(0,parseInt(inp.value,10)||0));
+      salvar(); render();
+    };
+  });
+
+  montarHolerites();
+}
+
 function montarHolerites(){
+  if(modoAtual()==='decimo'){ montarRecibos13(); return; }
   var e=dados.empresa;
   var comp = e.competencia ? e.competencia.split('-').reverse().join('/') : '';
   el('holerite').innerHTML = dados.funcionarios.map(function(f){
@@ -386,6 +486,40 @@ function montarHolerites(){
   }).join('');
 }
 
+function montarRecibos13(){
+  var e=dados.empresa;
+  var ano = e.competencia ? e.competencia.slice(0,4) : '';
+
+  el('holerite').innerHTML = dados.funcionarios.map(function(f){
+    var c=decimoTerceiroDe(f);
+    var lin=[
+      ['13º salário — '+c.meses+'/12 avos', brl(c.bruto), 'v', c.bruto],
+      ['INSS',  brl(c.inss),              'd', c.inss],
+      ['IRRF',  c.irrf.isento?'isento':brl(c.irrf.valor), 'd', c.irrf.valor]
+    ];
+
+    return '<div class="hol">'+
+      '<h3>'+esc(e.nome||'—')+'</h3>'+
+      '<div class="emp">CNPJ '+esc(e.cnpj||'—')+' &nbsp;·&nbsp; Recibo de 13º salário'+
+        (ano?' &nbsp;·&nbsp; Ano '+esc(ano):'')+'</div>'+
+      '<div style="margin-bottom:6px"><strong>'+esc(f.nome)+'</strong>'+(f.cargo?' — '+esc(f.cargo):'')+'</div>'+
+      '<table><thead><tr><th>Descrição</th><th>Referência</th><th>Vencimentos</th><th>Descontos</th></tr></thead><tbody>'+
+      lin.map(function(l){
+        return '<tr><td>'+l[0]+'</td><td></td>'+
+          (l[2]==='d' ? '<td></td><td>'+l[1]+'</td>' : '<td>'+l[1]+'</td><td></td>')+'</tr>';
+      }).join('')+
+      '<tr class="tot"><td>Totais</td><td></td><td>'+brl(c.bruto)+'</td><td>'+brl(c.descontos)+'</td></tr>'+
+      '<tr class="tot"><td colspan="3">Líquido do 13º</td><td>'+brl(c.liquido)+'</td></tr>'+
+      '<tr><td colspan="3">1ª parcela — paga até 30/11, sem desconto</td><td>'+brl(c.primeira)+'</td></tr>'+
+      '<tr><td colspan="3">2ª parcela — paga até 20/12</td><td>'+brl(c.segunda)+'</td></tr>'+
+      '<tr><td colspan="3">FGTS sobre o 13º (depositado pelo empregador)</td><td>'+brl(c.fgts)+'</td></tr>'+
+      '</tbody></table>'+
+      '<div class="ass"><div>Assinatura do empregador</div><div>Recebi em ___/___/______</div></div>'+
+      (DEMO?'<div class="marca-demo">DEMONSTRAÇÃO — não vale como recibo</div>':'')+
+      '</div>';
+  }).join('');
+}
+
 /* ---------- AÇÕES ---------- */
 el('btAdd').onclick=function(){
   if(DEMO && dados.funcionarios.length>=DEMO.limite){
@@ -397,7 +531,8 @@ el('btAdd').onclick=function(){
   if(num(v('fSalario'))<=0){ alert('Informe o salário bruto.'); el('fSalario').focus(); return; }
   dados.funcionarios.push({
     nome:nome, cargo:v('fCargo').trim(), salario:num(v('fSalario')),
-    dependentes:parseInt(v('fDep'),10)||0, vt:num(v('fVt')), outros:num(v('fOutros'))
+    dependentes:parseInt(v('fDep'),10)||0, vt:num(v('fVt')), outros:num(v('fOutros')),
+    meses:Math.min(12,Math.max(0,parseInt(v('fMeses'),10)||12))
   });
   salvar(); render(); limparCampos(); el('fNome').focus();
 };
@@ -408,11 +543,38 @@ function limparCampos(){
 el('btLimpar').onclick=limparCampos;
 
 ['empNome','empCnpj','competencia'].forEach(function(id){
-  el(id).oninput=function(){
-    dados.empresa={ nome:v('empNome'), cnpj:v('empCnpj'), competencia:v('competencia') };
-    salvar(); montarHolerites();
-  };
+  el(id).oninput=function(){ guardarEmpresa(); montarHolerites(); };
 });
+el('modo').onchange=function(){ guardarEmpresa(); ajustarCampos(); render(); };
+
+function guardarEmpresa(){
+  dados.empresa={ nome:v('empNome'), cnpj:v('empCnpj'),
+                  competencia:v('competencia'), modo:v('modo') };
+  salvar();
+}
+
+/* Vale-transporte e outros descontos não existem no 13º, e "meses
+   trabalhados" não existe na folha mensal. Campo que fica na tela sem
+   efeito nenhum faz o usuário achar que mexeu em algo quando não mexeu. */
+function textoAviso(){
+  var base = '<strong>Estimativa de apoio.</strong> Os cálculos seguem as tabelas oficiais ' +
+             'de 2026 de INSS e IRRF, incluindo a isenção da Lei 15.270/2025. ';
+  return base + (modoAtual()==='decimo'
+    ? 'O 13º tem base própria de INSS e IRRF — ele nunca se soma ao salário do mês. ' +
+      'Verbas variáveis que integram a média (horas extras, comissões, adicionais) não ' +
+      'entram automaticamente: ajuste o salário informado. Isto não substitui contador.'
+    : 'Adicionais, horas extras, faltas, acordos coletivos e verbas específicas do ' +
+      'contrato não entram automaticamente — lance em "outros descontos" ou ajuste o ' +
+      'salário. Isto não substitui contador.');
+}
+
+function ajustarCampos(){
+  el('avisoGeral').innerHTML = textoAviso();
+  var d = modoAtual()==='decimo';
+  el('campoMeses').style.display = d ? '' : 'none';
+  el('fVt').parentNode.style.display = d ? 'none' : '';
+  el('fOutros').parentNode.style.display = d ? 'none' : '';
+}
 
 el('btImprimir').onclick=function(){
   if(!dados.funcionarios.length){ alert('Adicione ao menos um funcionário.'); return; }
@@ -446,9 +608,10 @@ function preencher(){
   el('empCnpj').value=dados.empresa.cnpj||'';
   el('competencia').value=dados.empresa.competencia||new Date().toISOString().slice(0,7);
   dados.empresa.competencia=el('competencia').value;
+  el('modo').value=modoAtual();
 }
 
-carregar(); preencher(); render();
+carregar(); preencher(); ajustarCampos(); render();
 </script>
 </body>
 </html>

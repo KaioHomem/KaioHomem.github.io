@@ -35,7 +35,8 @@ if (ini === -1 || fim === -1 || fim < ini) {
 
 var embutido = {};
 new Function('exports', html.slice(ini, fim) +
-  '\nexports.calcINSS=calcINSS;exports.calcIRRF=calcIRRF;exports.folhaDe=folhaDe;'
+  '\nexports.calcINSS=calcINSS;exports.calcIRRF=calcIRRF;exports.folhaDe=folhaDe;' +
+  'exports.decimoTerceiroDe=decimoTerceiroDe;'
 )(embutido);
 
 var nucleo = require(path.join(RAIZ, 'ferramentas', 'nucleo.js'));
@@ -64,6 +65,34 @@ for (var sal = 500; sal <= 25000; sal += 37) {
   });
 }
 
+// O 13º tem base tributável própria, e a chance de as duas cópias
+// divergirem aqui é maior que na folha mensal: são menos linhas, menos
+// olhos e um caminho que só é exercitado em novembro e dezembro.
+var comparados13 = 0;
+for (var s13 = 500; s13 <= 25000; s13 += 137) {
+  [3, 7, 12].forEach(function (meses) {
+    [0, 2].forEach(function (dep) {
+      comparados13++;
+      var a = embutido.decimoTerceiroDe({ salario: s13, meses: meses, dependentes: dep });
+      var b = nucleo.decimoTerceiro({ salario: s13, meses: meses, dependentes: dep });
+
+      [['13º bruto', a.bruto, b.bruto],
+       ['13º INSS', a.inss, b.inss.valor],
+       ['13º IRRF', a.irrf.valor, b.irrf.valor],
+       ['13º líquido', a.liquido, b.liquido],
+       ['13º 1ª parcela', a.primeira, b.primeiraParcela],
+       ['13º 2ª parcela', a.segunda, b.segundaParcela],
+       ['13º FGTS', a.fgts, b.fgts]
+      ].forEach(function (c) {
+        if (Math.abs(c[1] - c[2]) > 0.001) {
+          divergencias.push(c[0] + ' em R$' + s13 + ', ' + meses + ' meses, ' + dep +
+                            ' dep: produto=' + c[1] + ' nucleo=' + c[2]);
+        }
+      });
+    });
+  });
+}
+
 // Âncoras absolutas, para o caso de os DOIS motores estarem errados juntos.
 var ancoras = [
   ['líquido de R$ 5.000', embutido.folhaDe({ salario: 5000, dependentes: 0 }).liquido, 4498.49],
@@ -78,6 +107,7 @@ ancoras.forEach(function (a) {
 });
 
 console.log(comparados + ' salários comparados entre o produto e o motor testado.');
+console.log(comparados13 + ' cenários de 13º comparados.');
 console.log(ancoras.length + ' âncoras absolutas verificadas.');
 
 if (!divergencias.length) {
