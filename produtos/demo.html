@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Demonstração — Folha Simples — folha de pagamento e holerite</title>
+<meta name="robots" content="noindex">
+
+<!-- A promessa deste programa é que a folha não sai deste computador.
+     Sem isto, é só promessa: qualquer linha de código que aparecesse
+     aqui um dia poderia mandar tudo para fora. `connect-src 'none'`
+     mais `form-action 'none'` fazem o navegador impedir — não há canal
+     de saída, nem por fetch, nem por XHR, nem por formulário, nem por
+     imagem remota.
+
+     script-src precisa de 'unsafe-inline' porque o programa é um
+     arquivo único, com o script embutido; é o custo de rodar offline
+     sem instalar nada. A defesa contra conteúdo hostil num backup
+     importado está em normalizar() e esc(). Mesmo que um script
+     escapasse das duas, não teria para onde enviar nada. -->
+<meta http-equiv="Content-Security-Policy" content="
+  default-src 'none';
+  script-src 'unsafe-inline';
+  style-src 'unsafe-inline';
+  img-src data:;
+  font-src data:;
+  connect-src 'none';
+  form-action 'none';
+  base-uri 'none';
+  object-src 'none';
+  frame-src 'none';
+">
+<!--
+  ===================================================
+  FOLHA SIMPLES
+  Arquivo único. Funciona offline, sem instalar nada.
+
+  Seus dados de folha NUNCA saem deste computador:
+  não há servidor, não há envio, não há nuvem. Tudo
+  fica no armazenamento local do seu navegador.
+
+  Para fazer backup, use o botão "Exportar".
+  ===================================================
+-->
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0d1117;--bg2:#161b22;--bg3:#21262d;--bd:#30363d;
+  --ac:#58a6ff;--gr:#3fb950;--rd:#f85149;--am:#d29922;
+  --tx:#e6edf3;--t2:#8b949e;--t3:#6e7681;
+  --sans:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --mono:'JetBrains Mono','SF Mono',Consolas,monospace;
+}
+body{font-family:var(--sans);background:var(--bg);color:var(--tx);line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1080px;margin:0 auto;padding:0 1.2rem}
+header{border-bottom:1px solid var(--bd);background:rgba(13,17,23,.9);position:sticky;top:0;z-index:40;backdrop-filter:blur(8px)}
+.hd{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.9rem 0;flex-wrap:wrap}
+.faixa-demo{background:#1f2937;border-bottom:1px solid #374151;color:#e5e7eb;padding:.75rem 1rem;font-size:.86rem;text-align:center;line-height:1.5}.faixa-demo a{color:#60a5fa;font-weight:600;white-space:nowrap}.faixa-demo strong{color:#fff}
+.marca{font-weight:700;font-size:1.05rem}.marca span{color:var(--ac)}
+.meses-edit{background:var(--bg);color:var(--tx);border:1px solid var(--bd);border-radius:6px;
+  padding:.2rem .35rem;font-family:var(--mono);font-size:.8rem;text-align:center}
+.marca-demo{margin-top:10px;padding:6px 0;border-top:1px dashed #999;color:#666;
+  font-size:11px;letter-spacing:.14em;text-align:center;text-transform:uppercase}
+.acoes{display:flex;gap:.5rem;flex-wrap:wrap}
+main{padding:1.8rem 0 4rem}
+h2{font-size:1.15rem;font-weight:600;margin:2rem 0 .8rem}
+h2:first-child{margin-top:0}
+p{color:var(--t2);margin-bottom:.8rem}
+.rot{font-family:var(--mono);font-size:.7rem;text-transform:uppercase;letter-spacing:.07em;color:var(--t3);margin-bottom:.4rem}
+.card{background:var(--bg2);border:1px solid var(--bd);border-radius:12px;padding:1.3rem;margin-bottom:1rem}
+.grade{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.9rem}
+.campo{display:flex;flex-direction:column;gap:.3rem}
+.campo label{font-size:.8rem;color:var(--t2);font-weight:500}
+.campo .dica{font-size:.72rem;color:var(--t3)}
+input,select{background:var(--bg);border:1.5px solid var(--bd);border-radius:8px;color:var(--tx);
+  font-family:var(--mono);font-size:.9rem;padding:.55rem .7rem;width:100%}
+input:focus,select:focus{outline:none;border-color:var(--ac);background:var(--bg3)}
+select{font-family:var(--sans)}
+button{font-family:inherit;cursor:pointer;border:none;border-radius:8px;font-size:.87rem;font-weight:500;padding:.55rem 1.1rem;transition:.2s}
+.b1{background:var(--ac);color:var(--bg)}.b1:hover{background:#79b8ff}
+.b2{background:transparent;color:var(--tx);border:1.5px solid var(--bd)}.b2:hover{border-color:var(--ac)}
+.b3{background:transparent;color:var(--rd);border:1.5px solid rgba(248,81,73,.35);padding:.35rem .8rem;font-size:.8rem}
+.b3:hover{background:rgba(248,81,73,.1)}
+.tabela{overflow-x:auto;border:1px solid var(--bd);border-radius:12px}
+table{width:100%;border-collapse:collapse;font-size:.87rem;min-width:720px}
+th,td{padding:.65rem .85rem;text-align:right;border-bottom:1px solid var(--bd)}
+th{background:var(--bg3);font-family:var(--mono);font-size:.68rem;text-transform:uppercase;
+  letter-spacing:.05em;color:var(--t2);font-weight:500}
+td{font-family:var(--mono)}
+th:first-child,td:first-child{text-align:left;font-family:var(--sans)}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover td{background:var(--bg3)}
+tfoot td{background:var(--bg3);font-weight:600;border-top:2px solid var(--bd)}
+.neg{color:var(--rd)}.pos{color:var(--gr)}
+.vazio{text-align:center;padding:2.5rem 1rem;color:var(--t3)}
+.resumo{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:.9rem;margin-bottom:1rem}
+.kpi{background:var(--bg2);border:1px solid var(--bd);border-left:3px solid var(--ac);border-radius:10px;padding:1rem}
+.kpi.v{border-left-color:var(--gr)}.kpi.a{border-left-color:var(--am)}
+.kpi .n{font-family:var(--mono);font-size:1.35rem;font-weight:700;line-height:1.2}
+.kpi .l{font-size:.78rem;color:var(--t2);margin-top:.2rem}
+.aviso{background:rgba(210,153,34,.1);border-left:3px solid rgba(210,153,34,.5);border-radius:8px;
+  padding:.9rem 1.1rem;font-size:.85rem;color:var(--t2);margin:1rem 0}
+.aviso strong{color:var(--am)}
+dialog{background:var(--bg2);color:var(--tx);border:1px solid var(--bd);border-radius:14px;
+  padding:0;max-width:640px;width:92%}
+dialog::backdrop{background:rgba(0,0,0,.7)}
+.dlg-h{padding:1.1rem 1.3rem;border-bottom:1px solid var(--bd);font-weight:600}
+.dlg-b{padding:1.3rem}
+.dlg-f{padding:1rem 1.3rem;border-top:1px solid var(--bd);display:flex;gap:.6rem;justify-content:flex-end}
+
+/* ---------- HOLERITE PARA IMPRESSÃO ---------- */
+#holerite{display:none}
+@media print{
+  body{background:#fff;color:#000}
+  header,main,.naoimprime{display:none!important}
+  #holerite{display:block!important;font-family:Arial,sans-serif;color:#000;padding:0}
+  .hol{border:1px solid #000;padding:14px;margin-bottom:18px;page-break-inside:avoid;font-size:11px}
+  .hol h3{font-size:13px;margin-bottom:2px}
+  .hol .emp{font-size:10px;color:#333;margin-bottom:8px;border-bottom:1px solid #999;padding-bottom:6px}
+  .hol table{width:100%;border-collapse:collapse;min-width:0;font-size:10.5px}
+  .hol th,.hol td{border:1px solid #999;padding:3px 5px;text-align:right;background:#fff;color:#000;font-family:Arial,sans-serif}
+  .hol th{background:#eee;font-size:9px;text-transform:uppercase}
+  .hol th:first-child,.hol td:first-child{text-align:left}
+  .hol .tot td{font-weight:bold;background:#f5f5f5}
+  .hol .ass{margin-top:26px;display:flex;justify-content:space-between;font-size:9.5px}
+  .hol .ass div{border-top:1px solid #000;padding-top:3px;width:44%;text-align:center}
+}
+</style>
+</head>
+<body>
+
+<div class="faixa-demo naoimprime"><strong>Você está na demonstração.</strong> Ela vai até 2 funcionários e marca os holerites. Todo o resto é igual — o cálculo é o mesmo. <a href="folha-de-pagamento.html">Ver a versão completa →</a></div>
+
+<header class="naoimprime"><div class="wrap hd">
+  <div class="marca">folha<span>simples</span></div>
+  <div class="acoes">
+    <button class="b2" id="btExportar">Exportar backup</button>
+    <button class="b2" id="btImportar">Importar</button>
+    <button class="b1" id="btImprimir">Imprimir holerites</button>
+  </div>
+</div></header>
+
+<main class="naoimprime"><div class="wrap">
+
+  <h2>Empresa</h2>
+  <div class="card"><div class="grade">
+    <div class="campo"><label for="empNome">Razão social</label><input id="empNome" placeholder="Minha Empresa LTDA"></div>
+    <div class="campo"><label for="empCnpj">CNPJ</label><input id="empCnpj" placeholder="00.000.000/0001-00"></div>
+    <div class="campo"><label for="competencia">Competência</label><input id="competencia" type="month"></div>
+    <div class="campo"><label for="modo">O que calcular</label>
+      <select id="modo">
+        <option value="mensal">Folha mensal</option>
+        <option value="decimo">13º salário</option>
+        <option value="ferias">Férias</option>
+      </select></div>
+  </div></div>
+
+  <h2>Funcionários</h2>
+  <div class="card">
+    <div class="grade">
+      <div class="campo"><label for="fNome">Nome</label><input id="fNome" placeholder="Maria Silva"></div>
+      <div class="campo"><label for="fCargo">Cargo</label><input id="fCargo" placeholder="Vendedora"></div>
+      <div class="campo"><label for="fSalario">Salário bruto (R$)</label><input id="fSalario" inputmode="decimal" placeholder="2.500,00"></div>
+      <div class="campo"><label for="fDep">Dependentes</label><input id="fDep" type="number" min="0" max="20" value="0"></div>
+      <div class="campo" id="campoVt"><label for="fVt">Vale-transporte (R$)</label><input id="fVt" inputmode="decimal" placeholder="0,00">
+        <span class="dica">Limite legal: 6% do salário.</span></div>
+      <div class="campo" id="campoOutros"><label for="fOutros">Outros descontos (R$)</label><input id="fOutros" inputmode="decimal" placeholder="0,00"></div>
+      <div class="campo" id="campoDias"><label for="fDias">Dias de férias</label>
+        <input id="fDias" type="number" min="1" max="30" value="30"></div>
+      <div class="campo" id="campoVendidos"><label for="fVendidos">Dias vendidos (abono)</label>
+        <input id="fVendidos" type="number" min="0" max="10" value="0">
+        <span class="dica">No máximo 1/3 do período.</span></div>
+      <div class="campo" id="campoMeses"><label for="fMeses">Meses trabalhados no ano</label>
+        <input id="fMeses" type="number" min="0" max="12" value="12">
+        <span class="dica">Mês com 15 dias ou mais conta inteiro.</span></div>
+    </div>
+    <div style="margin-top:1rem;display:flex;gap:.6rem">
+      <button class="b1" id="btAdd">Adicionar</button>
+      <button class="b2" id="btLimpar">Limpar campos</button>
+    </div>
+  </div>
+
+  <div class="resumo" id="resumo"></div>
+  <div class="tabela"><table id="tabela"></table></div>
+
+  <div class="aviso" id="avisoGeral"></div>
+
+  <p style="font-size:.82rem;color:var(--t3)">
+    Seus dados ficam apenas neste navegador, neste computador. Não há servidor e nada é
+    enviado para lugar nenhum. Use "Exportar backup" antes de limpar o navegador ou trocar
+    de máquina.
+  </p>
+
+</div></main>
+
+<div id="holerite"></div>
+
+<dialog id="dlgImportar">
+  <div class="dlg-h">Importar backup</div>
+  <div class="dlg-b">
+    <p>Cole o conteúdo do arquivo exportado. Isso substitui os dados atuais.</p>
+    <textarea id="txtImportar" style="width:100%;height:150px;background:var(--bg);color:var(--tx);
+      border:1.5px solid var(--bd);border-radius:8px;padding:.6rem;font-family:var(--mono);font-size:.8rem"></textarea>
+  </div>
+  <div class="dlg-f">
+    <button class="b2" id="btCancelaImp">Cancelar</button>
+    <button class="b1" id="btConfirmaImp">Importar</button>
+  </div>
+</dialog>
+
+<script>
+/* ===================================================
+   MOTOR FISCAL 2026
+   Mesmas tabelas do site público, cobertas por 152
+   testes automatizados. Fonte única de verdade.
+   =================================================== */
+var TABELAS = {
+  ano: 2026,
+  inss: { teto: 8475.55, faixas: [
+    { ate: 1621.00, aliquota: 0.075 }, { ate: 2902.84, aliquota: 0.09 },
+    { ate: 4354.27, aliquota: 0.12 },  { ate: 8475.55, aliquota: 0.14 } ] },
+  irrf: {
+    faixas: [
+      { ate: 2428.80, aliquota: 0,     deduzir: 0 },
+      { ate: 2826.65, aliquota: 0.075, deduzir: 182.16 },
+      { ate: 3751.05, aliquota: 0.15,  deduzir: 394.16 },
+      { ate: 4664.68, aliquota: 0.225, deduzir: 675.49 },
+      { ate: Infinity, aliquota: 0.275, deduzir: 908.73 } ],
+    descontoSimplificado: 607.20, deducaoDependente: 189.59,
+    redutor: { limite: 7350.00, constante: 978.62, indice: 0.133145 } },
+  fgts: { aliquota: 0.08 }
+};
+
+function round2(n){
+  var v=Number(n); if(!isFinite(v))return 0;
+  var s=v<0?-1:1, e=Math.abs(v)*100;
+  return s*Math.round(e+e*1e-9)/100;
+}
+function pos(n){ var v=Number(n); return isFinite(v)&&v>0?v:0; }
+
+function calcINSS(sal){
+  var b=pos(sal), t=0, piso=0;
+  for(var i=0;i<TABELAS.inss.faixas.length;i++){
+    var f=TABELAS.inss.faixas[i];
+    if(b<=piso) break;
+    t += (Math.min(b,f.ate)-piso)*f.aliquota;
+    piso=f.ate;
+  }
+  return round2(t);
+}
+function tabelaIRRF(base){
+  var f=TABELAS.irrf.faixas;
+  for(var i=0;i<f.length;i++) if(base<=f[i].ate)
+    return { imposto: Math.max(0, base*f[i].aliquota - f[i].deduzir), aliquota: f[i].aliquota };
+  return { imposto:0, aliquota:0 };
+}
+function calcIRRF(bruto, inss, dep, pensao){
+  var r=TABELAS.irrf.redutor;
+  var bLegal=Math.max(0, bruto-inss-(dep||0)*TABELAS.irrf.deducaoDependente-(pensao||0));
+  var bSimp =Math.max(0, bruto-TABELAS.irrf.descontoSimplificado);
+  var pL=tabelaIRRF(bLegal), pS=tabelaIRRF(bSimp);
+  var usaSimp = pS.imposto < pL.imposto;
+  var esc = usaSimp ? pS : pL;
+  var redutor = bruto > r.limite ? 0 : Math.max(0, round2(r.constante - r.indice*bruto));
+  var imposto = round2(esc.imposto);
+  return {
+    valor: round2(Math.max(0, imposto-redutor)),
+    aliquota: esc.aliquota,
+    base: round2(usaSimp?bSimp:bLegal),
+    redutor: Math.min(redutor, imposto),
+    isento: round2(Math.max(0, imposto-redutor))===0
+  };
+}
+function folhaDe(f){
+  var bruto=pos(f.salario);
+  var inss=calcINSS(bruto);
+  var irrf=calcIRRF(bruto, inss, f.dependentes);
+  // Vale-transporte: a lei limita o desconto a 6% do salário bruto.
+  var vtTeto=round2(bruto*0.06);
+  var vt=Math.min(pos(f.vt), vtTeto);
+  var outros=pos(f.outros);
+  var descontos=round2(inss+irrf.valor+vt+outros);
+  return {
+    bruto:round2(bruto), inss:inss, irrf:irrf,
+    vt:vt, vtLimitado: pos(f.vt) > vtTeto, outros:round2(outros),
+    descontos:descontos, liquido:round2(bruto-descontos),
+    fgts:round2(bruto*TABELAS.fgts.aliquota)
+  };
+}
+
+/* O 13º nunca se soma ao salário do mês: INSS e IRRF são calculados
+   sobre uma base própria. Somar as duas coisas joga o funcionário numa
+   faixa que ele não está e desconta a mais — é o erro mais comum de
+   quem faz 13º na planilha.
+
+   Também não tem vale-transporte: o funcionário não se desloca por
+   causa do 13º.
+
+   A primeira parcela é metade do BRUTO e sai sem desconto nenhum, até
+   30 de novembro. A conta inteira cai na segunda, até 20 de dezembro —
+   por isso a segunda parcela é sempre bem menor que a primeira. */
+function decimoTerceiroDe(f){
+  var salario=pos(f.salario);
+  var meses=Math.min(12, Math.max(0, parseInt(f.meses,10)||0));
+  var bruto=round2((salario/12)*meses);
+
+  var primeira=round2(bruto/2);
+  var inss=calcINSS(bruto);
+  var irrf=calcIRRF(bruto, inss, f.dependentes);
+  var descontos=round2(inss+irrf.valor);
+  var liquido=round2(bruto-descontos);
+
+  return {
+    bruto:bruto, meses:meses,
+    primeira:primeira, segunda:round2(liquido-primeira),
+    inss:inss, irrf:irrf, descontos:descontos, liquido:liquido,
+    fgts:round2(bruto*TABELAS.fgts.aliquota)
+  };
+}
+
+/* Férias têm duas metades com naturezas opostas.
+
+   Os dias gozados e o terço constitucional são remuneração: pagam INSS,
+   IRRF e FGTS. O abono pecuniário — vender até um terço do período — é
+   indenização: não paga nenhum dos três. Misturar as duas coisas numa
+   base só é o erro que faz o funcionário receber menos do que deve.
+
+   A lei limita a venda a 1/3 do período a que ele tem direito, então
+   30 dias vendem no máximo 10. */
+function feriasDe(f){
+  var salario=pos(f.salario);
+  var dias=Math.min(30,Math.max(1,parseInt(f.dias,10)||30));
+  var diasVendidos=Math.min(Math.floor(dias/3), Math.max(0,parseInt(f.diasVendidos,10)||0));
+  var diasGozados=dias-diasVendidos;
+
+  var valorFerias=round2((salario/30)*diasGozados);
+  var terco=round2(valorFerias/3);
+  var base=round2(valorFerias+terco);
+
+  var abono=round2((salario/30)*diasVendidos);
+  var tercoAbono=round2(abono/3);
+  var totalAbono=round2(abono+tercoAbono);
+
+  var inss=calcINSS(base);
+  var irrf=calcIRRF(base, inss, f.dependentes);
+  var descontos=round2(inss+irrf.valor);
+
+  return {
+    dias:dias, diasGozados:diasGozados, diasVendidos:diasVendidos,
+    valorFerias:valorFerias, terco:terco, base:base,
+    abono:abono, tercoAbono:tercoAbono, totalAbono:totalAbono,
+    inss:inss, irrf:irrf, descontos:descontos,
+    liquido:round2(base-descontos+totalAbono),
+    // FGTS incide sobre as férias gozadas e o terço, não sobre o abono.
+    fgts:round2(base*TABELAS.fgts.aliquota)
+  };
+}
+
+/* ---------- FORMATO E ENTRADA ---------- */
+var fmt = new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'});
+function brl(n){ return fmt.format(Number(n)||0); }
+function num(txt){
+  if(typeof txt==='number') return txt;
+  var s=String(txt||'').trim().replace(/[^\d,.-]/g,'');
+  if(!s) return 0;
+  if(s.indexOf(',')>-1) s=s.replace(/\./g,'').replace(',','.');
+  else { var p=s.split('.'); if(p.length>2||(p.length===2&&p[1].length===3)) s=p.join(''); }
+  var n=parseFloat(s); return isFinite(n)?n:0;
+}
+function esc(t){ return String(t==null?'':t).replace(/[&<>"]/g,function(c){
+  return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+
+/* ---------- DEMONSTRAÇÃO ---------- */
+/* A versão de demonstração da página de venda é gerada a partir deste
+   mesmo arquivo, trocando só a linha abaixo. Manter o gancho aqui é o
+   que impede as duas de divergirem: a alternativa era um segundo HTML
+   copiado, e cópia de motor fiscal envelhece errado — foi exatamente
+   esse risco que obrigou a criar o verificar-motor.js. */
+var DEMO={limite:2};
+
+/* ---------- ESTADO ---------- */
+var CHAVE=DEMO?'folhasimples.demo.v1':'folhasimples.v1';
+var dados={ empresa:{nome:'',cnpj:'',competencia:'',modo:'mensal'}, funcionarios:[] };
+function modoAtual(){
+  var m = dados.empresa.modo;
+  return (m==='decimo' || m==='ferias') ? m : 'mensal';
+}
+
+/* Backup vem de arquivo: pode estar truncado, editado à mão ou ser de
+   uma versão futura. Isto devolve um estado sempre utilizável, ou null.
+
+   Nada é aproveitado direto do arquivo: cada campo é reconstruído com o
+   tipo certo. Confiar no que veio de fora foi o que quebrou a versão
+   anterior — bastava um backup sem o objeto `empresa` para preencher()
+   estourar em `dados.empresa.nome`, e como o estado já tinha sido salvo,
+   o erro voltava a cada abertura. A app ficava inutilizável até alguém
+   saber limpar o armazenamento do navegador. */
+function normalizar(d){
+  if(!d || typeof d!=='object' || !Array.isArray(d.funcionarios)) return null;
+
+  var emp = (d.empresa && typeof d.empresa==='object') ? d.empresa : {};
+  var modo = (emp.modo==='decimo' || emp.modo==='ferias') ? emp.modo : 'mensal';
+
+  return {
+    empresa: {
+      nome: String(emp.nome==null?'':emp.nome).slice(0,120),
+      cnpj: String(emp.cnpj==null?'':emp.cnpj).slice(0,24),
+      // O <input type="month"> só aceita AAAA-MM; qualquer outra coisa
+      // deixa o campo vazio sem dizer por quê.
+      competencia: /^\d{4}-\d{2}$/.test(String(emp.competencia||'')) ? emp.competencia : '',
+      modo: modo
+    },
+    funcionarios: d.funcionarios
+      .filter(function(f){ return f && typeof f==='object'; })
+      .slice(0,500)
+      .map(function(f){
+        return {
+          nome: String(f.nome==null?'':f.nome).slice(0,120),
+          cargo: String(f.cargo==null?'':f.cargo).slice(0,120),
+          salario: pos(f.salario),
+          dependentes: Math.min(20,Math.max(0,parseInt(f.dependentes,10)||0)),
+          vt: pos(f.vt),
+          outros: pos(f.outros),
+          meses: Math.min(12,Math.max(0,parseInt(f.meses,10)||12)),
+          dias: Math.min(30,Math.max(1,parseInt(f.dias,10)||30)),
+          diasVendidos: Math.max(0,parseInt(f.diasVendidos,10)||0)
+        };
+      })
+  };
+}
+
+function carregar(){
+  try{
+    var d=normalizar(JSON.parse(localStorage.getItem(CHAVE)||'null'));
+    if(d) dados=d;
+  }catch(e){
+    /* Armazenamento corrompido não pode impedir a app de abrir: ela
+       começa vazia, que é recuperável, em vez de morrer na carga. */
+  }
+}
+function salvar(){
+  try{ localStorage.setItem(CHAVE, JSON.stringify(dados)); }
+  catch(e){ alert('Não consegui salvar. O armazenamento do navegador pode estar cheio ou desativado.'); }
+}
+function el(id){ return document.getElementById(id); }
+function v(id){ return el(id).value; }
+
+/* ---------- RENDER ---------- */
+function render(){
+  if(modoAtual()==='decimo'){ renderDecimo(); return; }
+  if(modoAtual()==='ferias'){ renderFerias(); return; }
+  var linhas='', tot={bruto:0,inss:0,irrf:0,vt:0,outros:0,liq:0,fgts:0};
+  var algumVtLimitado=false;
+
+  dados.funcionarios.forEach(function(f,i){
+    var c=folhaDe(f);
+    tot.bruto+=c.bruto; tot.inss+=c.inss; tot.irrf+=c.irrf.valor;
+    tot.vt+=c.vt; tot.outros+=c.outros; tot.liq+=c.liquido; tot.fgts+=c.fgts;
+    if(c.vtLimitado) algumVtLimitado=true;
+
+    linhas+='<tr>'+
+      '<td>'+esc(f.nome)+(f.cargo?'<br><span style="font-size:.75rem;color:var(--t3)">'+esc(f.cargo)+'</span>':'')+'</td>'+
+      '<td>'+brl(c.bruto)+'</td>'+
+      '<td class="neg">'+brl(c.inss)+'</td>'+
+      '<td class="'+(c.irrf.valor?'neg':'')+'">'+(c.irrf.isento?'isento':brl(c.irrf.valor))+'</td>'+
+      '<td class="neg">'+brl(c.vt)+'</td>'+
+      '<td class="neg">'+brl(c.outros)+'</td>'+
+      '<td class="pos">'+brl(c.liquido)+'</td>'+
+      '<td>'+brl(c.fgts)+'</td>'+
+      '<td class="naoimprime"><button class="b3" data-rem="'+i+'">remover</button></td></tr>';
+  });
+
+  el('tabela').innerHTML = dados.funcionarios.length
+    ? '<thead><tr><th>Funcionário</th><th>Bruto</th><th>INSS</th><th>IRRF</th>'+
+      '<th>VT</th><th>Outros</th><th>Líquido</th><th>FGTS</th><th></th></tr></thead><tbody>'+linhas+'</tbody>'+
+      '<tfoot><tr><td>Total ('+dados.funcionarios.length+')</td><td>'+brl(tot.bruto)+'</td>'+
+      '<td class="neg">'+brl(tot.inss)+'</td><td class="neg">'+brl(tot.irrf)+'</td>'+
+      '<td class="neg">'+brl(tot.vt)+'</td><td class="neg">'+brl(tot.outros)+'</td>'+
+      '<td class="pos">'+brl(tot.liq)+'</td><td>'+brl(tot.fgts)+'</td><td></td></tr></tfoot>'
+    : '<tbody><tr><td class="vazio" colspan="9">Nenhum funcionário ainda. Preencha acima e clique em Adicionar.</td></tr></tbody>';
+
+  var custo = tot.bruto + tot.fgts;
+  el('resumo').innerHTML = dados.funcionarios.length ? [
+    ['Custo total da folha', brl(custo), 'a', 'salários + FGTS'],
+    ['Líquido a pagar', brl(tot.liq), 'v', 'o que sai da conta'],
+    ['INSS a recolher', brl(tot.inss), '', 'retido dos funcionários'],
+    ['FGTS a depositar', brl(tot.fgts), '', '8% sobre o bruto']
+  ].map(function(k){
+    return '<div class="kpi '+k[2]+'"><div class="n">'+k[1]+'</div><div class="l">'+k[0]+
+           '<br><span style="color:var(--t3);font-size:.72rem">'+k[3]+'</span></div></div>';
+  }).join('') : '';
+
+  if(algumVtLimitado){
+    el('resumo').insertAdjacentHTML('afterend',
+      '<div class="aviso" id="avisoVt"><strong>Vale-transporte ajustado.</strong> '+
+      'A lei limita o desconto a 6% do salário bruto; o valor acima disso foi ignorado no cálculo.</div>');
+  } else { var a=el('avisoVt'); if(a) a.remove(); }
+
+  document.querySelectorAll('[data-rem]').forEach(function(b){
+    b.onclick=function(){
+      var i=+b.getAttribute('data-rem');
+      if(confirm('Remover '+dados.funcionarios[i].nome+'?')){
+        dados.funcionarios.splice(i,1); salvar(); render();
+      }
+    };
+  });
+  montarHolerites();
+}
+
+function renderDecimo(){
+  var linhas='', tot={bruto:0,inss:0,irrf:0,p1:0,p2:0,liq:0,fgts:0};
+
+  dados.funcionarios.forEach(function(f,i){
+    var c=decimoTerceiroDe(f);
+    tot.bruto+=c.bruto; tot.inss+=c.inss; tot.irrf+=c.irrf.valor;
+    tot.p1+=c.primeira; tot.p2+=c.segunda; tot.liq+=c.liquido; tot.fgts+=c.fgts;
+
+    linhas+='<tr>'+
+      '<td>'+esc(f.nome)+(f.cargo?'<br><span style="font-size:.75rem;color:var(--t3)">'+esc(f.cargo)+'</span>':'')+'</td>'+
+      '<td><input class="meses-edit" type="number" min="0" max="12" value="'+c.meses+
+        '" data-meses="'+i+'" style="width:3.4rem"></td>'+
+      '<td>'+brl(c.bruto)+'</td>'+
+      '<td class="neg">'+brl(c.inss)+'</td>'+
+      '<td class="'+(c.irrf.valor?'neg':'')+'">'+(c.irrf.isento?'isento':brl(c.irrf.valor))+'</td>'+
+      '<td>'+brl(c.primeira)+'</td>'+
+      '<td class="pos">'+brl(c.segunda)+'</td>'+
+      '<td>'+brl(c.fgts)+'</td>'+
+      '<td class="naoimprime"><button class="b3" data-rem="'+i+'">remover</button></td></tr>';
+  });
+
+  el('tabela').innerHTML = dados.funcionarios.length
+    ? '<thead><tr><th>Funcionário</th><th>Meses</th><th>Bruto</th><th>INSS</th><th>IRRF</th>'+
+      '<th>1ª parcela</th><th>2ª parcela</th><th>FGTS</th><th></th></tr></thead><tbody>'+linhas+'</tbody>'+
+      '<tfoot><tr><td>Total ('+dados.funcionarios.length+')</td><td></td><td>'+brl(tot.bruto)+'</td>'+
+      '<td class="neg">'+brl(tot.inss)+'</td><td class="neg">'+brl(tot.irrf)+'</td>'+
+      '<td>'+brl(tot.p1)+'</td><td class="pos">'+brl(tot.p2)+'</td>'+
+      '<td>'+brl(tot.fgts)+'</td><td></td></tr></tfoot>'
+    : '<tbody><tr><td class="vazio" colspan="9">Nenhum funcionário ainda. Preencha acima e clique em Adicionar.</td></tr></tbody>';
+
+  el('resumo').innerHTML = dados.funcionarios.length ? [
+    ['Custo total do 13º', brl(tot.bruto + tot.fgts), 'a', 'bruto + FGTS'],
+    ['1ª parcela — até 30/11', brl(tot.p1), 'v', 'metade do bruto, sem desconto'],
+    ['2ª parcela — até 20/12', brl(tot.p2), 'v', 'líquido menos a primeira'],
+    ['INSS a recolher', brl(tot.inss), '', 'base própria, não soma ao mês']
+  ].map(function(k){
+    return '<div class="kpi '+k[2]+'"><div class="n">'+k[1]+'</div><div class="l">'+k[0]+
+           '<br><span style="color:var(--t3);font-size:.72rem">'+k[3]+'</span></div></div>';
+  }).join('') : '';
+
+  var a=el('avisoVt'); if(a) a.remove();
+
+  Array.prototype.forEach.call(document.querySelectorAll('[data-rem]'), function(b){
+    b.onclick=function(){
+      var i=+b.getAttribute('data-rem');
+      if(confirm('Remover '+dados.funcionarios[i].nome+'?')){
+        dados.funcionarios.splice(i,1); salvar(); render();
+      }
+    };
+  });
+
+  Array.prototype.forEach.call(document.querySelectorAll('[data-meses]'), function(inp){
+    inp.onchange=function(){
+      var i=+inp.getAttribute('data-meses');
+      dados.funcionarios[i].meses=Math.min(12,Math.max(0,parseInt(inp.value,10)||0));
+      salvar(); render();
+    };
+  });
+
+  montarHolerites();
+}
+
+function renderFerias(){
+  var linhas='', tot={base:0,inss:0,irrf:0,abono:0,liq:0,fgts:0};
+  var algumLimitado=false;
+
+  dados.funcionarios.forEach(function(f,i){
+    var c=feriasDe(f);
+    tot.base+=c.base; tot.inss+=c.inss; tot.irrf+=c.irrf.valor;
+    tot.abono+=c.totalAbono; tot.liq+=c.liquido; tot.fgts+=c.fgts;
+    if(Math.max(0,parseInt(f.diasVendidos,10)||0) > c.diasVendidos) algumLimitado=true;
+
+    linhas+='<tr>'+
+      '<td>'+esc(f.nome)+(f.cargo?'<br><span style="font-size:.75rem;color:var(--t3)">'+esc(f.cargo)+'</span>':'')+'</td>'+
+      '<td>'+c.diasGozados+(c.diasVendidos?' + '+c.diasVendidos+' vend.':'')+'</td>'+
+      '<td>'+brl(c.base)+'</td>'+
+      '<td class="neg">'+brl(c.inss)+'</td>'+
+      '<td class="'+(c.irrf.valor?'neg':'')+'">'+(c.irrf.isento?'isento':brl(c.irrf.valor))+'</td>'+
+      '<td>'+brl(c.totalAbono)+'</td>'+
+      '<td class="pos">'+brl(c.liquido)+'</td>'+
+      '<td>'+brl(c.fgts)+'</td>'+
+      '<td class="naoimprime"><button class="b3" data-rem="'+i+'">remover</button></td></tr>';
+  });
+
+  el('tabela').innerHTML = dados.funcionarios.length
+    ? '<thead><tr><th>Funcionário</th><th>Dias</th><th>Férias + 1/3</th><th>INSS</th><th>IRRF</th>'+
+      '<th>Abono</th><th>Líquido</th><th>FGTS</th><th></th></tr></thead><tbody>'+linhas+'</tbody>'+
+      '<tfoot><tr><td>Total ('+dados.funcionarios.length+')</td><td></td><td>'+brl(tot.base)+'</td>'+
+      '<td class="neg">'+brl(tot.inss)+'</td><td class="neg">'+brl(tot.irrf)+'</td>'+
+      '<td>'+brl(tot.abono)+'</td><td class="pos">'+brl(tot.liq)+'</td>'+
+      '<td>'+brl(tot.fgts)+'</td><td></td></tr></tfoot>'
+    : '<tbody><tr><td class="vazio" colspan="9">Nenhum funcionário ainda. Preencha acima e clique em Adicionar.</td></tr></tbody>';
+
+  el('resumo').innerHTML = dados.funcionarios.length ? [
+    ['Custo total das férias', brl(tot.base + tot.abono + tot.fgts), 'a', 'férias + abono + FGTS'],
+    ['Líquido a pagar', brl(tot.liq), 'v', 'o que sai da conta'],
+    ['INSS a recolher', brl(tot.inss), '', 'só sobre férias e o terço'],
+    ['Abono pecuniário', brl(tot.abono), '', 'indenizatório: sem INSS, IRRF ou FGTS']
+  ].map(function(k){
+    return '<div class="kpi '+k[2]+'"><div class="n">'+k[1]+'</div><div class="l">'+k[0]+
+           '<br><span style="color:var(--t3);font-size:.72rem">'+k[3]+'</span></div></div>';
+  }).join('') : '';
+
+  var a=el('avisoVt'); if(a) a.remove();
+  if(algumLimitado){
+    el('resumo').insertAdjacentHTML('afterend',
+      '<div class="aviso" id="avisoVt"><strong>Dias vendidos ajustados.</strong> '+
+      'A lei limita o abono a um terço do período — o excedente foi ignorado.</div>');
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll('[data-rem]'), function(b){
+    b.onclick=function(){
+      var i=+b.getAttribute('data-rem');
+      if(confirm('Remover '+dados.funcionarios[i].nome+'?')){
+        dados.funcionarios.splice(i,1); salvar(); render();
+      }
+    };
+  });
+  montarHolerites();
+}
+
+function montarRecibosFerias(){
+  var e=dados.empresa;
+  var comp = e.competencia ? e.competencia.split('-').reverse().join('/') : '';
+
+  el('holerite').innerHTML = dados.funcionarios.map(function(f){
+    var c=feriasDe(f);
+    var lin=[
+      ['Férias — '+c.diasGozados+' dias', brl(c.valorFerias), 'v', c.valorFerias],
+      ['Terço constitucional',            brl(c.terco),       'v', c.terco],
+      ['INSS',                            brl(c.inss),        'd', c.inss],
+      ['IRRF', c.irrf.isento?'isento':brl(c.irrf.valor),      'd', c.irrf.valor]
+    ];
+    if(c.diasVendidos){
+      lin.splice(2, 0,
+        ['Abono pecuniário — '+c.diasVendidos+' dias', brl(c.abono), 'v', c.abono],
+        ['Terço sobre o abono',                        brl(c.tercoAbono), 'v', c.tercoAbono]);
+    }
+
+    return '<div class="hol">'+
+      '<h3>'+esc(e.nome||'—')+'</h3>'+
+      '<div class="emp">CNPJ '+esc(e.cnpj||'—')+' &nbsp;·&nbsp; Recibo de férias'+
+        (comp?' &nbsp;·&nbsp; Competência '+esc(comp):'')+'</div>'+
+      '<div style="margin-bottom:6px"><strong>'+esc(f.nome)+'</strong>'+(f.cargo?' — '+esc(f.cargo):'')+'</div>'+
+      '<table><thead><tr><th>Descrição</th><th>Referência</th><th>Vencimentos</th><th>Descontos</th></tr></thead><tbody>'+
+      lin.map(function(l){
+        return '<tr><td>'+l[0]+'</td><td></td>'+
+          (l[2]==='d' ? '<td></td><td>'+l[1]+'</td>' : '<td>'+l[1]+'</td><td></td>')+'</tr>';
+      }).join('')+
+      '<tr class="tot"><td>Totais</td><td></td><td>'+brl(round2(c.base+c.totalAbono))+'</td><td>'+brl(c.descontos)+'</td></tr>'+
+      '<tr class="tot"><td colspan="3">Líquido a receber</td><td>'+brl(c.liquido)+'</td></tr>'+
+      '<tr><td colspan="3">FGTS sobre as férias (depositado pelo empregador)</td><td>'+brl(c.fgts)+'</td></tr>'+
+      '</tbody></table>'+
+      '<div class="ass"><div>Assinatura do empregador</div><div>Recebi em ___/___/______</div></div>'+
+      (DEMO?'<div class="marca-demo">DEMONSTRAÇÃO — não vale como recibo</div>':'')+
+      '</div>';
+  }).join('');
+}
+
+function montarHolerites(){
+  if(modoAtual()==='decimo'){ montarRecibos13(); return; }
+  if(modoAtual()==='ferias'){ montarRecibosFerias(); return; }
+  var e=dados.empresa;
+  var comp = e.competencia ? e.competencia.split('-').reverse().join('/') : '';
+  el('holerite').innerHTML = dados.funcionarios.map(function(f){
+    var c=folhaDe(f);
+    // Cada linha declara a coluna a que pertence — 'v' vencimento, 'd'
+    // desconto — em vez de deduzir isso do valor. Um desconto de R$ 0,00
+    // continua sendo um desconto, e não pode migrar para a coluna de
+    // vencimentos só porque zerou.
+    //
+    // O filtro compara o número, não o texto formatado: Intl.NumberFormat
+    // separa o símbolo com espaço não separável (U+00A0), então
+    // brl(0) !== 'R$ 0,00' e a comparação por string nunca casava.
+    var lin=[
+      ['Salário base',     brl(c.bruto),  'v', c.bruto],
+      ['INSS',             brl(c.inss),   'd', c.inss],
+      ['IRRF',             c.irrf.isento?'isento':brl(c.irrf.valor), 'd', c.irrf.valor],
+      ['Vale-transporte',  brl(c.vt),     'd', c.vt],
+      ['Outros descontos', brl(c.outros), 'd', c.outros]
+    ].filter(function(l,i){ return i<3 || l[3]>0; });
+
+    return '<div class="hol">'+
+      '<h3>'+esc(e.nome||'—')+'</h3>'+
+      '<div class="emp">CNPJ '+esc(e.cnpj||'—')+' &nbsp;·&nbsp; Recibo de pagamento de salário &nbsp;·&nbsp; Competência '+esc(comp)+'</div>'+
+      '<div style="margin-bottom:6px"><strong>'+esc(f.nome)+'</strong>'+(f.cargo?' — '+esc(f.cargo):'')+'</div>'+
+      '<table><thead><tr><th>Descrição</th><th>Referência</th><th>Vencimentos</th><th>Descontos</th></tr></thead><tbody>'+
+      lin.map(function(l){
+        return '<tr><td>'+l[0]+'</td><td></td>'+
+          (l[2]==='d' ? '<td></td><td>'+l[1]+'</td>' : '<td>'+l[1]+'</td><td></td>')+'</tr>';
+      }).join('')+
+      '<tr class="tot"><td>Totais</td><td></td><td>'+brl(c.bruto)+'</td><td>'+brl(c.descontos)+'</td></tr>'+
+      '<tr class="tot"><td colspan="3">Líquido a receber</td><td>'+brl(c.liquido)+'</td></tr>'+
+      '<tr><td colspan="3">FGTS do mês (depositado pelo empregador)</td><td>'+brl(c.fgts)+'</td></tr>'+
+      '</tbody></table>'+
+      '<div class="ass"><div>Assinatura do empregador</div><div>Recebi em ___/___/______</div></div>'+
+      (DEMO?'<div class="marca-demo">DEMONSTRAÇÃO — não vale como recibo</div>':'')+
+      '</div>';
+  }).join('');
+}
+
+function montarRecibos13(){
+  var e=dados.empresa;
+  var ano = e.competencia ? e.competencia.slice(0,4) : '';
+
+  el('holerite').innerHTML = dados.funcionarios.map(function(f){
+    var c=decimoTerceiroDe(f);
+    var lin=[
+      ['13º salário — '+c.meses+'/12 avos', brl(c.bruto), 'v', c.bruto],
+      ['INSS',  brl(c.inss),              'd', c.inss],
+      ['IRRF',  c.irrf.isento?'isento':brl(c.irrf.valor), 'd', c.irrf.valor]
+    ];
+
+    return '<div class="hol">'+
+      '<h3>'+esc(e.nome||'—')+'</h3>'+
+      '<div class="emp">CNPJ '+esc(e.cnpj||'—')+' &nbsp;·&nbsp; Recibo de 13º salário'+
+        (ano?' &nbsp;·&nbsp; Ano '+esc(ano):'')+'</div>'+
+      '<div style="margin-bottom:6px"><strong>'+esc(f.nome)+'</strong>'+(f.cargo?' — '+esc(f.cargo):'')+'</div>'+
+      '<table><thead><tr><th>Descrição</th><th>Referência</th><th>Vencimentos</th><th>Descontos</th></tr></thead><tbody>'+
+      lin.map(function(l){
+        return '<tr><td>'+l[0]+'</td><td></td>'+
+          (l[2]==='d' ? '<td></td><td>'+l[1]+'</td>' : '<td>'+l[1]+'</td><td></td>')+'</tr>';
+      }).join('')+
+      '<tr class="tot"><td>Totais</td><td></td><td>'+brl(c.bruto)+'</td><td>'+brl(c.descontos)+'</td></tr>'+
+      '<tr class="tot"><td colspan="3">Líquido do 13º</td><td>'+brl(c.liquido)+'</td></tr>'+
+      '<tr><td colspan="3">1ª parcela — paga até 30/11, sem desconto</td><td>'+brl(c.primeira)+'</td></tr>'+
+      '<tr><td colspan="3">2ª parcela — paga até 20/12</td><td>'+brl(c.segunda)+'</td></tr>'+
+      '<tr><td colspan="3">FGTS sobre o 13º (depositado pelo empregador)</td><td>'+brl(c.fgts)+'</td></tr>'+
+      '</tbody></table>'+
+      '<div class="ass"><div>Assinatura do empregador</div><div>Recebi em ___/___/______</div></div>'+
+      (DEMO?'<div class="marca-demo">DEMONSTRAÇÃO — não vale como recibo</div>':'')+
+      '</div>';
+  }).join('');
+}
+
+/* ---------- AÇÕES ---------- */
+el('btAdd').onclick=function(){
+  if(DEMO && dados.funcionarios.length>=DEMO.limite){
+    alert('A demonstração vai até '+DEMO.limite+' funcionários. A versão completa não tem limite.');
+    return;
+  }
+  var nome=v('fNome').trim();
+  if(!nome){ alert('Informe o nome do funcionário.'); el('fNome').focus(); return; }
+  if(num(v('fSalario'))<=0){ alert('Informe o salário bruto.'); el('fSalario').focus(); return; }
+  dados.funcionarios.push({
+    nome:nome, cargo:v('fCargo').trim(), salario:num(v('fSalario')),
+    dependentes:parseInt(v('fDep'),10)||0, vt:num(v('fVt')), outros:num(v('fOutros')),
+    meses:Math.min(12,Math.max(0,parseInt(v('fMeses'),10)||12)),
+    dias:Math.min(30,Math.max(1,parseInt(v('fDias'),10)||30)),
+    diasVendidos:Math.max(0,parseInt(v('fVendidos'),10)||0)
+  });
+  salvar(); render(); limparCampos(); el('fNome').focus();
+};
+function limparCampos(){
+  ['fNome','fCargo','fSalario','fVt','fOutros'].forEach(function(i){ el(i).value=''; });
+  el('fDep').value='0';
+  el('fMeses').value='12'; el('fDias').value='30'; el('fVendidos').value='0';
+}
+el('btLimpar').onclick=limparCampos;
+
+['empNome','empCnpj','competencia'].forEach(function(id){
+  el(id).oninput=function(){ guardarEmpresa(); montarHolerites(); };
+});
+el('modo').onchange=function(){ guardarEmpresa(); ajustarCampos(); render(); };
+
+function guardarEmpresa(){
+  dados.empresa={ nome:v('empNome'), cnpj:v('empCnpj'),
+                  competencia:v('competencia'), modo:v('modo') };
+  salvar();
+}
+
+/* Vale-transporte e outros descontos não existem no 13º, e "meses
+   trabalhados" não existe na folha mensal. Campo que fica na tela sem
+   efeito nenhum faz o usuário achar que mexeu em algo quando não mexeu. */
+function textoAviso(){
+  var base = '<strong>Estimativa de apoio.</strong> Os cálculos seguem as tabelas oficiais ' +
+             'de 2026 de INSS e IRRF, incluindo a isenção da Lei 15.270/2025. ';
+  if(modoAtual()==='ferias'){
+    return base + 'Os dias gozados e o terço pagam INSS, IRRF e FGTS. O abono ' +
+           'pecuniário e o terço dele são indenizatórios e não pagam nenhum dos ' +
+           'três. Médias de horas extras e comissões não entram automaticamente: ' +
+           'ajuste o salário informado. Isto não substitui contador.';
+  }
+  return base + (modoAtual()==='decimo'
+    ? 'O 13º tem base própria de INSS e IRRF — ele nunca se soma ao salário do mês. ' +
+      'Verbas variáveis que integram a média (horas extras, comissões, adicionais) não ' +
+      'entram automaticamente: ajuste o salário informado. Isto não substitui contador.'
+    : 'Adicionais, horas extras, faltas, acordos coletivos e verbas específicas do ' +
+      'contrato não entram automaticamente — lance em "outros descontos" ou ajuste o ' +
+      'salário. Isto não substitui contador.');
+}
+
+var CAMPOS_POR_MODO = {
+  mensal:  ['campoVt', 'campoOutros'],
+  decimo:  ['campoMeses'],
+  ferias:  ['campoDias', 'campoVendidos']
+};
+var TODOS_OPCIONAIS = ['campoVt', 'campoOutros', 'campoMeses', 'campoDias', 'campoVendidos'];
+
+function ajustarCampos(){
+  el('avisoGeral').innerHTML = textoAviso();
+  var visiveis = CAMPOS_POR_MODO[modoAtual()] || [];
+  TODOS_OPCIONAIS.forEach(function(id){
+    el(id).style.display = visiveis.indexOf(id) === -1 ? 'none' : '';
+  });
+}
+
+el('btImprimir').onclick=function(){
+  if(!dados.funcionarios.length){ alert('Adicione ao menos um funcionário.'); return; }
+  if(!dados.empresa.nome){ alert('Preencha a razão social da empresa — ela vai no holerite.'); el('empNome').focus(); return; }
+  window.print();
+};
+
+/* ---------- BACKUP CIFRADO ---------- */
+/* O arquivo de backup é a única parte da folha que sai deste computador:
+   vai por e-mail para o contador, para um pendrive, para a pasta que
+   sincroniza com a nuvem. Ali o salário de todo mundo viaja em texto
+   puro, e é ali que cifrar tem efeito real.
+
+   O localStorage fica de fora de propósito. Cifrar dado que a própria
+   página tem de ler exigiria a chave junto do código — obfuscação, não
+   criptografia. Pedir a senha a cada abertura protegeria de verdade,
+   mas num programa usado uma vez por mês isso é o atrito que faz a
+   pessoa voltar para a planilha. Quem tem acesso ao navegador do dono já
+   tem acesso à máquina do dono.
+
+   PBKDF2-SHA256 com 310.000 iterações (recomendação da OWASP) derivando
+   AES-GCM de 256 bits. A contagem vai dentro do arquivo, para que um
+   backup antigo continue abrindo quando o número subir. */
+var CRIPTO = { formato:'folhasimples.cripto.v1', iteracoes:310000 };
+
+function temCripto(){
+  return !!(window.crypto && window.crypto.subtle && window.isSecureContext);
+}
+function b64(buf){
+  var bin=''; var b=new Uint8Array(buf);
+  for(var i=0;i<b.length;i++) bin+=String.fromCharCode(b[i]);
+  return btoa(bin);
+}
+function deB64(txt){
+  var bin=atob(txt); var b=new Uint8Array(bin.length);
+  for(var i=0;i<bin.length;i++) b[i]=bin.charCodeAt(i);
+  return b;
+}
+function derivar(senha, salt, iteracoes){
+  return crypto.subtle.importKey('raw', new TextEncoder().encode(senha), 'PBKDF2', false, ['deriveKey'])
+    .then(function(km){
+      return crypto.subtle.deriveKey(
+        { name:'PBKDF2', salt:salt, iterations:iteracoes, hash:'SHA-256' },
+        km, { name:'AES-GCM', length:256 }, false, ['encrypt','decrypt']);
+    });
+}
+function cifrar(texto, senha){
+  var salt=crypto.getRandomValues(new Uint8Array(16));
+  var iv=crypto.getRandomValues(new Uint8Array(12));
+  return derivar(senha, salt, CRIPTO.iteracoes).then(function(key){
+    return crypto.subtle.encrypt({ name:'AES-GCM', iv:iv }, key, new TextEncoder().encode(texto));
+  }).then(function(ct){
+    return JSON.stringify({
+      formato: CRIPTO.formato, iteracoes: CRIPTO.iteracoes,
+      salt: b64(salt), iv: b64(iv), dados: b64(ct)
+    }, null, 2);
+  });
+}
+function decifrar(env, senha){
+  var it = parseInt(env.iteracoes,10) || CRIPTO.iteracoes;
+  return derivar(senha, deB64(env.salt), it).then(function(key){
+    return crypto.subtle.decrypt({ name:'AES-GCM', iv:deB64(env.iv) }, key, deB64(env.dados));
+  }).then(function(pt){
+    return new TextDecoder().decode(pt);
+  });
+}
+
+function baixar(texto, nome){
+  var blob=new Blob([texto],{type:'application/json'});
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=nome;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(function(){ URL.revokeObjectURL(a.href); }, 1000);
+}
+
+el('btExportar').onclick=function(){
+  var comp = dados.empresa.competencia||'atual';
+  var txt = JSON.stringify(dados,null,2);
+
+  if(!temCripto()){
+    baixar(txt, 'folha-backup-'+comp+'.json');
+    return;
+  }
+
+  var senha = prompt(
+    'Senha para proteger o backup.\n\n' +
+    'O arquivo leva o salário de todo mundo. Se ele for por e-mail ou ' +
+    'pendrive, use uma senha.\n\n' +
+    'Deixe em branco para salvar sem proteção.');
+
+  // null é cancelar; string vazia é "sem senha, sei o que faço".
+  if(senha===null) return;
+  if(senha===''){ baixar(txt, 'folha-backup-'+comp+'.json'); return; }
+
+  cifrar(txt, senha).then(function(env){
+    baixar(env, 'folha-backup-'+comp+'.cripto.json');
+    alert('Backup cifrado.\n\nGuarde a senha: sem ela o arquivo não abre, ' +
+          'nem por mim nem por ninguém. Não há como recuperar.');
+  }).catch(function(){
+    alert('Não consegui cifrar o backup. Nada foi salvo — tente de novo.');
+  });
+};
+
+el('btImportar').onclick=function(){ el('dlgImportar').showModal(); };
+el('btCancelaImp').onclick=function(){ el('dlgImportar').close(); };
+function aplicarImportado(novo){
+  if(!novo){
+    alert('Arquivo inválido. Cole o conteúdo exato do backup exportado — ' +
+          'ele começa com { e tem uma lista "funcionarios".');
+    return;
+  }
+  dados=novo; salvar(); preencher(); ajustarCampos(); render();
+  el('dlgImportar').close(); el('txtImportar').value='';
+}
+
+el('btConfirmaImp').onclick=function(){
+  var bruto=null;
+  try{ bruto=JSON.parse(el('txtImportar').value); }catch(e){ bruto=null; }
+
+  // Backup cifrado: pedir a senha antes de qualquer validação, porque
+  // sem decifrar não há o que validar.
+  if(bruto && bruto.formato===CRIPTO.formato){
+    if(!temCripto()){
+      alert('Este backup está cifrado e o navegador não expõe as funções de ' +
+            'criptografia aqui. Abra o arquivo direto do disco, com dois cliques.');
+      return;
+    }
+    var senha = prompt('Senha do backup cifrado:');
+    if(senha===null) return;
+    decifrar(bruto, senha).then(function(txt){
+      aplicarImportado(normalizar(JSON.parse(txt)));
+    }).catch(function(){
+      alert('Senha errada, ou o arquivo foi alterado depois de cifrado.');
+    });
+    return;
+  }
+
+  var novo=null;
+  try{ novo=normalizar(bruto); }catch(e){ novo=null; }
+
+  // Validar antes de tocar no estado. A versão anterior gravava e só
+  // então descobria o problema, então avisava "arquivo inválido" com o
+  // arquivo inválido já salvo por cima do bom.
+  aplicarImportado(novo);
+};
+
+function preencher(){
+  el('empNome').value=dados.empresa.nome||'';
+  el('empCnpj').value=dados.empresa.cnpj||'';
+  el('competencia').value=dados.empresa.competencia||new Date().toISOString().slice(0,7);
+  dados.empresa.competencia=el('competencia').value;
+  el('modo').value=modoAtual();
+}
+
+carregar(); preencher(); ajustarCampos(); render();
+</script>
+</body>
+</html>

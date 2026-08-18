@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Folha Simples — gerador de holerite e folha de pagamento 2026</title>
+<meta name="description" content="Gere holerite e calcule folha, férias e 13º dos seus funcionários com as tabelas de 2026. Roda offline, seus dados nunca saem do computador. Pagamento único, sem mensalidade.">
+<link rel="canonical" href="https://kaiohomem.github.io/produtos/folha-de-pagamento.html">
+
+<meta property="og:type" content="product">
+<meta property="og:url" content="https://kaiohomem.github.io/produtos/folha-de-pagamento.html">
+<meta property="og:title" content="Folha Simples — holerite sem planilha e sem mensalidade">
+<meta property="og:description" content="INSS, IRRF e FGTS calculados com as tabelas de 2026. Roda offline, sem enviar dado de salário para lugar nenhum.">
+<meta property="og:locale" content="pt_BR">
+<meta name="twitter:card" content="summary">
+
+<meta http-equiv="Content-Security-Policy" content="
+  default-src 'self';
+  script-src 'self';
+  style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+  font-src https://fonts.gstatic.com;
+  img-src 'self' data:;
+  connect-src 'self';
+  object-src 'none'; base-uri 'self'; form-action 'self';
+">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📋</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../ferramentas/tools.css">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Folha Simples",
+  "applicationCategory": "BusinessApplication",
+  "operatingSystem": "Any",
+  "inLanguage": "pt-BR",
+  "description": "Gerador de holerite, folha de pagamento, férias e 13º salário com as tabelas fiscais brasileiras de 2026. Funciona offline.",
+  "offers": { "@type": "Offer", "price": "97.00", "priceCurrency": "BRL" }
+}
+</script>
+
+<style>
+.preco-caixa{background:linear-gradient(135deg,var(--green-dim),transparent);
+  border:1px solid rgba(63,185,80,.35);border-radius:var(--radius-lg);padding:2rem;margin:2rem 0;text-align:center}
+.preco-caixa .valor{font-family:var(--font-mono);font-size:3rem;font-weight:700;color:var(--green);line-height:1}
+.preco-caixa .sub{color:var(--text-2);margin:.4rem 0 1.4rem}
+.btn-comprar{display:inline-flex;align-items:center;gap:.6rem;background:var(--green);color:var(--bg);
+  font-weight:600;font-size:1.05rem;padding:1rem 2.2rem;border-radius:var(--radius);text-decoration:none;
+  transition:transform .3s var(--ease-spring),background-color var(--ease)}
+.btn-comprar:hover{background:#4ac860;color:var(--bg);transform:translateY(-2px)}
+.btn-comprar.indisponivel{background:var(--bg-3);color:var(--text-2);cursor:not-allowed;pointer-events:none}
+.tela{border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;margin:1.5rem 0;background:var(--bg-2)}
+.tela img{width:100%;display:block}
+.tela-legenda{padding:.7rem 1rem;font-size:.82rem;color:var(--text-3);border-top:1px solid var(--border)}
+.destaque-privacidade{background:var(--accent-dim);border:1px solid rgba(88,166,255,.3);
+  border-radius:var(--radius-lg);padding:1.5rem;margin:2rem 0}
+.destaque-privacidade h3{margin-top:0;color:var(--accent)}
+.destaque-privacidade p:last-child{margin-bottom:0}
+.link-demo{font-size:.9rem;color:var(--accent);font-weight:500}
+.caixa-demo{border:1px dashed var(--border);border-radius:var(--radius-lg);padding:1.5rem;margin:2rem 0}
+.caixa-demo h3{margin-top:0}
+.caixa-demo p{color:var(--text-2)}
+.caixa-demo a{display:inline-block;margin-top:.4rem;font-weight:600;color:var(--accent)}
+</style>
+</head>
+<body data-ferramenta="">
+
+<header class="topo" id="topo"></header>
+
+<main class="wrap">
+
+  <div class="cabecalho">
+    <div class="trilha"><a href="../ferramentas/index.html">ferramentas</a> / folha simples</div>
+    <div class="selo">tabelas de 2026</div>
+    <h1>Holerite pronto em 2 minutos, sem planilha e sem mensalidade</h1>
+    <p class="resumo">
+      Você digita o salário. Ele calcula INSS, IRRF e FGTS pelas tabelas oficiais de 2026
+      e imprime o holerite de cada funcionário. Faz também férias e 13º, cada um com
+      a sua regra. Roda no seu computador, offline.
+    </p>
+  </div>
+
+  <div class="preco-caixa">
+    <div class="rotulo" style="font-family:var(--font-mono);font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;color:var(--text-2);margin-bottom:.5rem">Pagamento único</div>
+    <div class="valor">R$ 97</div>
+    <div class="sub">Sem mensalidade. Sem cadastro. O arquivo é seu para sempre.</div>
+    <a class="btn-comprar indisponivel" id="btComprar" href="#">Comprar agora →</a>
+    <p style="font-size:.82rem;color:var(--text-3);margin:1rem 0 0" id="notaCompra">
+      Link de pagamento sendo configurado.
+    </p>
+    <p style="margin:1.2rem 0 0">
+      <a href="demo.html" class="link-demo">Testar antes, sem pagar nada →</a>
+    </p>
+  </div>
+
+  <div class="tela">
+    <img src="tela-folha.webp" width="1520" height="1524" loading="lazy"
+         alt="Tela do Folha Simples com quatro funcionários cadastrados, os totais de custo da folha, líquido, INSS e FGTS, e a tabela de cálculo por pessoa.">
+    <div class="tela-legenda">
+      A tela real do programa. Os quatro cartões no topo respondem o que o dono da
+      empresa pergunta todo mês: quanto sai da conta, quanto recolher e quanto depositar.
+    </div>
+  </div>
+
+  <div class="tela">
+    <img src="tela-decimo.webp" width="1520" height="1430" loading="lazy"
+         alt="A mesma tela no modo 13º salário, com os meses trabalhados por funcionário, a primeira e a segunda parcela e o INSS calculado sobre base própria.">
+    <div class="tela-legenda">
+      Em novembro é só trocar o seletor. Ele recalcula a equipe inteira em 13º, com os
+      avos de quem entrou no meio do ano e as duas parcelas separadas.
+    </div>
+  </div>
+
+  <div class="tela">
+    <img src="tela-holerite.webp" width="1300" height="346" loading="lazy"
+         alt="Holerite gerado pelo programa, com salário base em vencimentos, INSS, IRRF e outros descontos na coluna de descontos, totais, líquido a receber e FGTS do mês.">
+    <div class="tela-legenda">
+      O holerite que ele imprime — um por funcionário, com espaço para as duas
+      assinaturas. Dá para mandar para a impressora ou salvar em PDF.
+    </div>
+  </div>
+
+  <div class="caixa-demo">
+    <h3>Teste com os seus números antes de decidir</h3>
+    <p>
+      A demonstração roda aqui no navegador e vai até dois funcionários. O cálculo é
+      exatamente o mesmo da versão completa — é o mesmo arquivo, gerado a partir dele.
+      Os holerites saem marcados como demonstração.
+    </p>
+    <a href="demo.html">Abrir a demonstração →</a>
+  </div>
+
+  <article class="conteudo">
+
+    <h2>O problema</h2>
+    <p>
+      Se você tem funcionário registrado, é <strong>obrigado por lei</strong> a entregar
+      um recibo de pagamento todo mês. E a conta não é simples: o INSS é progressivo faixa
+      por faixa, o IRRF tem desconto simplificado que às vezes compensa e às vezes não, e
+      em 2026 entrou ainda o redutor da Lei 15.270 que isenta quem ganha até R$ 5.000.
+    </p>
+    <p>
+      Errar para menos gera passivo trabalhista. Errar para mais é dinheiro seu indo
+      embora. E fazer na planilha significa refazer a fórmula toda vez que a tabela muda.
+    </p>
+
+    <h2>O que ele faz</h2>
+    <ul>
+      <li>Cadastra seus funcionários com salário, dependentes e descontos</li>
+      <li>Calcula <strong>INSS progressivo</strong> pelas quatro faixas de 2026</li>
+      <li>Calcula <strong>IRRF</strong> escolhendo sozinho entre desconto simplificado e deduções legais, já com o redutor da Lei 15.270/2025</li>
+      <li>Limita o <strong>vale-transporte</strong> ao teto legal de 6% automaticamente</li>
+      <li>Mostra o <strong>custo total da folha</strong>, o líquido a pagar, o INSS a recolher e o FGTS a depositar</li>
+      <li>Calcula o <strong>13º salário</strong> com as duas parcelas e os avos de quem entrou no meio do ano</li>
+      <li>Calcula <strong>férias</strong>, com o terço e o abono pecuniário separados como manda a lei</li>
+      <li><strong>Imprime o holerite</strong> de cada um, pronto para assinar</li>
+      <li>Faz backup em arquivo, para você guardar onde quiser</li>
+    </ul>
+
+    <h2>O 13º, que é onde a planilha mais erra</h2>
+    <p>
+      O 13º <strong>não se soma ao salário do mês</strong>. INSS e IRRF são calculados
+      sobre uma base própria. Quem soma as duas coisas joga o funcionário numa faixa em
+      que ele não está e desconta a mais — e o funcionário não tem como perceber.
+    </p>
+    <p>
+      A primeira parcela é <strong>metade do bruto, sem desconto nenhum</strong>, até 30 de
+      novembro. A conta inteira cai na segunda, até 20 de dezembro, e por isso ela sempre
+      vem bem menor que a primeira. Quem entrou no meio do ano recebe por avos — mês com
+      15 dias ou mais conta inteiro.
+    </p>
+    <p>
+      O programa faz isso para a equipe toda de uma vez e emite o recibo com as duas
+      parcelas no mesmo papel, porque emitir dois documentos para o mesmo direito só cria
+      chance de pagar um e esquecer o outro.
+    </p>
+
+    <h2>Férias: duas metades com regras opostas</h2>
+    <p>
+      Os dias gozados e o terço constitucional são remuneração — pagam INSS, IRRF e FGTS.
+      O <strong>abono pecuniário</strong>, que é vender até um terço do período, é
+      indenização: <strong>não paga nenhum dos três</strong>.
+    </p>
+    <p>
+      Quem joga tudo numa base só desconta INSS e IRRF sobre um valor que a lei não manda
+      tributar, e o funcionário recebe menos do que deve. O programa separa as duas
+      metades sozinho e ainda limita a venda ao teto de um terço.
+    </p>
+
+    <div class="destaque-privacidade">
+      <h3>Seus dados de salário não saem do seu computador</h3>
+      <p>
+        Não existe servidor. Não existe nuvem. Não existe cadastro. O arquivo roda no seu
+        navegador, e os dados ficam no seu disco — inclusive sem internet.
+      </p>
+      <p>
+        Isso importa porque folha de pagamento é o dado mais sensível de uma empresa
+        pequena: salário de cada pessoa, CPF, quem ganha mais que quem. Num sistema
+        online, isso está no servidor de outra pessoa. Aqui não está.
+      </p>
+    </div>
+
+    <h2>Os cálculos são conferidos</h2>
+    <p>
+      O motor fiscal deste programa é <strong>o mesmo</strong> das
+      <a href="../ferramentas/index.html">calculadoras públicas do site</a>, e passa por
+      152 testes automatizados a cada alteração — ancorados em valores oficiais como o
+      desconto máximo de INSS de R$ 988,09 e o redutor do IRRF zerando exatamente em
+      R$ 7.350.
+    </p>
+    <p>
+      Há ainda um teste que compara, salário a salário de R$ 500 a R$ 25.000, o motor
+      embutido no programa contra o motor testado. Se um centavo divergir, a publicação
+      trava. Você pode conferir tudo:
+      <a href="https://github.com/KaioHomem/KaioHomem.github.io" rel="noopener">o código é aberto</a>.
+    </p>
+
+    <div class="aviso">
+      <p>
+        <strong>Não substitui contador.</strong> Ele calcula a folha padrão. Adicionais de
+        insalubridade e periculosidade, horas extras, faltas, acordos coletivos e verbas
+        específicas do contrato precisam ser lançados manualmente. Obrigações acessórias —
+        eSocial, guias, FGTS Digital — continuam com seu contador.
+      </p>
+    </div>
+
+    <h2>Perguntas frequentes</h2>
+
+    <details>
+      <summary>Preciso instalar alguma coisa?</summary>
+      <p>
+        Não. É um arquivo só. Você baixa, dá dois cliques e abre no navegador que já tem.
+        Funciona no Windows, Mac, Linux e até no celular.
+      </p>
+    </details>
+
+    <details>
+      <summary>E quando as tabelas mudarem em janeiro?</summary>
+      <p>
+        Você recebe a versão atualizada sem pagar de novo — o mesmo link de download
+        continua valendo. As tabelas do INSS e do IRRF são republicadas todo janeiro, e
+        existe uma verificação automática mensal que avisa quando isso acontece.
+      </p>
+    </details>
+
+    <details>
+      <summary>Quantos funcionários ele aguenta?</summary>
+      <p>
+        Não há limite imposto. Ele foi feito pensando em empresas de 1 a 20 funcionários,
+        que é onde a planilha manual dói mais.
+      </p>
+    </details>
+
+    <details>
+      <summary>Se eu trocar de computador, perco os dados?</summary>
+      <p>
+        Os dados ficam no navegador daquele computador. Use o botão "Exportar backup"
+        antes de trocar — ele salva um arquivo que você importa na máquina nova.
+      </p>
+    </details>
+
+    <details>
+      <summary>E se não servir para mim?</summary>
+      <p>
+        Devolvo o valor. Escreva para
+        <a href="mailto:kaiokateto@gmail.com">kaiokateto@gmail.com</a> dentro de 7 dias
+        dizendo que não serviu — sem precisar justificar.
+      </p>
+    </details>
+
+  </article>
+
+</main>
+
+<footer class="rodape" id="rodape"></footer>
+
+<script src="../ferramentas/nucleo.js"></script>
+<script src="../ferramentas/app.js"></script>
+<script src="pagamento.js"></script>
+</body>
+</html>

@@ -5,14 +5,26 @@ on:
     branches: ["main"]
     paths:
       - 'ferramentas/**'
+      - 'produtos/**'
+      - 'package.json'
       - '.github/workflows/ferramentas.yml'
   pull_request:
     paths:
       - 'ferramentas/**'
+      - 'produtos/**'
+      - 'package.json'
+      - '.github/workflows/ferramentas.yml'
   # First day of every month, 09:00 UTC.
   schedule:
     - cron: '0 9 1 * *'
   workflow_dispatch:
+
+# Um push novo torna a execução anterior irrelevante. Sem isto ela
+# continua rodando até terminar — ou, se travar, até o teto de seis
+# horas do GitHub.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: write
@@ -22,6 +34,7 @@ jobs:
   testes:
     name: Verificar cálculos
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
 
@@ -44,9 +57,61 @@ jobs:
       - name: Auditoria de links, acessibilidade e peso
         run: node ferramentas/auditoria.js
 
+      # Gate: o produto vendido carrega uma cópia das tabelas fiscais,
+      # porque precisa rodar offline. Cópia que ninguém compara com o
+      # original é cópia que envelhece errado — e um holerite errado é o
+      # pior defeito possível num programa de folha.
+      - name: Conferir o motor embutido no produto
+        run: node produtos/verificar-motor.js
+
+      # Gate: a demonstração é gerada a partir do produto. Se alguém
+      # editar o produto e esquecer de regenerar, a demo passa a calcular
+      # diferente do que o comprador leva — e demo que mente sobre o
+      # produto é pior que demo nenhuma.
+      - name: Conferir se a demonstração está em dia
+        run: node produtos/gerar-demo.js --verificar
+
+  navegador:
+    name: Verificar as páginas no navegador
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # npm ci em vez de npm install: instala exatamente o que está no
+      # lockfile. Com install, cada execução podia resolver uma versão
+      # diferente — e um gate que roda contra código diferente do que foi
+      # revisado não garante muita coisa.
+      - name: Instalar dependências de verificação
+        run: npm ci --no-audit --no-fund
+
+      # Gate: vulnerabilidade alta ou crítica nas ferramentas de
+      # verificação. Nível baixo/moderado não derruba o build — o
+      # playwright só roda na CI e nunca chega ao navegador de um
+      # visitante, então travar o deploy por aviso menor treinaria todo
+      # mundo a ignorar este passo.
+      - name: Varredura de vulnerabilidades
+        run: npm audit --audit-level=high
+
+      - name: Baixar o Chromium
+        run: npx playwright install --with-deps chromium
+
+      # Gate: os outros gates leem arquivos. Este abre as páginas num
+      # navegador de verdade, onde mora uma classe inteira de defeito que
+      # a leitura estática não alcança — erro de JavaScript que apaga a
+      # tela, botão que não calcula, página que rola sozinha para o lugar
+      # errado. Foi escrito depois de dois desses passarem batido.
+      - name: Abrir as dez páginas num Chromium
+        run: node ferramentas/verificar-paginas.js
+
   manutencao:
     name: Manutenção mensal
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     needs: testes
     if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
     steps:

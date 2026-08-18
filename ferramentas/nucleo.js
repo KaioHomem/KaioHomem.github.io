@@ -93,7 +93,23 @@
       adicionalExtraComum: 0.5,   // business days, legal minimum
       adicionalExtraDomingo: 1.0, // Sundays and public holidays
       adicionalNoturno: 0.2,      // urban worker, 22h–05h
-      minutosHoraNoturna: 52.5    // the "reduced" night hour
+      minutosHoraNoturna: 52.5,   // the "reduced" night hour
+      horasMes: 220               // 44h/week, the standard schedule
+    },
+
+    // Employer-side charges. These sit on top of the salary and never
+    // appear on the payslip, which is why hiring surprises people.
+    // Source: Lei 8.212/1991 art. 22 (CPP and RAT) and LC 123/2006
+    // art. 13 (what the Simples DAS already covers).
+    empregador: {
+      cpp: 0.20,              // contribuição previdenciária patronal
+      ratOpcoes: [0.01, 0.02, 0.03],  // risco leve, médio, grave
+      fapMin: 0.5,
+      fapMax: 2.0,
+      terceirosPadrao: 0.058, // Sistema S, INCRA, salário-educação
+      terceirosMax: 0.078,
+      multaFgts: 0.40,        // sobre o saldo, na dispensa sem justa causa
+      tetoDescontoVt: 0.06    // do salário base, Lei 7.418/1985
     }
   };
 
@@ -380,6 +396,94 @@
     };
   }
 
+  /**
+   * custoDemissao — the employer's side of a dismissal.
+   *
+   * rescisao() answers what the worker receives. This answers the
+   * question that keeps the owner awake: how much cash has to be in the
+   * account on the day. The two differ by the employer charges, which
+   * never appear on the worker's termination statement.
+   *
+   * Which charge lands on which verba is the whole difficulty, and it is
+   * settled case law rather than something derivable:
+   *
+   *   saldo de salário e 13º proporcional  → INSS patronal e FGTS
+   *   aviso prévio indenizado              → só FGTS (Súmula 305 do TST);
+   *                                          o INSS patronal não incide
+   *                                          (STJ, Tema 478)
+   *   férias indenizadas e o terço         → nenhum dos dois; são verbas
+   *                                          indenizatórias (STJ, Tema 737)
+   *
+   * O terço de férias GOZADAS é outra história e paga INSS patronal
+   * (STF, Tema 985) — está em custoFuncionario, não aqui.
+   *
+   * A multa de 40% incide sobre o saldo da conta na data do pagamento,
+   * sem a projeção do aviso indenizado (OJ 42, II, da SDI-1 do TST). Como
+   * o saldo entra como dado informado, é exatamente isso que acontece.
+   */
+  function custoDemissao(opcoes) {
+    var o = opcoes || {};
+    var E = TABELAS.empregador;
+
+    var r = rescisao(o);
+
+    var regime = o.regime === 'normal' ? 'normal'
+               : o.regime === 'simplesIV' ? 'simplesIV'
+               : 'simples';
+
+    var rat = positivo(o.rat) || E.ratOpcoes[1];
+    var fap = Number(o.fap);
+    if (!isFinite(fap) || fap <= 0) fap = 1.0;
+    fap = Math.min(E.fapMax, Math.max(E.fapMin, fap));
+
+    var terceiros = o.terceiros === undefined ? E.terceirosPadrao : positivo(o.terceiros);
+
+    var pagaCpp = regime !== 'simples';
+    var pagaTerceiros = regime === 'normal';
+
+    var aliquotaPatronal = (pagaCpp ? E.cpp + rat * fap : 0) +
+                           (pagaTerceiros ? terceiros : 0);
+
+    var basePatronal = round2(
+      r.proventos.saldoSalario + r.proventos.decimoTerceiroProporcional
+    );
+    var baseFgts = round2(basePatronal + r.proventos.avisoPrevioIndenizado);
+
+    var inssPatronal = round2(basePatronal * aliquotaPatronal);
+    var fgtsSobreVerbas = round2(baseFgts * TABELAS.fgts.aliquota);
+
+    // O total de proventos já inclui a multa de 40% e os descontos saem
+    // de dentro dele — o que o trabalhador não leva na mão vai para o
+    // governo, mas sai igual do caixa da empresa.
+    var total = round2(
+      r.totalProventos + inssPatronal + fgtsSobreVerbas
+    );
+
+    return {
+      rescisao: r,
+      regime: regime,
+
+      aoTrabalhador: r.liquido,
+      retidoDoTrabalhador: r.totalDescontos,
+      multaFGTS: r.proventos.multaFGTS,
+
+      encargos: {
+        aliquota: aliquotaPatronal,
+        basePatronal: basePatronal,
+        inssPatronal: inssPatronal,
+        baseFgts: baseFgts,
+        fgtsSobreVerbas: fgtsSobreVerbas,
+        total: round2(inssPatronal + fgtsSobreVerbas)
+      },
+
+      total: total,
+
+      // Quantos salários a demissão custa. É o número que responde
+      // "tenho caixa para isso?" sem precisar de contexto.
+      emSalarios: positivo(o.salario) > 0 ? total / positivo(o.salario) : 0
+    };
+  }
+
   /* ---------- 13TH SALARY ---------- */
   /**
    * Christmas bonus (13º salário).
@@ -572,7 +676,7 @@
     var t = TABELAS.jornada;
 
     var salario = positivo(o.salario);
-    var jornadaMensal = positivo(o.jornadaMensal) || 220;
+    var jornadaMensal = positivo(o.jornadaMensal) || TABELAS.jornada.horasMes;
     var valorHora = round2(salario / jornadaMensal);
 
     var horas50 = positivo(o.horas50);
@@ -867,6 +971,113 @@
     ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' })
     : null;
 
+  /**
+   * custoFuncionario — what an employee actually costs the employer.
+   *
+   * Everywhere else on this site answers the employee's question: what
+   * lands in my account. This answers the other one, and the two are
+   * further apart than almost anyone expects.
+   *
+   * The base is not twelve salaries. In a steady year the employer pays
+   * twelve monthly salaries, one 13th, and the constitutional third on
+   * top of the vacation month — 40/3 salaries, not 12. The vacation
+   * salary itself is not extra: the employee is paid while not working,
+   * but it replaces a month that would have been paid anyway. Counting
+   * it twice is the most common way these calculations come out wrong.
+   *
+   * The third carries CPP too: STF Tema 985 settled that in 2020
+   * (incidence valid from 15/09/2020), so it belongs in the charge base.
+   *
+   * Deliberately not modelled: the CPRB payroll-tax relief, which in
+   * 2026 applies to seventeen named sectors under a phase-out schedule
+   * (Lei 14.973/2024). A company inside it knows it is, and a company
+   * outside it would be misled by seeing the option.
+   */
+  function custoFuncionario(opcoes) {
+    var o = opcoes || {};
+    var E = TABELAS.empregador;
+
+    var salario = positivo(o.salario);
+    var beneficios = positivo(o.beneficios);   // VR, VA, plano — custo cheio
+    var vt = positivo(o.valeTransporte);       // custo total do passe
+
+    var regime = o.regime === 'normal' ? 'normal'
+               : o.regime === 'simplesIV' ? 'simplesIV'
+               : 'simples';
+
+    var rat = positivo(o.rat) || E.ratOpcoes[1];
+    var fap = Number(o.fap);
+    if (!isFinite(fap) || fap <= 0) fap = 1.0;
+    fap = Math.min(E.fapMax, Math.max(E.fapMin, fap));
+
+    var terceiros = o.terceiros === undefined ? E.terceirosPadrao : positivo(o.terceiros);
+    var provisionarMulta = o.provisionarMulta !== false;
+
+    /* --- The charge base: 12 salaries + 13th + the vacation third --- */
+    var baseAnual = round2(salario * (40 / 3));
+
+    /* --- Which charges this regime actually pays separately --- */
+    // In Simples annexes I, II, III and V the CPP, the RAT and the
+    // third-party contributions are already inside the DAS. Charging
+    // them again here would roughly double the answer.
+    var pagaCpp = regime !== 'simples';
+    var pagaTerceiros = regime === 'normal';   // Simples is exempt in every annex
+
+    var cpp = pagaCpp ? round2(baseAnual * E.cpp) : 0;
+    var ratEfetivo = pagaCpp ? rat * fap : 0;
+    var valorRat = round2(baseAnual * ratEfetivo);
+    var valorTerceiros = pagaTerceiros ? round2(baseAnual * terceiros) : 0;
+
+    var fgts = round2(baseAnual * TABELAS.fgts.aliquota);
+    var multa = provisionarMulta ? round2(fgts * E.multaFgts) : 0;
+
+    /* --- Benefits --- */
+    // Vale-transporte is bought whole by the employer, who may discount
+    // up to 6% of the base salary from the employee. Below that ceiling
+    // the discount covers it and the net cost is zero.
+    var vtLiquidoMes = round2(Math.max(0, vt - salario * E.tetoDescontoVt));
+    var beneficiosAno = round2(beneficios * 12);
+    var vtAno = round2(vtLiquidoMes * 12);
+
+    var encargosAno = round2(cpp + valorRat + valorTerceiros);
+    var totalAno = round2(baseAnual + encargosAno + fgts + multa + beneficiosAno + vtAno);
+    var totalMes = round2(totalAno / 12);
+
+    return {
+      salario: round2(salario),
+      regime: regime,
+      baseAnual: baseAnual,
+
+      // Monthly equivalents of the base, so the breakdown adds up on screen.
+      provisoes: {
+        decimoTerceiro: round2(salario / 12),
+        tercoFerias: round2(salario / 36)
+      },
+
+      encargos: {
+        cpp: cpp,
+        rat: valorRat,
+        ratAliquota: ratEfetivo,
+        terceiros: valorTerceiros,
+        total: encargosAno,
+        // Share of the charge base, which is what lets two regimes be compared.
+        aliquota: baseAnual > 0 ? encargosAno / baseAnual : 0
+      },
+
+      fgts: { deposito: fgts, multa: multa, total: round2(fgts + multa) },
+      beneficios: { valor: beneficiosAno, vt: vtAno, vtMensal: vtLiquidoMes },
+
+      anual: totalAno,
+      mensal: totalMes,
+
+      // The headline: how many reais leave the company per real of salary.
+      multiplicador: salario > 0 ? totalMes / salario : 0,
+
+      // 220h is the standard monthly schedule (44h/week).
+      custoHora: round2(totalMes / TABELAS.jornada.horasMes)
+    };
+  }
+
   function brl(n) {
     var v = Number(n) || 0;
     return formatadorBRL ? formatadorBRL.format(v) : 'R$ ' + v.toFixed(2);
@@ -891,6 +1102,8 @@
     horasExtras: horasExtras,
     aliquotaSimples: aliquotaSimples,
     cltVsPj: cltVsPj,
+    custoFuncionario: custoFuncionario,
+    custoDemissao: custoDemissao,
     jurosCompostos: jurosCompostos,
     anualParaMensal: anualParaMensal,
     financiamento: financiamento,

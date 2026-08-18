@@ -1,0 +1,18 @@
+{
+  "name": "ferramentas-br",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Calculadoras trabalhistas brasileiras e o produto Folha Simples. O site publicado não usa nada disto — é tudo ferramenta de verificação.",
+  "scripts": {
+    "teste": "node ferramentas/testes.js",
+    "consistencia": "node ferramentas/verificar-consistencia.js",
+    "auditoria": "node ferramentas/auditoria.js",
+    "motor": "node produtos/verificar-motor.js",
+    "paginas": "node ferramentas/verificar-paginas.js",
+    "sitemap": "node ferramentas/gerar-sitemap.js",
+    "verificar": "npm run teste && npm run consistencia && npm run auditoria && npm run motor && npm run paginas"
+  },
+  "devDependencies": {
+    "playwright": "^1.49.0"
+  }
+}

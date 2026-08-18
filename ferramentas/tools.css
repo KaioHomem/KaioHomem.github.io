@@ -306,6 +306,22 @@ tbody tr:hover td { background: var(--bg-3); }
 .relacionadas .item-ferramenta h3 { font-size: 0.95rem; }
 .relacionadas .item-ferramenta p { font-size: 0.83rem; }
 
+/* ---------- PRODUCT CTA ---------- */
+.produto-cta{
+  background: linear-gradient(135deg, var(--accent-dim), transparent);
+  border: 1px solid rgba(88, 166, 255, 0.3);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem 1.6rem;
+  margin: 2.5rem 0 1rem;
+}
+.produto-rot{
+  font-family: var(--font-mono); font-size: .7rem; text-transform: uppercase;
+  letter-spacing: .08em; color: var(--text-3); margin-bottom: .4rem;
+}
+.produto-cta h3{ margin: 0 0 .4rem; font-size: 1.05rem; color: var(--text); }
+.produto-cta p{ margin: 0 0 .9rem; font-size: .89rem; max-width: 64ch; }
+.produto-cta a{ font-size: .9rem; font-weight: 500; }
+
 /* ---------- FAQ ---------- */
 details {
   border: 1px solid var(--border);
@@ -398,7 +414,52 @@ details p { margin: 0.7rem 0 0; font-size: 0.89rem; }
 @media (max-width: 560px) {
   .consent-botoes { width: 100%; }
   .consent-botoes .btn { flex: 1; justify-content: center; }
+
+  /* Com dez ferramentas o menu quebrava em cinco linhas e comia 216px —
+     um quarto da tela de um celular gasto em navegação antes de aparecer
+     qualquer conteúdo. Numa faixa rolável ele cabe em uma linha e o
+     conteúdo volta para cima. */
+  .topo-inner { flex-direction: column; align-items: flex-start; gap: 0.55rem; }
+  .topo nav {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    max-width: 100%;
+    gap: 1rem;
+    padding-bottom: 0.25rem;
+    /* Sem isto o iOS deixa a faixa cortada na borda direita da tela. */
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .topo nav::-webkit-scrollbar { display: none; }
+  .topo nav a { white-space: nowrap; }
 }
+
+/* ---------- TABELA DENTRO DO TEXTO ---------- */
+/* Numa matriz de verba x encargo a tabela é a forma mais curta de dizer
+   a verdade. Em tela estreita ela rola dentro da própria caixa, para não
+   empurrar a página inteira na horizontal. */
+.conteudo .tabela-simples-caixa { overflow-x: auto; margin: 1.4rem 0; }
+.tabela-simples {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  min-width: 26rem;
+}
+.tabela-simples th, .tabela-simples td {
+  text-align: left;
+  padding: 0.7rem 0.9rem;
+  border-bottom: 1px solid var(--border);
+}
+.tabela-simples th {
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-3);
+  font-weight: 500;
+}
+.tabela-simples td:not(:first-child) { font-family: var(--font-mono); font-size: 0.85rem; }
+.tabela-simples tbody tr:last-child td { border-bottom: none; }
 
 /* ---------- FOOTER ---------- */
 .rodape {

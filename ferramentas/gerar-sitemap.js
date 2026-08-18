@@ -21,6 +21,7 @@ var RAIZ = path.join(__dirname, '..');
 var PAGINAS = [
   { caminho: 'index.html',                          url: '/',                                   prioridade: '0.8', frequencia: 'monthly' },
   { caminho: 'ferramentas/index.html',              url: '/ferramentas/',                       prioridade: '0.9', frequencia: 'weekly' },
+  { caminho: 'produtos/folha-de-pagamento.html', url: '/produtos/folha-de-pagamento.html', prioridade: '0.9', frequencia: 'monthly' },
   { caminho: 'privacidade.html',                    url: '/privacidade.html',                   prioridade: '0.3', frequencia: 'yearly' },
   { caminho: 'ferramentas/salario-liquido.html',    url: '/ferramentas/salario-liquido.html',   prioridade: '1.0', frequencia: 'monthly' },
   { caminho: 'ferramentas/rescisao.html',           url: '/ferramentas/rescisao.html',          prioridade: '1.0', frequencia: 'monthly' },
@@ -29,6 +30,8 @@ var PAGINAS = [
   { caminho: 'ferramentas/seguro-desemprego.html',  url: '/ferramentas/seguro-desemprego.html', prioridade: '1.0', frequencia: 'monthly' },
   { caminho: 'ferramentas/horas-extras.html',       url: '/ferramentas/horas-extras.html',      prioridade: '0.9', frequencia: 'monthly' },
   { caminho: 'ferramentas/clt-vs-pj.html',          url: '/ferramentas/clt-vs-pj.html',         prioridade: '1.0', frequencia: 'monthly' },
+  { caminho: 'ferramentas/custo-funcionario.html',  url: '/ferramentas/custo-funcionario.html', prioridade: '1.0', frequencia: 'monthly' },
+  { caminho: 'ferramentas/custo-demissao.html',     url: '/ferramentas/custo-demissao.html',    prioridade: '1.0', frequencia: 'monthly' },
   { caminho: 'ferramentas/juros-compostos.html',    url: '/ferramentas/juros-compostos.html',   prioridade: '0.9', frequencia: 'monthly' },
   { caminho: 'ferramentas/financiamento.html',      url: '/ferramentas/financiamento.html',     prioridade: '0.9', frequencia: 'monthly' }
 ];
