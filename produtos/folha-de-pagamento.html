@@ -90,6 +90,36 @@
   border-radius:var(--radius);text-decoration:none;
   transition:transform .3s var(--ease-spring),background-color var(--ease)}
 .btn-testar:hover{background:#79b8ff;color:var(--bg);transform:translateY(-2px)}
+/* O número do erro precisa parar o olho: é o argumento inteiro da página
+   numa linha só. */
+.numero-choque{display:flex;flex-direction:column;gap:.3rem;margin:1.4rem 0 1.6rem;
+  padding-left:1.1rem;border-left:4px solid var(--red)}
+.numero-choque strong{font-family:var(--font-mono);font-size:clamp(2rem,5vw,3rem);
+  color:var(--red);line-height:1;letter-spacing:-.02em}
+.numero-choque span{color:var(--text-2);font-size:1rem}
+.numero-choque em{font-style:normal;color:var(--text);font-weight:600}
+
+/* Três números lado a lado no lugar do depoimento que não existe. */
+.provas{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
+  gap:1rem;margin:1.6rem 0}
+.provas div{background:var(--bg-2);border:1px solid var(--border);
+  border-left:3px solid var(--green);border-radius:var(--radius);padding:1.1rem}
+.provas strong{display:block;font-family:var(--font-mono);font-size:1.9rem;
+  font-weight:700;color:var(--green);line-height:1.1}
+.provas span{display:block;font-size:.84rem;color:var(--text-2);margin-top:.4rem;line-height:1.45}
+
+.sob-botao{font-size:.86rem;color:var(--text-2);margin:.9rem 0 0}
+
+/* Quem se convence no meio do texto precisa de onde clicar ali mesmo. */
+.cta-meio{display:flex;flex-wrap:wrap;align-items:center;gap:.9rem 1.2rem;
+  background:var(--bg-2);border:1px solid var(--border);border-radius:var(--radius-lg);
+  padding:1.4rem 1.6rem;margin:2.2rem 0}
+.cta-meio span{font-size:.86rem;color:var(--text-3)}
+
+.urgencia{background:var(--accent-dim);border:1px solid rgba(88,166,255,.3);
+  border-radius:var(--radius-lg);padding:1.4rem 1.6rem;margin:2rem 0}
+.urgencia p{margin:0;color:var(--text-2)}
+
 .link-demo{font-size:.9rem;color:var(--accent);font-weight:500}
 .caixa-demo{border:1px dashed var(--border);border-radius:var(--radius-lg);padding:1.5rem;margin:2rem 0}
 .caixa-demo h3{margin-top:0}
@@ -138,6 +168,9 @@
     <p style="font-size:.82rem;color:var(--text-3);margin:1.1rem 0 0" id="notaCompra">
       Link de pagamento sendo configurado.
     </p>
+    <p class="sob-botao">
+      Não serviu? Devolvo os R$ 97 em até 7 dias, sem precisar justificar.
+    </p>
   </div>
 
   <div class="tela">
@@ -179,16 +212,34 @@
 
   <article class="conteudo">
 
-    <h2>O problema</h2>
-    <p>
-      Se você tem funcionário registrado, é <strong>obrigado por lei</strong> a entregar
-      um recibo de pagamento todo mês. E a conta não é simples: o INSS é progressivo faixa
-      por faixa, o IRRF tem desconto simplificado que às vezes compensa e às vezes não, e
-      em 2026 entrou ainda o redutor da Lei 15.270 que isenta quem ganha até R$ 5.000.
+    <h2>Um erro de dezembro custa dez vezes o programa</h2>
+    <p class="numero-choque">
+      <strong>R$ 960,56</strong>
+      <span>descontados a mais de <em>um</em> funcionário, em <em>um</em> dezembro</span>
     </p>
     <p>
-      Errar para menos gera passivo trabalhista. Errar para mais é dinheiro seu indo
-      embora. E fazer na planilha significa refazer a fórmula toda vez que a tabela muda.
+      É o que acontece quando se soma o 13º ao salário do mês numa base só. Num salário de
+      R$ 6.200, o desconto correto é R$ 2.257,08 — em duas bases separadas, como manda a
+      regra. Numa base única vira R$ 3.217,64.
+    </p>
+    <p>
+      A diferença sai do bolso do funcionário, e <strong>ele não tem como perceber</strong>.
+      Você pode conferir agora, de graça, na
+      <a href="../ferramentas/decimo-terceiro.html">calculadora de 13º</a> e na
+      <a href="../ferramentas/salario-liquido.html">de salário líquido</a> — são os mesmos
+      números desta página.
+    </p>
+    <p>
+      E o 13º é só um dos lugares onde a planilha erra. O INSS é progressivo faixa por
+      faixa. O IRRF tem desconto simplificado que às vezes compensa e às vezes não. Em 2026
+      entrou o redutor da Lei 15.270, que isenta quem ganha até R$ 5.000. Férias têm duas
+      metades com regras opostas. <strong>Cada uma dessas regras muda em janeiro</strong> —
+      e a fórmula da planilha não muda sozinha.
+    </p>
+    <p>
+      Errar para menos gera passivo trabalhista. Errar para mais é dinheiro seu indo embora.
+      O programa custa <strong>R$ 97, uma vez</strong> — cerca de um décimo de um único erro
+      como o de cima, e sem mensalidade nenhuma.
     </p>
 
     <h2>O que ele faz</h2>
@@ -222,6 +273,12 @@
       chance de pagar um e esquecer o outro.
     </p>
 
+
+  <div class="cta-meio">
+    <a class="btn-testar" href="demo.html">Testar com os seus números →</a>
+    <span>2 funcionários, sem pagar, sem cadastro</span>
+  </div>
+
     <h2>Férias: duas metades com regras opostas</h2>
     <p>
       Os dias gozados e o terço constitucional são remuneração — pagam INSS, IRRF e FGTS.
@@ -247,19 +304,34 @@
       </p>
     </div>
 
-    <h2>Os cálculos são conferidos</h2>
+
+  <div class="cta-meio">
+    <a class="btn-testar" href="demo.html">Testar com os seus números →</a>
+    <span>2 funcionários, sem pagar, sem cadastro</span>
+  </div>
+
+    <h2>A conta está certa, e dá para conferir</h2>
+    <p>
+      Não tenho depoimento para mostrar: o produto é novo. O que tenho é a prova que
+      importa num programa fiscal — a conta bate, e você não precisa acreditar em mim.
+    </p>
+    <div class="provas">
+      <div><strong>187</strong><span>testes automatizados a cada alteração, ancorados em valores oficiais</span></div>
+      <div><strong>3.820</strong><span>cenários comparando o motor do programa contra o motor testado</span></div>
+      <div><strong>0</strong><span>centavos de divergência aceitos: se houver, a publicação trava</span></div>
+    </div>
     <p>
       O motor fiscal deste programa é <strong>o mesmo</strong> das
-      <a href="../ferramentas/index.html">calculadoras públicas do site</a>, e passa por
-      152 testes automatizados a cada alteração — ancorados em valores oficiais como o
-      desconto máximo de INSS de R$ 988,09 e o redutor do IRRF zerando exatamente em
-      R$ 7.350.
+      <a href="../ferramentas/index.html">calculadoras públicas do site</a>. Os testes são
+      ancorados em valores oficiais como o desconto máximo de INSS de R$ 988,09 e o redutor
+      do IRRF zerando exatamente em R$ 7.350. Os 3.820 cenários cruzam folha mensal, férias
+      e 13º, de R$ 500 a R$ 25.000, com e sem dependentes.
     </p>
     <p>
-      Há ainda um teste que compara, salário a salário de R$ 500 a R$ 25.000, o motor
-      embutido no programa contra o motor testado. Se um centavo divergir, a publicação
-      trava. Você pode conferir tudo:
-      <a href="https://github.com/KaioHomem/KaioHomem.github.io" rel="noopener">o código é aberto</a>.
+      Nada disso é promessa: <a href="https://github.com/KaioHomem/KaioHomem.github.io" rel="noopener">o
+      código é aberto</a>, e as regras vêm de fonte primária — Tema 985 do STF para o terço
+      de férias, Súmula 305 do TST para o FGTS sobre aviso prévio, Lei 15.270/2025 para o
+      redutor do IRRF.
     </p>
 
     <div class="aviso">
@@ -268,6 +340,30 @@
         insalubridade e periculosidade, horas extras, faltas, acordos coletivos e verbas
         específicas do contrato precisam ser lançados manualmente. Obrigações acessórias —
         eSocial, guias, FGTS Digital — continuam com seu contador.
+      </p>
+    </div>
+
+    <h2>Para quem isto não serve</h2>
+    <p>
+      Prefiro que você não compre a que peça reembolso. Não serve se você:
+    </p>
+    <ul>
+      <li>precisa de <strong>eSocial, guias ou FGTS Digital</strong> — ele calcula e imprime, não transmite nada</li>
+      <li>precisa calcular <strong>rescisão</strong> — para isso há a
+        <a href="../ferramentas/rescisao.html">calculadora gratuita do site</a>, que não faz parte do programa</li>
+      <li>tem <strong>mais de 20 funcionários</strong> — não há limite técnico, mas acima disso um sistema
+        integrado com o contador compensa mais que um arquivo local</li>
+      <li>tem folha com <strong>muito adicional variável</strong> — insalubridade, periculosidade,
+        comissões e horas extras entram à mão, não automaticamente</li>
+    </ul>
+
+    <div class="urgencia">
+      <p>
+        <strong>Sobre janeiro.</strong> As tabelas do INSS e do IRRF são republicadas todo
+        janeiro, e a do IRRF mudou duas vezes em 2025. Quem compra agora usa o programa o
+        ano inteiro e <strong>recebe a versão atualizada sem pagar de novo</strong> — o
+        mesmo link de download continua valendo. Não é promoção nem prazo: é só que a
+        planilha que você usa hoje vai estar errada em janeiro, e esta não.
       </p>
     </div>
 
