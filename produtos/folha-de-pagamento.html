@@ -62,6 +62,34 @@
   border-radius:var(--radius-lg);padding:1.5rem;margin:2rem 0}
 .destaque-privacidade h3{margin-top:0;color:var(--accent)}
 .destaque-privacidade p:last-child{margin-bottom:0}
+.heroi{display:grid;grid-template-columns:0.95fr 1.05fr;gap:2.6rem;align-items:center;
+  padding:3rem 0 1rem}
+.heroi h1{font-size:clamp(1.9rem,2.6vw,2.45rem);line-height:1.15;letter-spacing:-.02em;margin:.9rem 0}
+.heroi .resumo{font-size:1.05rem;color:var(--text-2);max-width:34rem}
+.heroi-selos{display:flex;flex-wrap:wrap;gap:.6rem 1.4rem;margin-top:1.6rem;
+  font-family:var(--font-mono);font-size:.8rem;color:var(--green)}
+.heroi-tela{position:relative}
+/* O brilho atrás da captura separa a tela do fundo sem precisar de
+   borda: numa página escura inteira, tudo tende a virar uma mancha só. */
+/* Sem recuo negativo na horizontal: ele criava barra de rolagem lateral
+   no celular, e como é pseudo-elemento não aparecia ao varrer o DOM
+   atrás do culpado. O blur já espalha o brilho para fora da imagem. */
+.heroi-tela::before{content:'';position:absolute;inset:-14% 0 30%;
+  background:radial-gradient(closest-side,rgba(88,166,255,.22),transparent 72%);
+  filter:blur(28px);z-index:0}
+.heroi-tela img{position:relative;z-index:1;width:100%;height:auto;
+  border:1px solid var(--border);border-radius:var(--radius-lg);
+  box-shadow:0 24px 60px rgba(0,0,0,.5);display:block}
+@media (max-width:900px){
+  .heroi{grid-template-columns:1fr;gap:2rem;padding-top:1.5rem}
+  .heroi-tela{order:-1}
+}
+.botoes-compra{display:flex;gap:.9rem;justify-content:center;flex-wrap:wrap}
+.btn-testar{display:inline-flex;align-items:center;gap:.6rem;background:var(--accent);
+  color:var(--bg);font-weight:600;font-size:1.05rem;padding:1rem 2.2rem;
+  border-radius:var(--radius);text-decoration:none;
+  transition:transform .3s var(--ease-spring),background-color var(--ease)}
+.btn-testar:hover{background:#79b8ff;color:var(--bg);transform:translateY(-2px)}
 .link-demo{font-size:.9rem;color:var(--accent);font-weight:500}
 .caixa-demo{border:1px dashed var(--border);border-radius:var(--radius-lg);padding:1.5rem;margin:2rem 0}
 .caixa-demo h3{margin-top:0}
@@ -69,33 +97,46 @@
 .caixa-demo a{display:inline-block;margin-top:.4rem;font-weight:600;color:var(--accent)}
 </style>
 </head>
-<body data-ferramenta="">
+<body data-ferramenta="" data-topo="minimo">
 
 <header class="topo" id="topo"></header>
 
 <main class="wrap">
 
+  <div class="heroi">
+    <div class="heroi-texto">
+      <div class="selo">tabelas de 2026</div>
+      <h1>Holerite pronto em 2 minutos, sem planilha e sem mensalidade</h1>
+      <p class="resumo">
+        Você digita o salário. Ele calcula INSS, IRRF e FGTS pelas tabelas oficiais de 2026
+        e imprime o holerite de cada funcionário. Faz também férias e 13º, cada um com
+        a sua regra. Roda no seu computador, offline.
+      </p>
+      <div class="heroi-selos">
+        <span>✓ pagamento único</span>
+        <span>✓ roda offline</span>
+        <span>✓ sem cadastro</span>
+      </div>
+    </div>
+    <div class="heroi-tela">
+      <img src="tela-heroi.webp" width="1310" height="615" fetchpriority="high"
+           alt="Os totais da folha — custo total, líquido a pagar, INSS e FGTS — e a tabela com o cálculo de cada funcionário.">
+    </div>
+  </div>
+
   <div class="cabecalho">
-    <div class="trilha"><a href="../ferramentas/index.html">ferramentas</a> / folha simples</div>
-    <div class="selo">tabelas de 2026</div>
-    <h1>Holerite pronto em 2 minutos, sem planilha e sem mensalidade</h1>
-    <p class="resumo">
-      Você digita o salário. Ele calcula INSS, IRRF e FGTS pelas tabelas oficiais de 2026
-      e imprime o holerite de cada funcionário. Faz também férias e 13º, cada um com
-      a sua regra. Roda no seu computador, offline.
-    </p>
   </div>
 
   <div class="preco-caixa">
     <div class="rotulo" style="font-family:var(--font-mono);font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;color:var(--text-2);margin-bottom:.5rem">Pagamento único</div>
     <div class="valor">R$ 97</div>
     <div class="sub">Sem mensalidade. Sem cadastro. O arquivo é seu para sempre.</div>
-    <a class="btn-comprar indisponivel" id="btComprar" href="#">Comprar agora →</a>
-    <p style="font-size:.82rem;color:var(--text-3);margin:1rem 0 0" id="notaCompra">
+    <div class="botoes-compra">
+      <a class="btn-comprar indisponivel" id="btComprar" href="#">Comprar agora →</a>
+      <a class="btn-testar" href="demo.html">Testar agora, sem pagar →</a>
+    </div>
+    <p style="font-size:.82rem;color:var(--text-3);margin:1.1rem 0 0" id="notaCompra">
       Link de pagamento sendo configurado.
-    </p>
-    <p style="margin:1.2rem 0 0">
-      <a href="demo.html" class="link-demo">Testar antes, sem pagar nada →</a>
     </p>
   </div>
 

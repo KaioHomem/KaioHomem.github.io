@@ -68,9 +68,19 @@ button { font-family: inherit; cursor: pointer; }
 }
 .marca { font-weight: 700; font-size: 1.05rem; color: var(--text); }
 .marca span { color: var(--accent); }
-.topo nav { display: flex; gap: 1.1rem; font-size: 0.85rem; flex-wrap: wrap; }
-.topo nav a { color: var(--text-2); }
+.topo nav { display: flex; gap: 1.4rem; font-size: 0.85rem; align-items: center; }
+.topo nav a { color: var(--text-2); white-space: nowrap; }
 .topo nav a:hover, .topo nav a.ativo { color: var(--accent); }
+/* O link ativo ganha um traço embaixo: só a cor não sobrevive a quem
+   enxerga cor de outro jeito. */
+.topo nav a.ativo { box-shadow: 0 2px 0 -1px currentColor; }
+.topo nav a.mais {
+  font-family: var(--font-mono); font-size: 0.78rem;
+  color: var(--text-3); border: 1px solid var(--border);
+  border-radius: 999px; padding: 0.2rem 0.6rem;
+}
+.topo nav a.mais:hover { color: var(--accent); border-color: var(--accent); }
+.topo-inner.minimo nav a { font-size: 0.85rem; }
 
 main { padding: 2.5rem 0 4rem; }
 

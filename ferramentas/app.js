@@ -30,18 +30,49 @@
   var paraRaiz = emSubpasta ? '../' : '';
 
   /* ---------- SHELL ---------- */
+  // Onze links no cabeçalho não são navegação, são um diretório: quebram
+  // em duas linhas, espremem o logo e são a primeira coisa que o
+  // visitante vê em toda página. Aqui ficam só os caminhos mais
+  // procurados; o resto continua a um clique, no hub e no rodapé.
+  var DESTAQUE = ['salario-liquido', 'rescisao', 'decimo-terceiro', 'ferias', 'custo-funcionario'];
+
   function montarTopo() {
     var alvo = document.getElementById('topo');
     if (!alvo) return;
 
-    var links = FERRAMENTAS.map(function (f) {
+    var caminhoHub = (emSubpasta ? '' : 'ferramentas/') + 'index.html';
+
+    // A página de venda não é uma calculadora. Mostrar o diretório de
+    // ferramentas ali só dá ao visitante dez motivos para sair antes de
+    // decidir sobre o produto.
+    if (document.body.getAttribute('data-topo') === 'minimo') {
+      alvo.innerHTML =
+        '<div class="wrap topo-inner minimo">' +
+          '<a href="' + caminhoHub + '" class="marca">ferramentas<span>.</span></a>' +
+          '<nav aria-label="Navegação"><a href="' + caminhoHub + '">← todas as ferramentas</a></nav>' +
+        '</div>';
+      return;
+    }
+
+    // A da página atual entra mesmo fora do destaque: sem ela o visitante
+    // perde a única pista de onde está.
+    var mostrar = FERRAMENTAS.filter(function (f) {
+      return DESTAQUE.indexOf(f.id) !== -1 || f.id === atual;
+    });
+
+    var links = mostrar.map(function (f) {
       var ativo = f.id === atual ? ' class="ativo"' : '';
       return '<a href="' + f.arquivo + '"' + ativo + '>' + f.nome + '</a>';
     }).join('');
 
+    var faltam = FERRAMENTAS.length - mostrar.length;
+    if (faltam > 0) {
+      links += '<a href="' + caminhoHub + '" class="mais">+' + faltam + ' →</a>';
+    }
+
     alvo.innerHTML =
       '<div class="wrap topo-inner">' +
-        '<a href="index.html" class="marca">ferramentas<span>.</span></a>' +
+        '<a href="' + caminhoHub + '" class="marca">ferramentas<span>.</span></a>' +
         '<nav aria-label="Ferramentas">' + links + '</nav>' +
       '</div>';
 
