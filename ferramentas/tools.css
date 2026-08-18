@@ -434,6 +434,33 @@ details p { margin: 0.7rem 0 0; font-size: 0.89rem; }
   .topo nav a { white-space: nowrap; }
 }
 
+/* ---------- TABELA DENTRO DO TEXTO ---------- */
+/* Numa matriz de verba x encargo a tabela é a forma mais curta de dizer
+   a verdade. Em tela estreita ela rola dentro da própria caixa, para não
+   empurrar a página inteira na horizontal. */
+.conteudo .tabela-simples-caixa { overflow-x: auto; margin: 1.4rem 0; }
+.tabela-simples {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  min-width: 26rem;
+}
+.tabela-simples th, .tabela-simples td {
+  text-align: left;
+  padding: 0.7rem 0.9rem;
+  border-bottom: 1px solid var(--border);
+}
+.tabela-simples th {
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-3);
+  font-weight: 500;
+}
+.tabela-simples td:not(:first-child) { font-family: var(--font-mono); font-size: 0.85rem; }
+.tabela-simples tbody tr:last-child td { border-bottom: none; }
+
 /* ---------- FOOTER ---------- */
 .rodape {
   border-top: 1px solid var(--border);

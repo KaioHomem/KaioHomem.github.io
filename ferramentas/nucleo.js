@@ -396,6 +396,94 @@
     };
   }
 
+  /**
+   * custoDemissao — the employer's side of a dismissal.
+   *
+   * rescisao() answers what the worker receives. This answers the
+   * question that keeps the owner awake: how much cash has to be in the
+   * account on the day. The two differ by the employer charges, which
+   * never appear on the worker's termination statement.
+   *
+   * Which charge lands on which verba is the whole difficulty, and it is
+   * settled case law rather than something derivable:
+   *
+   *   saldo de salário e 13º proporcional  → INSS patronal e FGTS
+   *   aviso prévio indenizado              → só FGTS (Súmula 305 do TST);
+   *                                          o INSS patronal não incide
+   *                                          (STJ, Tema 478)
+   *   férias indenizadas e o terço         → nenhum dos dois; são verbas
+   *                                          indenizatórias (STJ, Tema 737)
+   *
+   * O terço de férias GOZADAS é outra história e paga INSS patronal
+   * (STF, Tema 985) — está em custoFuncionario, não aqui.
+   *
+   * A multa de 40% incide sobre o saldo da conta na data do pagamento,
+   * sem a projeção do aviso indenizado (OJ 42, II, da SDI-1 do TST). Como
+   * o saldo entra como dado informado, é exatamente isso que acontece.
+   */
+  function custoDemissao(opcoes) {
+    var o = opcoes || {};
+    var E = TABELAS.empregador;
+
+    var r = rescisao(o);
+
+    var regime = o.regime === 'normal' ? 'normal'
+               : o.regime === 'simplesIV' ? 'simplesIV'
+               : 'simples';
+
+    var rat = positivo(o.rat) || E.ratOpcoes[1];
+    var fap = Number(o.fap);
+    if (!isFinite(fap) || fap <= 0) fap = 1.0;
+    fap = Math.min(E.fapMax, Math.max(E.fapMin, fap));
+
+    var terceiros = o.terceiros === undefined ? E.terceirosPadrao : positivo(o.terceiros);
+
+    var pagaCpp = regime !== 'simples';
+    var pagaTerceiros = regime === 'normal';
+
+    var aliquotaPatronal = (pagaCpp ? E.cpp + rat * fap : 0) +
+                           (pagaTerceiros ? terceiros : 0);
+
+    var basePatronal = round2(
+      r.proventos.saldoSalario + r.proventos.decimoTerceiroProporcional
+    );
+    var baseFgts = round2(basePatronal + r.proventos.avisoPrevioIndenizado);
+
+    var inssPatronal = round2(basePatronal * aliquotaPatronal);
+    var fgtsSobreVerbas = round2(baseFgts * TABELAS.fgts.aliquota);
+
+    // O total de proventos já inclui a multa de 40% e os descontos saem
+    // de dentro dele — o que o trabalhador não leva na mão vai para o
+    // governo, mas sai igual do caixa da empresa.
+    var total = round2(
+      r.totalProventos + inssPatronal + fgtsSobreVerbas
+    );
+
+    return {
+      rescisao: r,
+      regime: regime,
+
+      aoTrabalhador: r.liquido,
+      retidoDoTrabalhador: r.totalDescontos,
+      multaFGTS: r.proventos.multaFGTS,
+
+      encargos: {
+        aliquota: aliquotaPatronal,
+        basePatronal: basePatronal,
+        inssPatronal: inssPatronal,
+        baseFgts: baseFgts,
+        fgtsSobreVerbas: fgtsSobreVerbas,
+        total: round2(inssPatronal + fgtsSobreVerbas)
+      },
+
+      total: total,
+
+      // Quantos salários a demissão custa. É o número que responde
+      // "tenho caixa para isso?" sem precisar de contexto.
+      emSalarios: positivo(o.salario) > 0 ? total / positivo(o.salario) : 0
+    };
+  }
+
   /* ---------- 13TH SALARY ---------- */
   /**
    * Christmas bonus (13º salário).
@@ -1015,6 +1103,7 @@
     aliquotaSimples: aliquotaSimples,
     cltVsPj: cltVsPj,
     custoFuncionario: custoFuncionario,
+    custoDemissao: custoDemissao,
     jurosCompostos: jurosCompostos,
     anualParaMensal: anualParaMensal,
     financiamento: financiamento,

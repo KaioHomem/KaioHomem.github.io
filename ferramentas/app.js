@@ -16,6 +16,7 @@
     { id: 'horas-extras',    arquivo: 'horas-extras.html',    nome: 'Horas extras' },
     { id: 'clt-vs-pj',       arquivo: 'clt-vs-pj.html',       nome: 'CLT vs PJ' },
     { id: 'custo-funcionario', arquivo: 'custo-funcionario.html', nome: 'Custo de funcionário' },
+    { id: 'custo-demissao',  arquivo: 'custo-demissao.html',  nome: 'Custo de demissão' },
     { id: 'juros-compostos', arquivo: 'juros-compostos.html', nome: 'Juros compostos' },
     { id: 'financiamento',   arquivo: 'financiamento.html',   nome: 'Financiamento' }
   ];

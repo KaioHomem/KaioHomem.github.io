@@ -534,6 +534,81 @@ console.log('\nCUSTO DO FUNCIONÁRIO');
   eq('salário zero não gera multiplicador infinito', zero.multiplicador, 0);
 })();
 
+/* ---------- CUSTO DA DEMISSÃO ---------- */
+console.log('\nCUSTO DA DEMISSÃO');
+
+(function () {
+  var base = {
+    salario: 3000, tipo: 'sem-justa-causa', diasTrabalhadosNoMes: 15,
+    anosCompletos: 2, mesesPara13: 8, mesesParaFerias: 8, saldoFGTS: 7000
+  };
+  function comRegime(regime, extra) {
+    var o = { regime: regime };
+    for (var k in base) o[k] = base[k];
+    for (var k2 in (extra || {})) o[k2] = extra[k2];
+    return F.custoDemissao(o);
+  }
+
+  var normal = comRegime('normal', { rat: 0.02, fap: 1, terceiros: 0.058 });
+  var r = normal.rescisao;
+
+  // A base do INSS patronal é só saldo de salário e 13º proporcional.
+  // Incluir o aviso indenizado é o erro clássico: ele parece salário, mas
+  // o STJ fixou no Tema 478 que não é (verba indenizatória).
+  eq('INSS patronal não pega o aviso prévio indenizado',
+    normal.encargos.basePatronal,
+    r.proventos.saldoSalario + r.proventos.decimoTerceiroProporcional);
+  verdadeiro('e o aviso indenizado existe neste cenário',
+    r.proventos.avisoPrevioIndenizado > 0);
+
+  // Férias indenizadas e o terço não pagam nenhum dos dois.
+  verdadeiro('férias indenizadas ficam fora das duas bases',
+    normal.encargos.baseFgts <
+      r.proventos.saldoSalario + r.proventos.decimoTerceiroProporcional +
+      r.proventos.avisoPrevioIndenizado + r.proventos.feriasProporcionais);
+
+  // Mas o FGTS pega o aviso indenizado — Súmula 305 do TST.
+  eq('FGTS pega o aviso prévio indenizado',
+    normal.encargos.baseFgts,
+    normal.encargos.basePatronal + r.proventos.avisoPrevioIndenizado);
+  eq('FGTS sobre as verbas é 8% da sua base',
+    normal.encargos.fgtsSobreVerbas, normal.encargos.baseFgts * 0.08);
+
+  // A multa de 40% sai do saldo informado, sem projetar o aviso
+  // (OJ 42, II, da SDI-1). Projetar inflaria a multa.
+  eq('multa de 40% usa o saldo informado, sem projeção', normal.multaFGTS, 7000 * 0.40);
+
+  // Simples I/II/III/V não recolhe CPP nem terceiros — mas o FGTS e a
+  // multa continuam iguais. Demitir no Simples não é de graça.
+  var simples = comRegime('simples');
+  eq('Simples não paga INSS patronal na rescisão', simples.encargos.inssPatronal, 0);
+  eq('mas paga o mesmo FGTS sobre as verbas',
+    simples.encargos.fgtsSobreVerbas, normal.encargos.fgtsSobreVerbas);
+  eq('e a mesma multa de 40%', simples.multaFGTS, normal.multaFGTS);
+  verdadeiro('demitir no Simples ainda custa mais que um salário',
+    simples.emSalarios > 1);
+
+  // O total é caixa: o que vai para o trabalhador, o que é retido dele e
+  // repassado ao governo, e os encargos do empregador.
+  eq('o total fecha com as partes',
+    normal.total,
+    normal.aoTrabalhador + normal.retidoDoTrabalhador + normal.encargos.total);
+
+  // Pedido de demissão não tem multa nem aviso a pagar.
+  var pedido = comRegime('normal', { tipo: 'pedido-demissao', rat: 0.02, fap: 1, terceiros: 0.058 });
+  eq('pedido de demissão não gera multa de 40%', pedido.multaFGTS, 0);
+  verdadeiro('e custa bem menos que a dispensa sem justa causa', pedido.total < normal.total);
+
+  // Justa causa é o piso: sem aviso, sem multa, sem férias proporcionais.
+  var justa = comRegime('normal', { tipo: 'justa-causa', rat: 0.02, fap: 1, terceiros: 0.058 });
+  verdadeiro('justa causa é o cenário mais barato para a empresa',
+    justa.total < pedido.total);
+
+  // Salário zero não pode gerar divisão por zero.
+  eq('salário zero não gera múltiplo infinito',
+    F.custoDemissao({ salario: 0 }).emSalarios, 0);
+})();
+
 /* ---------- RESULT ---------- */
 console.log('\n' + '-'.repeat(52));
 if (falhas === 0) {

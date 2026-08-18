@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Quanto custa demitir um funcionário — calculadora 2026</title>
+<meta name="description" content="Calcule quanto sai do caixa para demitir: verbas rescisórias, multa de 40% do FGTS, INSS patronal e FGTS sobre as verbas. Veja o total em salários antes de decidir.">
+<link rel="canonical" href="https://kaiohomem.github.io/ferramentas/custo-demissao.html">
+
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://kaiohomem.github.io/ferramentas/custo-demissao.html">
+<meta property="og:title" content="Quanto custa demitir um funcionário">
+<meta property="og:description" content="O caixa que a demissão exige: verbas, multa de 40%, INSS patronal e FGTS. Com as regras de 2026.">
+<meta property="og:locale" content="pt_BR">
+<meta name="twitter:card" content="summary">
+
+<meta http-equiv="Content-Security-Policy" content="
+  default-src 'self';
+  script-src 'self' https://pagead2.googlesyndication.com https://*.googlesyndication.com https://*.doubleclick.net https://*.google.com https://*.gstatic.com;
+  style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+  font-src https://fonts.gstatic.com;
+  img-src 'self' data: https:;
+  frame-src https://*.googlesyndication.com https://*.doubleclick.net;
+  connect-src 'self' https://*.google.com https://*.doubleclick.net;
+  object-src 'none'; base-uri 'self'; form-action 'self';
+">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📦</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tools.css">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Calculadora de Custo de Demissão",
+  "url": "https://kaiohomem.github.io/ferramentas/custo-demissao.html",
+  "applicationCategory": "FinanceApplication",
+  "operatingSystem": "Any",
+  "inLanguage": "pt-BR",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "BRL" }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Quanto custa demitir um funcionário sem justa causa?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Costuma passar de quatro salários para quem tem alguns anos de casa. Entram o saldo de salário, o aviso prévio indenizado, o 13º e as férias proporcionais com o terço, a multa de 40% sobre o FGTS depositado, mais o INSS patronal e o FGTS que incidem sobre parte dessas verbas. O peso maior costuma ser a multa de 40%, porque ela cresce com o tempo de casa."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "O aviso prévio indenizado paga INSS patronal?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Não. O STJ fixou no Tema 478 que não incide contribuição previdenciária patronal sobre o aviso prévio indenizado, por não ter natureza salarial. O FGTS, esse sim, incide — é o que diz a Súmula 305 do TST. As duas coisas convivem, e é por isso que a conta confunde."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "A multa de 40% considera o aviso prévio indenizado?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Não. A multa incide sobre o saldo da conta vinculada na data do pagamento das verbas, sem projetar o aviso prévio indenizado. É o que estabelece a Orientação Jurisprudencial 42, item II, da SDI-1 do TST."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Empresa do Simples Nacional paga menos para demitir?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Paga um pouco menos, mas bem menos do que se imagina. Nos anexos I, II, III e V não há INSS patronal sobre as verbas, porque a contribuição já está no DAS. Mas o FGTS sobre as verbas e, principalmente, a multa de 40% continuam idênticos — e a multa é a maior parcela da conta."
+      }
+    }
+  ]
+}
+</script>
+</head>
+<body data-ferramenta="custo-demissao">
+
+<header class="topo" id="topo"></header>
+
+<main class="wrap">
+
+  <div class="cabecalho">
+    <div class="trilha"><a href="index.html">ferramentas</a> / custo de demissão</div>
+    <div class="selo">regras de 2026</div>
+    <h1>Quanto custa demitir um funcionário</h1>
+    <p class="resumo">
+      O valor que aparece no termo de rescisão não é o que sai do caixa. Falta a multa de
+      40%, o INSS patronal e o FGTS que incidem sobre parte das verbas — e essa parte não
+      é a que a maioria imagina.
+    </p>
+  </div>
+
+  <div class="espaco-anuncio" data-slot="topo"></div>
+
+  <section class="cartao">
+    <form id="formulario" autocomplete="off">
+      <div class="grade">
+
+        <div class="campo">
+          <label for="salario">Salário bruto mensal (R$)</label>
+          <input class="entrada" type="text" id="salario" inputmode="decimal" placeholder="3.000,00" value="3.000,00">
+        </div>
+
+        <div class="campo">
+          <label for="tipo">Motivo do desligamento</label>
+          <select class="entrada" id="tipo">
+            <option value="sem-justa-causa">Dispensa sem justa causa</option>
+            <option value="acordo">Acordo entre as partes (art. 484-A)</option>
+            <option value="pedido-demissao">Pedido de demissão</option>
+            <option value="fim-contrato">Fim de contrato por prazo determinado</option>
+            <option value="justa-causa">Dispensa por justa causa</option>
+          </select>
+        </div>
+
+        <div class="campo">
+          <label for="regime">Regime tributário da empresa</label>
+          <select class="entrada" id="regime">
+            <option value="simples">Simples Nacional — anexos I, II, III ou V</option>
+            <option value="simplesIV">Simples Nacional — anexo IV</option>
+            <option value="normal">Lucro Presumido ou Lucro Real</option>
+          </select>
+        </div>
+
+        <div class="campo">
+          <label for="anosCompletos">Anos completos de casa</label>
+          <input class="entrada" type="number" id="anosCompletos" min="0" max="50" step="1" value="2">
+          <span class="dica">Cada ano acrescenta 3 dias ao aviso prévio.</span>
+        </div>
+
+        <div class="campo">
+          <label for="saldoFGTS">Saldo do FGTS (R$)</label>
+          <input class="entrada" type="text" id="saldoFGTS" inputmode="decimal" placeholder="0,00" value="7.000,00">
+          <span class="dica">Saldo na data do pagamento. É a base da multa.</span>
+        </div>
+
+        <div class="campo">
+          <label for="diasTrabalhadosNoMes">Dias trabalhados no mês</label>
+          <input class="entrada" type="number" id="diasTrabalhadosNoMes" min="0" max="30" step="1" value="15">
+        </div>
+
+        <div class="campo">
+          <label for="mesesPara13">Meses para o 13º</label>
+          <input class="entrada" type="number" id="mesesPara13" min="0" max="12" step="1" value="8">
+          <span class="dica">Mês com 15 dias ou mais conta inteiro.</span>
+        </div>
+
+        <div class="campo">
+          <label for="mesesParaFerias">Meses para as férias</label>
+          <input class="entrada" type="number" id="mesesParaFerias" min="0" max="12" step="1" value="8">
+        </div>
+
+        <div class="campo" id="campoRat">
+          <label for="rat">Grau de risco (RAT)</label>
+          <select class="entrada" id="rat">
+            <option value="0.01">1% — risco leve</option>
+            <option value="0.02" selected>2% — risco médio</option>
+            <option value="0.03">3% — risco grave</option>
+          </select>
+        </div>
+
+        <div class="campo" id="campoTerceiros">
+          <label for="terceiros">Terceiros (%)</label>
+          <input class="entrada" type="text" id="terceiros" inputmode="decimal" placeholder="5,8" value="5,8">
+        </div>
+
+        <div class="campo">
+          <label>Opções</label>
+          <div class="campo check">
+            <input type="checkbox" id="feriasVencidas">
+            <label for="feriasVencidas">Tem férias vencidas não gozadas</label>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="botoes">
+        <button type="button" class="btn" id="calcular">Calcular</button>
+        <button type="button" class="btn btn-vazado" id="limpar">Limpar</button>
+      </div>
+    </form>
+
+    <div class="resultado" id="resultado" aria-live="polite"></div>
+  </section>
+
+  <div class="espaco-anuncio" data-slot="resultado"></div>
+  <div class="bloco-afiliados"></div>
+
+  <article class="conteudo">
+
+    <h2>Por que o termo de rescisão engana</h2>
+    <p>
+      O termo mostra o que o trabalhador recebe. O caixa da empresa vê outra coisa: além
+      das verbas, saem a multa de 40% do FGTS, o INSS patronal e o FGTS que incidem sobre
+      algumas delas. Numa dispensa sem justa causa com dois anos de casa, a diferença
+      entre os dois números passa de mil reais num salário de R$ 3.000.
+    </p>
+
+    <h2>Qual verba paga qual encargo</h2>
+    <p>
+      Esta é a parte que quase ninguém acerta de cabeça, e não dá para deduzir: é
+      jurisprudência consolidada, verba por verba.
+    </p>
+
+    <div class="tabela-simples-caixa">
+    <table class="tabela-simples">
+      <thead>
+        <tr><th>Verba</th><th>INSS patronal</th><th>FGTS</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Saldo de salário</td><td>sim</td><td>sim</td></tr>
+        <tr><td>13º proporcional</td><td>sim</td><td>sim</td></tr>
+        <tr><td>Aviso prévio indenizado</td><td><strong>não</strong></td><td><strong>sim</strong></td></tr>
+        <tr><td>Férias proporcionais e o terço</td><td>não</td><td>não</td></tr>
+        <tr><td>Férias vencidas e o terço</td><td>não</td><td>não</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <h3>O aviso prévio indenizado é o caso estranho</h3>
+    <p>
+      Ele parece salário, mas não paga INSS patronal: o STJ fixou isso no
+      <strong>Tema 478</strong> — verba indenizatória, não remuneração. O FGTS, no entanto,
+      incide, por força da <strong>Súmula 305 do TST</strong>. As duas coisas convivem, e é
+      por isso que tanta gente erra a conta para os dois lados.
+    </p>
+
+    <h3>Férias indenizadas não pagam nada</h3>
+    <p>
+      Nem INSS patronal, nem FGTS. O terço de férias <em>indenizadas</em> ficou de fora
+      pelo <strong>Tema 737</strong> do STJ.
+    </p>
+    <p>
+      Cuidado para não confundir com o terço de férias <em>gozadas</em>, que paga INSS
+      patronal desde o Tema 985 do STF. Férias tiradas e férias pagas na rescisão seguem
+      regras opostas — e material antigo na internet mistura as duas.
+    </p>
+
+    <h2>A multa de 40% é quase sempre o maior item</h2>
+    <p>
+      Ela incide sobre <strong>todo o FGTS depositado naquele contrato</strong>, não sobre
+      o salário. Por isso cresce com o tempo de casa: demitir alguém de oito anos custa
+      muito mais que demitir dois funcionários de quatro.
+    </p>
+    <p>
+      E ela usa o <strong>saldo da conta na data do pagamento</strong>, sem projetar o aviso
+      prévio indenizado — é o que diz a
+      <strong>Orientação Jurisprudencial 42, item II, da SDI-1 do TST</strong>. Quem projeta
+      o aviso na base infla a multa e provisiona a mais.
+    </p>
+
+    <h2>No Simples custa menos, mas não muito menos</h2>
+    <p>
+      Nos anexos I, II, III e V não há INSS patronal sobre as verbas — já está no DAS. Mas
+      o FGTS sobre as verbas e a multa de 40% são idênticos em qualquer regime. Como a
+      multa costuma ser a maior parcela, a economia é menor do que se imagina. Use o seletor
+      de regime acima para ver a diferença no seu caso.
+    </p>
+
+    <h2>O que esta conta não cobre</h2>
+    <p>
+      Estabilidades (gestante, cipeiro, acidentado), aviso prévio trabalhado em vez de
+      indenizado, verbas de convenção coletiva, multas do artigo 477 por atraso no
+      pagamento e eventual passivo trabalhista. Todos empurram o custo para cima, nunca
+      para baixo.
+    </p>
+
+    <div class="aviso">
+      <p>
+        <strong>Isto é estimativa de planejamento.</strong> Uma rescisão real depende do
+        contrato, da convenção coletiva da categoria e da situação específica do
+        funcionário. Confirme com seu contador antes de comunicar a decisão.
+      </p>
+    </div>
+
+  </article>
+
+  <section class="relacionadas" id="relacionadas"></section>
+
+</main>
+
+<footer class="rodape" id="rodape"></footer>
+
+<script src="nucleo.js"></script>
+<script src="app.js"></script>
+<script src="pg-custo-demissao.js"></script>
+<script src="consentimento.js"></script>
+<script src="monetizacao.js"></script>
+</body>
+</html>
