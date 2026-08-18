@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Folha Simples — folha de pagamento e holerite</title>
+<meta name="robots" content="noindex, nofollow">
+<title>Demonstração — Folha Simples — folha de pagamento e holerite</title>
 <meta name="robots" content="noindex">
 <!--
   ===================================================
@@ -30,6 +31,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--tx);line-height:1.
 .wrap{max-width:1080px;margin:0 auto;padding:0 1.2rem}
 header{border-bottom:1px solid var(--bd);background:rgba(13,17,23,.9);position:sticky;top:0;z-index:40;backdrop-filter:blur(8px)}
 .hd{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.9rem 0;flex-wrap:wrap}
+.faixa-demo{background:#1f2937;border-bottom:1px solid #374151;color:#e5e7eb;padding:.75rem 1rem;font-size:.86rem;text-align:center;line-height:1.5}.faixa-demo a{color:#60a5fa;font-weight:600;white-space:nowrap}.faixa-demo strong{color:#fff}
 .marca{font-weight:700;font-size:1.05rem}.marca span{color:var(--ac)}
 .marca-demo{margin-top:10px;padding:6px 0;border-top:1px dashed #999;color:#666;
   font-size:11px;letter-spacing:.14em;text-align:center;text-transform:uppercase}
@@ -100,6 +102,8 @@ dialog::backdrop{background:rgba(0,0,0,.7)}
 </style>
 </head>
 <body>
+
+<div class="faixa-demo naoimprime"><strong>Você está na demonstração.</strong> Ela vai até 2 funcionários e marca os holerites. Todo o resto é igual — o cálculo é o mesmo. <a href="folha-de-pagamento.html">Ver a versão completa →</a></div>
 
 <header class="naoimprime"><div class="wrap hd">
   <div class="marca">folha<span>simples</span></div>
@@ -269,7 +273,7 @@ function esc(t){ return String(t==null?'':t).replace(/[&<>"]/g,function(c){
    que impede as duas de divergirem: a alternativa era um segundo HTML
    copiado, e cópia de motor fiscal envelhece errado — foi exatamente
    esse risco que obrigou a criar o verificar-motor.js. */
-var DEMO=null; /* gancho-demo */
+var DEMO={limite:2};
 
 /* ---------- ESTADO ---------- */
 var CHAVE=DEMO?'folhasimples.demo.v1':'folhasimples.v1';

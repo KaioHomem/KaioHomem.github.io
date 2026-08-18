@@ -56,6 +56,13 @@ jobs:
       - name: Conferir o motor embutido no produto
         run: node produtos/verificar-motor.js
 
+      # Gate: a demonstração é gerada a partir do produto. Se alguém
+      # editar o produto e esquecer de regenerar, a demo passa a calcular
+      # diferente do que o comprador leva — e demo que mente sobre o
+      # produto é pior que demo nenhuma.
+      - name: Conferir se a demonstração está em dia
+        run: node produtos/gerar-demo.js --verificar
+
   navegador:
     name: Verificar as páginas no navegador
     runs-on: ubuntu-latest

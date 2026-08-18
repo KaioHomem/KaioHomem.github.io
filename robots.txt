@@ -7,5 +7,6 @@ Allow: /
 # quem copiaria o link não teria comprado.
 Disallow: /produtos/folha-simples
 Disallow: /produtos/obrigado.html
+Disallow: /produtos/demo.html
 
 Sitemap: https://kaiohomem.github.io/sitemap.xml

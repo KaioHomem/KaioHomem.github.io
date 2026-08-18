@@ -184,16 +184,40 @@
    * people. Someone checking their own net salary is not a buyer, and
    * putting an ad in front of them is noise that costs trust.
    */
-  var PRODUTO = {
-    paginas: ['salario-liquido', 'decimo-terceiro', 'ferias', 'clt-vs-pj'],
-    titulo: 'Você calcula a folha de outras pessoas?',
-    texto: 'O Folha Simples faz esta mesma conta para vários funcionários de uma vez e ' +
-           'imprime o holerite de cada um. Roda offline — os salários não saem do seu computador.',
-    rotulo: 'Ver o Folha Simples'
-  };
+  // Duas mensagens, porque são dois visitantes diferentes.
+  //
+  // Quem abre "custo de funcionário" ou "custo de demissão" já se
+  // identificou como empregador ao fazer a pergunta — ele está calculando
+  // o custo de outra pessoa. Perguntar de novo se ele é empregador soa
+  // como um formulário que não prestou atenção.
+  //
+  // Nas outras, o visitante tanto pode ser quem confere o próprio salário
+  // quanto quem calcula o dos outros. Ali a pergunta trabalha: quem não
+  // se reconhece nela simplesmente segue lendo.
+  var PRODUTO = [
+    {
+      paginas: ['custo-funcionario', 'custo-demissao'],
+      titulo: 'Esse funcionário tem holerite todo mês',
+      texto: 'O Folha Simples calcula a folha da equipe inteira e imprime o recibo de ' +
+             'cada um, com as tabelas de 2026. Roda offline, num arquivo só — os salários ' +
+             'não saem do seu computador.',
+      rotulo: 'Ver o Folha Simples'
+    },
+    {
+      paginas: ['salario-liquido', 'decimo-terceiro', 'ferias', 'clt-vs-pj'],
+      titulo: 'Você calcula a folha de outras pessoas?',
+      texto: 'O Folha Simples faz esta mesma conta para vários funcionários de uma vez e ' +
+             'imprime o holerite de cada um. Roda offline — os salários não saem do seu computador.',
+      rotulo: 'Ver o Folha Simples'
+    }
+  ];
 
   function montarProduto() {
-    if (PRODUTO.paginas.indexOf(atual) === -1) return;
+    var variante = null;
+    for (var i = 0; i < PRODUTO.length; i++) {
+      if (PRODUTO[i].paginas.indexOf(atual) !== -1) { variante = PRODUTO[i]; break; }
+    }
+    if (!variante) return;
 
     var principal = document.querySelector('main');
     if (!principal) return;
@@ -203,9 +227,9 @@
     secao.className = 'produto-cta';
     secao.innerHTML =
       '<div class="produto-rot">Ferramenta paga</div>' +
-      '<h3>' + PRODUTO.titulo + '</h3>' +
-      '<p>' + PRODUTO.texto + '</p>' +
-      '<a href="' + caminho + '">' + PRODUTO.rotulo + ' →</a>';
+      '<h3>' + variante.titulo + '</h3>' +
+      '<p>' + variante.texto + '</p>' +
+      '<a href="' + caminho + '">' + variante.rotulo + ' →</a>';
 
     var anuncio = principal.querySelector('.espaco-anuncio[data-slot="rodape"]');
     if (anuncio) principal.insertBefore(secao, anuncio);
