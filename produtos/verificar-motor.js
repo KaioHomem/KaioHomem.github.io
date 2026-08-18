@@ -36,7 +36,7 @@ if (ini === -1 || fim === -1 || fim < ini) {
 var embutido = {};
 new Function('exports', html.slice(ini, fim) +
   '\nexports.calcINSS=calcINSS;exports.calcIRRF=calcIRRF;exports.folhaDe=folhaDe;' +
-  'exports.decimoTerceiroDe=decimoTerceiroDe;'
+  'exports.decimoTerceiroDe=decimoTerceiroDe;exports.feriasDe=feriasDe;'
 )(embutido);
 
 var nucleo = require(path.join(RAIZ, 'ferramentas', 'nucleo.js'));
@@ -93,6 +93,38 @@ for (var s13 = 500; s13 <= 25000; s13 += 137) {
   });
 }
 
+// Férias: o abono pecuniário não é tributado e o terço dele também não.
+// Se alguém puser o abono na base do INSS, é aqui que aparece.
+var comparadosFer = 0;
+for (var sf = 500; sf <= 25000; sf += 173) {
+  [[30, 0], [30, 10], [20, 6], [15, 5], [10, 0]].forEach(function (d) {
+    [0, 2].forEach(function (dep) {
+      comparadosFer++;
+      var a = embutido.feriasDe({ salario: sf, dias: d[0], diasVendidos: d[1], dependentes: dep });
+      var b = nucleo.ferias({ salario: sf, dias: d[0], diasVendidos: d[1], dependentes: dep });
+
+      [['férias base', a.base, b.baseTributavel],
+       ['férias INSS', a.inss, b.inss.valor],
+       ['férias IRRF', a.irrf.valor, b.irrf.valor],
+       ['férias abono', a.totalAbono, b.totalAbono],
+       ['férias líquido', a.liquido, b.liquido]
+      ].forEach(function (c) {
+        if (Math.abs(c[1] - c[2]) > 0.001) {
+          divergencias.push(c[0] + ' em R$' + sf + ', ' + d[0] + ' dias, ' + d[1] +
+                            ' vendidos, ' + dep + ' dep: produto=' + c[1] + ' nucleo=' + c[2]);
+        }
+      });
+
+      // O FGTS não vem do nucleo (ele não modela a parte do empregador
+      // nas férias), então aqui a checagem é contra a regra: 8% sobre as
+      // férias gozadas e o terço, nunca sobre o abono.
+      if (Math.abs(a.fgts - Math.round(a.base * 8) / 100) > 0.011) {
+        divergencias.push('férias FGTS em R$' + sf + ': ' + a.fgts + ' não é 8% de ' + a.base);
+      }
+    });
+  });
+}
+
 // Âncoras absolutas, para o caso de os DOIS motores estarem errados juntos.
 var ancoras = [
   ['líquido de R$ 5.000', embutido.folhaDe({ salario: 5000, dependentes: 0 }).liquido, 4498.49],
@@ -108,6 +140,7 @@ ancoras.forEach(function (a) {
 
 console.log(comparados + ' salários comparados entre o produto e o motor testado.');
 console.log(comparados13 + ' cenários de 13º comparados.');
+console.log(comparadosFer + ' cenários de férias comparados.');
 console.log(ancoras.length + ' âncoras absolutas verificadas.');
 
 if (!divergencias.length) {

@@ -123,6 +123,7 @@ dialog::backdrop{background:rgba(0,0,0,.7)}
       <select id="modo">
         <option value="mensal">Folha mensal</option>
         <option value="decimo">13º salário</option>
+        <option value="ferias">Férias</option>
       </select></div>
   </div></div>
 
@@ -133,9 +134,14 @@ dialog::backdrop{background:rgba(0,0,0,.7)}
       <div class="campo"><label for="fCargo">Cargo</label><input id="fCargo" placeholder="Vendedora"></div>
       <div class="campo"><label for="fSalario">Salário bruto (R$)</label><input id="fSalario" inputmode="decimal" placeholder="2.500,00"></div>
       <div class="campo"><label for="fDep">Dependentes</label><input id="fDep" type="number" min="0" max="20" value="0"></div>
-      <div class="campo"><label for="fVt">Vale-transporte (R$)</label><input id="fVt" inputmode="decimal" placeholder="0,00">
+      <div class="campo" id="campoVt"><label for="fVt">Vale-transporte (R$)</label><input id="fVt" inputmode="decimal" placeholder="0,00">
         <span class="dica">Limite legal: 6% do salário.</span></div>
-      <div class="campo"><label for="fOutros">Outros descontos (R$)</label><input id="fOutros" inputmode="decimal" placeholder="0,00"></div>
+      <div class="campo" id="campoOutros"><label for="fOutros">Outros descontos (R$)</label><input id="fOutros" inputmode="decimal" placeholder="0,00"></div>
+      <div class="campo" id="campoDias"><label for="fDias">Dias de férias</label>
+        <input id="fDias" type="number" min="1" max="30" value="30"></div>
+      <div class="campo" id="campoVendidos"><label for="fVendidos">Dias vendidos (abono)</label>
+        <input id="fVendidos" type="number" min="0" max="10" value="0">
+        <span class="dica">No máximo 1/3 do período.</span></div>
       <div class="campo" id="campoMeses"><label for="fMeses">Meses trabalhados no ano</label>
         <input id="fMeses" type="number" min="0" max="12" value="12">
         <span class="dica">Mês com 15 dias ou mais conta inteiro.</span></div>
@@ -284,6 +290,44 @@ function decimoTerceiroDe(f){
   };
 }
 
+/* Férias têm duas metades com naturezas opostas.
+
+   Os dias gozados e o terço constitucional são remuneração: pagam INSS,
+   IRRF e FGTS. O abono pecuniário — vender até um terço do período — é
+   indenização: não paga nenhum dos três. Misturar as duas coisas numa
+   base só é o erro que faz o funcionário receber menos do que deve.
+
+   A lei limita a venda a 1/3 do período a que ele tem direito, então
+   30 dias vendem no máximo 10. */
+function feriasDe(f){
+  var salario=pos(f.salario);
+  var dias=Math.min(30,Math.max(1,parseInt(f.dias,10)||30));
+  var diasVendidos=Math.min(Math.floor(dias/3), Math.max(0,parseInt(f.diasVendidos,10)||0));
+  var diasGozados=dias-diasVendidos;
+
+  var valorFerias=round2((salario/30)*diasGozados);
+  var terco=round2(valorFerias/3);
+  var base=round2(valorFerias+terco);
+
+  var abono=round2((salario/30)*diasVendidos);
+  var tercoAbono=round2(abono/3);
+  var totalAbono=round2(abono+tercoAbono);
+
+  var inss=calcINSS(base);
+  var irrf=calcIRRF(base, inss, f.dependentes);
+  var descontos=round2(inss+irrf.valor);
+
+  return {
+    dias:dias, diasGozados:diasGozados, diasVendidos:diasVendidos,
+    valorFerias:valorFerias, terco:terco, base:base,
+    abono:abono, tercoAbono:tercoAbono, totalAbono:totalAbono,
+    inss:inss, irrf:irrf, descontos:descontos,
+    liquido:round2(base-descontos+totalAbono),
+    // FGTS incide sobre as férias gozadas e o terço, não sobre o abono.
+    fgts:round2(base*TABELAS.fgts.aliquota)
+  };
+}
+
 /* ---------- FORMATO E ENTRADA ---------- */
 var fmt = new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'});
 function brl(n){ return fmt.format(Number(n)||0); }
@@ -309,7 +353,10 @@ var DEMO=null; /* gancho-demo */
 /* ---------- ESTADO ---------- */
 var CHAVE=DEMO?'folhasimples.demo.v1':'folhasimples.v1';
 var dados={ empresa:{nome:'',cnpj:'',competencia:'',modo:'mensal'}, funcionarios:[] };
-function modoAtual(){ return dados.empresa.modo==='decimo' ? 'decimo' : 'mensal'; }
+function modoAtual(){
+  var m = dados.empresa.modo;
+  return (m==='decimo' || m==='ferias') ? m : 'mensal';
+}
 
 function carregar(){
   try{ var d=JSON.parse(localStorage.getItem(CHAVE)||'null');
@@ -325,6 +372,7 @@ function v(id){ return el(id).value; }
 /* ---------- RENDER ---------- */
 function render(){
   if(modoAtual()==='decimo'){ renderDecimo(); return; }
+  if(modoAtual()==='ferias'){ renderFerias(); return; }
   var linhas='', tot={bruto:0,inss:0,irrf:0,vt:0,outros:0,liq:0,fgts:0};
   var algumVtLimitado=false;
 
@@ -445,8 +493,106 @@ function renderDecimo(){
   montarHolerites();
 }
 
+function renderFerias(){
+  var linhas='', tot={base:0,inss:0,irrf:0,abono:0,liq:0,fgts:0};
+  var algumLimitado=false;
+
+  dados.funcionarios.forEach(function(f,i){
+    var c=feriasDe(f);
+    tot.base+=c.base; tot.inss+=c.inss; tot.irrf+=c.irrf.valor;
+    tot.abono+=c.totalAbono; tot.liq+=c.liquido; tot.fgts+=c.fgts;
+    if(Math.max(0,parseInt(f.diasVendidos,10)||0) > c.diasVendidos) algumLimitado=true;
+
+    linhas+='<tr>'+
+      '<td>'+esc(f.nome)+(f.cargo?'<br><span style="font-size:.75rem;color:var(--t3)">'+esc(f.cargo)+'</span>':'')+'</td>'+
+      '<td>'+c.diasGozados+(c.diasVendidos?' + '+c.diasVendidos+' vend.':'')+'</td>'+
+      '<td>'+brl(c.base)+'</td>'+
+      '<td class="neg">'+brl(c.inss)+'</td>'+
+      '<td class="'+(c.irrf.valor?'neg':'')+'">'+(c.irrf.isento?'isento':brl(c.irrf.valor))+'</td>'+
+      '<td>'+brl(c.totalAbono)+'</td>'+
+      '<td class="pos">'+brl(c.liquido)+'</td>'+
+      '<td>'+brl(c.fgts)+'</td>'+
+      '<td class="naoimprime"><button class="b3" data-rem="'+i+'">remover</button></td></tr>';
+  });
+
+  el('tabela').innerHTML = dados.funcionarios.length
+    ? '<thead><tr><th>Funcionário</th><th>Dias</th><th>Férias + 1/3</th><th>INSS</th><th>IRRF</th>'+
+      '<th>Abono</th><th>Líquido</th><th>FGTS</th><th></th></tr></thead><tbody>'+linhas+'</tbody>'+
+      '<tfoot><tr><td>Total ('+dados.funcionarios.length+')</td><td></td><td>'+brl(tot.base)+'</td>'+
+      '<td class="neg">'+brl(tot.inss)+'</td><td class="neg">'+brl(tot.irrf)+'</td>'+
+      '<td>'+brl(tot.abono)+'</td><td class="pos">'+brl(tot.liq)+'</td>'+
+      '<td>'+brl(tot.fgts)+'</td><td></td></tr></tfoot>'
+    : '<tbody><tr><td class="vazio" colspan="9">Nenhum funcionário ainda. Preencha acima e clique em Adicionar.</td></tr></tbody>';
+
+  el('resumo').innerHTML = dados.funcionarios.length ? [
+    ['Custo total das férias', brl(tot.base + tot.abono + tot.fgts), 'a', 'férias + abono + FGTS'],
+    ['Líquido a pagar', brl(tot.liq), 'v', 'o que sai da conta'],
+    ['INSS a recolher', brl(tot.inss), '', 'só sobre férias e o terço'],
+    ['Abono pecuniário', brl(tot.abono), '', 'indenizatório: sem INSS, IRRF ou FGTS']
+  ].map(function(k){
+    return '<div class="kpi '+k[2]+'"><div class="n">'+k[1]+'</div><div class="l">'+k[0]+
+           '<br><span style="color:var(--t3);font-size:.72rem">'+k[3]+'</span></div></div>';
+  }).join('') : '';
+
+  var a=el('avisoVt'); if(a) a.remove();
+  if(algumLimitado){
+    el('resumo').insertAdjacentHTML('afterend',
+      '<div class="aviso" id="avisoVt"><strong>Dias vendidos ajustados.</strong> '+
+      'A lei limita o abono a um terço do período — o excedente foi ignorado.</div>');
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll('[data-rem]'), function(b){
+    b.onclick=function(){
+      var i=+b.getAttribute('data-rem');
+      if(confirm('Remover '+dados.funcionarios[i].nome+'?')){
+        dados.funcionarios.splice(i,1); salvar(); render();
+      }
+    };
+  });
+  montarHolerites();
+}
+
+function montarRecibosFerias(){
+  var e=dados.empresa;
+  var comp = e.competencia ? e.competencia.split('-').reverse().join('/') : '';
+
+  el('holerite').innerHTML = dados.funcionarios.map(function(f){
+    var c=feriasDe(f);
+    var lin=[
+      ['Férias — '+c.diasGozados+' dias', brl(c.valorFerias), 'v', c.valorFerias],
+      ['Terço constitucional',            brl(c.terco),       'v', c.terco],
+      ['INSS',                            brl(c.inss),        'd', c.inss],
+      ['IRRF', c.irrf.isento?'isento':brl(c.irrf.valor),      'd', c.irrf.valor]
+    ];
+    if(c.diasVendidos){
+      lin.splice(2, 0,
+        ['Abono pecuniário — '+c.diasVendidos+' dias', brl(c.abono), 'v', c.abono],
+        ['Terço sobre o abono',                        brl(c.tercoAbono), 'v', c.tercoAbono]);
+    }
+
+    return '<div class="hol">'+
+      '<h3>'+esc(e.nome||'—')+'</h3>'+
+      '<div class="emp">CNPJ '+esc(e.cnpj||'—')+' &nbsp;·&nbsp; Recibo de férias'+
+        (comp?' &nbsp;·&nbsp; Competência '+esc(comp):'')+'</div>'+
+      '<div style="margin-bottom:6px"><strong>'+esc(f.nome)+'</strong>'+(f.cargo?' — '+esc(f.cargo):'')+'</div>'+
+      '<table><thead><tr><th>Descrição</th><th>Referência</th><th>Vencimentos</th><th>Descontos</th></tr></thead><tbody>'+
+      lin.map(function(l){
+        return '<tr><td>'+l[0]+'</td><td></td>'+
+          (l[2]==='d' ? '<td></td><td>'+l[1]+'</td>' : '<td>'+l[1]+'</td><td></td>')+'</tr>';
+      }).join('')+
+      '<tr class="tot"><td>Totais</td><td></td><td>'+brl(round2(c.base+c.totalAbono))+'</td><td>'+brl(c.descontos)+'</td></tr>'+
+      '<tr class="tot"><td colspan="3">Líquido a receber</td><td>'+brl(c.liquido)+'</td></tr>'+
+      '<tr><td colspan="3">FGTS sobre as férias (depositado pelo empregador)</td><td>'+brl(c.fgts)+'</td></tr>'+
+      '</tbody></table>'+
+      '<div class="ass"><div>Assinatura do empregador</div><div>Recebi em ___/___/______</div></div>'+
+      (DEMO?'<div class="marca-demo">DEMONSTRAÇÃO — não vale como recibo</div>':'')+
+      '</div>';
+  }).join('');
+}
+
 function montarHolerites(){
   if(modoAtual()==='decimo'){ montarRecibos13(); return; }
+  if(modoAtual()==='ferias'){ montarRecibosFerias(); return; }
   var e=dados.empresa;
   var comp = e.competencia ? e.competencia.split('-').reverse().join('/') : '';
   el('holerite').innerHTML = dados.funcionarios.map(function(f){
@@ -532,13 +678,16 @@ el('btAdd').onclick=function(){
   dados.funcionarios.push({
     nome:nome, cargo:v('fCargo').trim(), salario:num(v('fSalario')),
     dependentes:parseInt(v('fDep'),10)||0, vt:num(v('fVt')), outros:num(v('fOutros')),
-    meses:Math.min(12,Math.max(0,parseInt(v('fMeses'),10)||12))
+    meses:Math.min(12,Math.max(0,parseInt(v('fMeses'),10)||12)),
+    dias:Math.min(30,Math.max(1,parseInt(v('fDias'),10)||30)),
+    diasVendidos:Math.max(0,parseInt(v('fVendidos'),10)||0)
   });
   salvar(); render(); limparCampos(); el('fNome').focus();
 };
 function limparCampos(){
   ['fNome','fCargo','fSalario','fVt','fOutros'].forEach(function(i){ el(i).value=''; });
   el('fDep').value='0';
+  el('fMeses').value='12'; el('fDias').value='30'; el('fVendidos').value='0';
 }
 el('btLimpar').onclick=limparCampos;
 
@@ -559,6 +708,12 @@ function guardarEmpresa(){
 function textoAviso(){
   var base = '<strong>Estimativa de apoio.</strong> Os cálculos seguem as tabelas oficiais ' +
              'de 2026 de INSS e IRRF, incluindo a isenção da Lei 15.270/2025. ';
+  if(modoAtual()==='ferias'){
+    return base + 'Os dias gozados e o terço pagam INSS, IRRF e FGTS. O abono ' +
+           'pecuniário e o terço dele são indenizatórios e não pagam nenhum dos ' +
+           'três. Médias de horas extras e comissões não entram automaticamente: ' +
+           'ajuste o salário informado. Isto não substitui contador.';
+  }
   return base + (modoAtual()==='decimo'
     ? 'O 13º tem base própria de INSS e IRRF — ele nunca se soma ao salário do mês. ' +
       'Verbas variáveis que integram a média (horas extras, comissões, adicionais) não ' +
@@ -568,12 +723,19 @@ function textoAviso(){
       'salário. Isto não substitui contador.');
 }
 
+var CAMPOS_POR_MODO = {
+  mensal:  ['campoVt', 'campoOutros'],
+  decimo:  ['campoMeses'],
+  ferias:  ['campoDias', 'campoVendidos']
+};
+var TODOS_OPCIONAIS = ['campoVt', 'campoOutros', 'campoMeses', 'campoDias', 'campoVendidos'];
+
 function ajustarCampos(){
   el('avisoGeral').innerHTML = textoAviso();
-  var d = modoAtual()==='decimo';
-  el('campoMeses').style.display = d ? '' : 'none';
-  el('fVt').parentNode.style.display = d ? 'none' : '';
-  el('fOutros').parentNode.style.display = d ? 'none' : '';
+  var visiveis = CAMPOS_POR_MODO[modoAtual()] || [];
+  TODOS_OPCIONAIS.forEach(function(id){
+    el(id).style.display = visiveis.indexOf(id) === -1 ? 'none' : '';
+  });
 }
 
 el('btImprimir').onclick=function(){
