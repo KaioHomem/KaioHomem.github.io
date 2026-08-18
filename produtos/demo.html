@@ -6,6 +6,31 @@
 <meta name="robots" content="noindex, nofollow">
 <title>Demonstração — Folha Simples — folha de pagamento e holerite</title>
 <meta name="robots" content="noindex">
+
+<!-- A promessa deste programa é que a folha não sai deste computador.
+     Sem isto, é só promessa: qualquer linha de código que aparecesse
+     aqui um dia poderia mandar tudo para fora. `connect-src 'none'`
+     mais `form-action 'none'` fazem o navegador impedir — não há canal
+     de saída, nem por fetch, nem por XHR, nem por formulário, nem por
+     imagem remota.
+
+     script-src precisa de 'unsafe-inline' porque o programa é um
+     arquivo único, com o script embutido; é o custo de rodar offline
+     sem instalar nada. A defesa contra conteúdo hostil num backup
+     importado está em normalizar() e esc(). Mesmo que um script
+     escapasse das duas, não teria para onde enviar nada. -->
+<meta http-equiv="Content-Security-Policy" content="
+  default-src 'none';
+  script-src 'unsafe-inline';
+  style-src 'unsafe-inline';
+  img-src data:;
+  font-src data:;
+  connect-src 'none';
+  form-action 'none';
+  base-uri 'none';
+  object-src 'none';
+  frame-src 'none';
+">
 <!--
   ===================================================
   FOLHA SIMPLES
@@ -362,9 +387,57 @@ function modoAtual(){
   return (m==='decimo' || m==='ferias') ? m : 'mensal';
 }
 
+/* Backup vem de arquivo: pode estar truncado, editado à mão ou ser de
+   uma versão futura. Isto devolve um estado sempre utilizável, ou null.
+
+   Nada é aproveitado direto do arquivo: cada campo é reconstruído com o
+   tipo certo. Confiar no que veio de fora foi o que quebrou a versão
+   anterior — bastava um backup sem o objeto `empresa` para preencher()
+   estourar em `dados.empresa.nome`, e como o estado já tinha sido salvo,
+   o erro voltava a cada abertura. A app ficava inutilizável até alguém
+   saber limpar o armazenamento do navegador. */
+function normalizar(d){
+  if(!d || typeof d!=='object' || !Array.isArray(d.funcionarios)) return null;
+
+  var emp = (d.empresa && typeof d.empresa==='object') ? d.empresa : {};
+  var modo = (emp.modo==='decimo' || emp.modo==='ferias') ? emp.modo : 'mensal';
+
+  return {
+    empresa: {
+      nome: String(emp.nome==null?'':emp.nome).slice(0,120),
+      cnpj: String(emp.cnpj==null?'':emp.cnpj).slice(0,24),
+      // O <input type="month"> só aceita AAAA-MM; qualquer outra coisa
+      // deixa o campo vazio sem dizer por quê.
+      competencia: /^\d{4}-\d{2}$/.test(String(emp.competencia||'')) ? emp.competencia : '',
+      modo: modo
+    },
+    funcionarios: d.funcionarios
+      .filter(function(f){ return f && typeof f==='object'; })
+      .slice(0,500)
+      .map(function(f){
+        return {
+          nome: String(f.nome==null?'':f.nome).slice(0,120),
+          cargo: String(f.cargo==null?'':f.cargo).slice(0,120),
+          salario: pos(f.salario),
+          dependentes: Math.min(20,Math.max(0,parseInt(f.dependentes,10)||0)),
+          vt: pos(f.vt),
+          outros: pos(f.outros),
+          meses: Math.min(12,Math.max(0,parseInt(f.meses,10)||12)),
+          dias: Math.min(30,Math.max(1,parseInt(f.dias,10)||30)),
+          diasVendidos: Math.max(0,parseInt(f.diasVendidos,10)||0)
+        };
+      })
+  };
+}
+
 function carregar(){
-  try{ var d=JSON.parse(localStorage.getItem(CHAVE)||'null');
-    if(d&&d.funcionarios) dados=d; }catch(e){}
+  try{
+    var d=normalizar(JSON.parse(localStorage.getItem(CHAVE)||'null'));
+    if(d) dados=d;
+  }catch(e){
+    /* Armazenamento corrompido não pode impedir a app de abrir: ela
+       começa vazia, que é recuperável, em vez de morrer na carga. */
+  }
 }
 function salvar(){
   try{ localStorage.setItem(CHAVE, JSON.stringify(dados)); }
@@ -748,25 +821,144 @@ el('btImprimir').onclick=function(){
   window.print();
 };
 
-el('btExportar').onclick=function(){
-  var txt=JSON.stringify(dados,null,2);
-  var blob=new Blob([txt],{type:'application/json'});
+/* ---------- BACKUP CIFRADO ---------- */
+/* O arquivo de backup é a única parte da folha que sai deste computador:
+   vai por e-mail para o contador, para um pendrive, para a pasta que
+   sincroniza com a nuvem. Ali o salário de todo mundo viaja em texto
+   puro, e é ali que cifrar tem efeito real.
+
+   O localStorage fica de fora de propósito. Cifrar dado que a própria
+   página tem de ler exigiria a chave junto do código — obfuscação, não
+   criptografia. Pedir a senha a cada abertura protegeria de verdade,
+   mas num programa usado uma vez por mês isso é o atrito que faz a
+   pessoa voltar para a planilha. Quem tem acesso ao navegador do dono já
+   tem acesso à máquina do dono.
+
+   PBKDF2-SHA256 com 310.000 iterações (recomendação da OWASP) derivando
+   AES-GCM de 256 bits. A contagem vai dentro do arquivo, para que um
+   backup antigo continue abrindo quando o número subir. */
+var CRIPTO = { formato:'folhasimples.cripto.v1', iteracoes:310000 };
+
+function temCripto(){
+  return !!(window.crypto && window.crypto.subtle && window.isSecureContext);
+}
+function b64(buf){
+  var bin=''; var b=new Uint8Array(buf);
+  for(var i=0;i<b.length;i++) bin+=String.fromCharCode(b[i]);
+  return btoa(bin);
+}
+function deB64(txt){
+  var bin=atob(txt); var b=new Uint8Array(bin.length);
+  for(var i=0;i<bin.length;i++) b[i]=bin.charCodeAt(i);
+  return b;
+}
+function derivar(senha, salt, iteracoes){
+  return crypto.subtle.importKey('raw', new TextEncoder().encode(senha), 'PBKDF2', false, ['deriveKey'])
+    .then(function(km){
+      return crypto.subtle.deriveKey(
+        { name:'PBKDF2', salt:salt, iterations:iteracoes, hash:'SHA-256' },
+        km, { name:'AES-GCM', length:256 }, false, ['encrypt','decrypt']);
+    });
+}
+function cifrar(texto, senha){
+  var salt=crypto.getRandomValues(new Uint8Array(16));
+  var iv=crypto.getRandomValues(new Uint8Array(12));
+  return derivar(senha, salt, CRIPTO.iteracoes).then(function(key){
+    return crypto.subtle.encrypt({ name:'AES-GCM', iv:iv }, key, new TextEncoder().encode(texto));
+  }).then(function(ct){
+    return JSON.stringify({
+      formato: CRIPTO.formato, iteracoes: CRIPTO.iteracoes,
+      salt: b64(salt), iv: b64(iv), dados: b64(ct)
+    }, null, 2);
+  });
+}
+function decifrar(env, senha){
+  var it = parseInt(env.iteracoes,10) || CRIPTO.iteracoes;
+  return derivar(senha, deB64(env.salt), it).then(function(key){
+    return crypto.subtle.decrypt({ name:'AES-GCM', iv:deB64(env.iv) }, key, deB64(env.dados));
+  }).then(function(pt){
+    return new TextDecoder().decode(pt);
+  });
+}
+
+function baixar(texto, nome){
+  var blob=new Blob([texto],{type:'application/json'});
   var a=document.createElement('a');
   a.href=URL.createObjectURL(blob);
-  a.download='folha-backup-'+(dados.empresa.competencia||'atual')+'.json';
+  a.download=nome;
   document.body.appendChild(a); a.click(); a.remove();
   setTimeout(function(){ URL.revokeObjectURL(a.href); }, 1000);
+}
+
+el('btExportar').onclick=function(){
+  var comp = dados.empresa.competencia||'atual';
+  var txt = JSON.stringify(dados,null,2);
+
+  if(!temCripto()){
+    baixar(txt, 'folha-backup-'+comp+'.json');
+    return;
+  }
+
+  var senha = prompt(
+    'Senha para proteger o backup.\n\n' +
+    'O arquivo leva o salário de todo mundo. Se ele for por e-mail ou ' +
+    'pendrive, use uma senha.\n\n' +
+    'Deixe em branco para salvar sem proteção.');
+
+  // null é cancelar; string vazia é "sem senha, sei o que faço".
+  if(senha===null) return;
+  if(senha===''){ baixar(txt, 'folha-backup-'+comp+'.json'); return; }
+
+  cifrar(txt, senha).then(function(env){
+    baixar(env, 'folha-backup-'+comp+'.cripto.json');
+    alert('Backup cifrado.\n\nGuarde a senha: sem ela o arquivo não abre, ' +
+          'nem por mim nem por ninguém. Não há como recuperar.');
+  }).catch(function(){
+    alert('Não consegui cifrar o backup. Nada foi salvo — tente de novo.');
+  });
 };
 
 el('btImportar').onclick=function(){ el('dlgImportar').showModal(); };
 el('btCancelaImp').onclick=function(){ el('dlgImportar').close(); };
+function aplicarImportado(novo){
+  if(!novo){
+    alert('Arquivo inválido. Cole o conteúdo exato do backup exportado — ' +
+          'ele começa com { e tem uma lista "funcionarios".');
+    return;
+  }
+  dados=novo; salvar(); preencher(); ajustarCampos(); render();
+  el('dlgImportar').close(); el('txtImportar').value='';
+}
+
 el('btConfirmaImp').onclick=function(){
-  try{
-    var d=JSON.parse(el('txtImportar').value);
-    if(!d||!Array.isArray(d.funcionarios)) throw new Error('formato');
-    dados=d; salvar(); preencher(); render();
-    el('dlgImportar').close(); el('txtImportar').value='';
-  }catch(e){ alert('Arquivo inválido. Cole o conteúdo exato do backup exportado.'); }
+  var bruto=null;
+  try{ bruto=JSON.parse(el('txtImportar').value); }catch(e){ bruto=null; }
+
+  // Backup cifrado: pedir a senha antes de qualquer validação, porque
+  // sem decifrar não há o que validar.
+  if(bruto && bruto.formato===CRIPTO.formato){
+    if(!temCripto()){
+      alert('Este backup está cifrado e o navegador não expõe as funções de ' +
+            'criptografia aqui. Abra o arquivo direto do disco, com dois cliques.');
+      return;
+    }
+    var senha = prompt('Senha do backup cifrado:');
+    if(senha===null) return;
+    decifrar(bruto, senha).then(function(txt){
+      aplicarImportado(normalizar(JSON.parse(txt)));
+    }).catch(function(){
+      alert('Senha errada, ou o arquivo foi alterado depois de cifrado.');
+    });
+    return;
+  }
+
+  var novo=null;
+  try{ novo=normalizar(bruto); }catch(e){ novo=null; }
+
+  // Validar antes de tocar no estado. A versão anterior gravava e só
+  // então descobria o problema, então avisava "arquivo inválido" com o
+  // arquivo inválido já salvo por cima do bom.
+  aplicarImportado(novo);
 };
 
 function preencher(){

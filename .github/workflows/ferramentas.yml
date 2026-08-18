@@ -82,8 +82,20 @@ jobs:
         with:
           node-version: '20'
 
+      # npm ci em vez de npm install: instala exatamente o que está no
+      # lockfile. Com install, cada execução podia resolver uma versão
+      # diferente — e um gate que roda contra código diferente do que foi
+      # revisado não garante muita coisa.
       - name: Instalar dependências de verificação
-        run: npm install --no-audit --no-fund
+        run: npm ci --no-audit --no-fund
+
+      # Gate: vulnerabilidade alta ou crítica nas ferramentas de
+      # verificação. Nível baixo/moderado não derruba o build — o
+      # playwright só roda na CI e nunca chega ao navegador de um
+      # visitante, então travar o deploy por aviso menor treinaria todo
+      # mundo a ignorar este passo.
+      - name: Varredura de vulnerabilidades
+        run: npm audit --audit-level=high
 
       - name: Baixar o Chromium
         run: npx playwright install --with-deps chromium

@@ -214,6 +214,80 @@ function varrerCifrao(arquivo) {
     .forEach(function (n) { varrerCifrao(path.join(pasta, n)); });
 });
 
+/* ---------- O PRODUTO NÃO PODE TER SAÍDA DE REDE ---------- */
+// A frase que vende o Folha Simples é que a folha não sai do computador
+// do comprador. Isso está garantido por CSP, e CSP some fácil: basta
+// alguém mexer no <head> sem saber o que aquela linha faz.
+//
+// Verificado no navegador de verdade em vez de só aqui: fetch, XHR e
+// imagem remota, os três bloqueados. Este gate protege a diretiva.
+(function () {
+  var produto = path.join(RAIZ, 'produtos', 'folha-simples-fc86aa480de7f81c.html');
+  if (!fs.existsSync(produto)) return;
+
+  [produto, path.join(RAIZ, 'produtos', 'demo.html')].forEach(function (arquivo) {
+    if (!fs.existsSync(arquivo)) return;
+    var html = ler(arquivo);
+    var rel = path.relative(RAIZ, arquivo);
+
+    // Só o conteúdo da meta tag conta. Procurar as diretivas em qualquer
+    // lugar do arquivo fazia o gate casar com o comentário que explica a
+    // CSP logo acima dela — passava verde com a diretiva removida, que é
+    // o pior defeito possível num gate: confiança falsa.
+    var meta = html.match(
+      /<meta[^>]+http-equiv=["']Content-Security-Policy["'][^>]*content=["']([\s\S]*?)["']\s*>/i);
+
+    exigir(
+      !!meta,
+      rel + ' não tem meta tag de CSP. Sem ela, "os salários não saem do seu ' +
+      'computador" volta a ser promessa em vez de garantia do navegador.'
+    );
+    if (!meta) return;
+
+    var politica = meta[1];
+    [['default-src', 'sem ele, todo canal não listado fica liberado'],
+     ['connect-src', 'é o que impede exfiltração da folha por fetch ou XHR'],
+     ['form-action', 'formulário é canal de saída como outro qualquer']
+    ].forEach(function (d) {
+      exigir(
+        new RegExp(d[0] + "\\s+'none'").test(politica),
+        rel + ": a CSP perdeu " + d[0] + " 'none' — " + d[1] + '.'
+      );
+    });
+  });
+})();
+
+/* ---------- SUPERFÍCIE DE DEPENDÊNCIAS ---------- */
+// O site publicado não carrega uma linha de JavaScript vinda do npm: as
+// calculadoras e o produto são código próprio. Essa é a propriedade de
+// segurança que mais importa aqui — não há cadeia de suprimentos para
+// comprometer.
+//
+// O playwright existe só para os gates rodarem, e nunca chega ao
+// navegador de um visitante. Se alguém algum dia adicionar uma
+// dependência de produção, isso muda a superfície de ataque do site e
+// tem de ser decisão consciente, não um `npm install` distraído.
+(function () {
+  var pkgPath = path.join(RAIZ, 'package.json');
+  if (!fs.existsSync(pkgPath)) return;
+
+  var pkg = JSON.parse(ler(pkgPath));
+  var producao = Object.keys(pkg.dependencies || {});
+
+  exigir(
+    producao.length === 0,
+    'O site ganhou dependência de produção: ' + producao.join(', ') + '. ' +
+    'Um site estático que serve código de terceiros herda a cadeia de ' +
+    'suprimentos dele. Se for intencional, ajuste esta checagem junto.'
+  );
+
+  exigir(
+    fs.existsSync(path.join(RAIZ, 'package-lock.json')),
+    'Falta o package-lock.json. Sem ele a CI resolve versões novas a cada ' +
+    'execução e o npm audit não roda.'
+  );
+})();
+
 /* ---------- RESULT ---------- */
 console.log('\n' + '-'.repeat(52));
 if (problemas.length === 0) {
