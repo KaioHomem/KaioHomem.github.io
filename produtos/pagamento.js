@@ -8,6 +8,10 @@
    desabilitado com um aviso honesto em vez de levar o
    visitante para um 404 — o pior primeiro contato
    possível com um produto pago.
+
+   Ainda não existe link porque a conta do Stripe não está
+   ativada, e ativar é um passo que só o dono da conta pode
+   dar. O passo a passo está em ATIVAR-VENDA.md, aqui do lado.
    =================================================== */
 
 window.PAGAMENTO = {
