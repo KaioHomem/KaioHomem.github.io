@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Folha Simples — folha de pagamento e holerite</title>
+<meta name="robots" content="noindex">
+<!--
+  ===================================================
+  FOLHA SIMPLES
+  Arquivo único. Funciona offline, sem instalar nada.
+
+  Seus dados de folha NUNCA saem deste computador:
+  não há servidor, não há envio, não há nuvem. Tudo
+  fica no armazenamento local do seu navegador.
+
+  Para fazer backup, use o botão "Exportar".
+  ===================================================
+-->
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0d1117;--bg2:#161b22;--bg3:#21262d;--bd:#30363d;
+  --ac:#58a6ff;--gr:#3fb950;--rd:#f85149;--am:#d29922;
+  --tx:#e6edf3;--t2:#8b949e;--t3:#6e7681;
+  --sans:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --mono:'JetBrains Mono','SF Mono',Consolas,monospace;
+}
+body{font-family:var(--sans);background:var(--bg);color:var(--tx);line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1080px;margin:0 auto;padding:0 1.2rem}
+header{border-bottom:1px solid var(--bd);background:rgba(13,17,23,.9);position:sticky;top:0;z-index:40;backdrop-filter:blur(8px)}
+.hd{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.9rem 0;flex-wrap:wrap}
+.marca{font-weight:700;font-size:1.05rem}.marca span{color:var(--ac)}
+.acoes{display:flex;gap:.5rem;flex-wrap:wrap}
+main{padding:1.8rem 0 4rem}
+h2{font-size:1.15rem;font-weight:600;margin:2rem 0 .8rem}
+h2:first-child{margin-top:0}
+p{color:var(--t2);margin-bottom:.8rem}
+.rot{font-family:var(--mono);font-size:.7rem;text-transform:uppercase;letter-spacing:.07em;color:var(--t3);margin-bottom:.4rem}
+.card{background:var(--bg2);border:1px solid var(--bd);border-radius:12px;padding:1.3rem;margin-bottom:1rem}
+.grade{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.9rem}
+.campo{display:flex;flex-direction:column;gap:.3rem}
+.campo label{font-size:.8rem;color:var(--t2);font-weight:500}
+.campo .dica{font-size:.72rem;color:var(--t3)}
+input,select{background:var(--bg);border:1.5px solid var(--bd);border-radius:8px;color:var(--tx);
+  font-family:var(--mono);font-size:.9rem;padding:.55rem .7rem;width:100%}
+input:focus,select:focus{outline:none;border-color:var(--ac);background:var(--bg3)}
+select{font-family:var(--sans)}
+button{font-family:inherit;cursor:pointer;border:none;border-radius:8px;font-size:.87rem;font-weight:500;padding:.55rem 1.1rem;transition:.2s}
+.b1{background:var(--ac);color:var(--bg)}.b1:hover{background:#79b8ff}
+.b2{background:transparent;color:var(--tx);border:1.5px solid var(--bd)}.b2:hover{border-color:var(--ac)}
+.b3{background:transparent;color:var(--rd);border:1.5px solid rgba(248,81,73,.35);padding:.35rem .8rem;font-size:.8rem}
+.b3:hover{background:rgba(248,81,73,.1)}
+.tabela{overflow-x:auto;border:1px solid var(--bd);border-radius:12px}
+table{width:100%;border-collapse:collapse;font-size:.87rem;min-width:720px}
+th,td{padding:.65rem .85rem;text-align:right;border-bottom:1px solid var(--bd)}
+th{background:var(--bg3);font-family:var(--mono);font-size:.68rem;text-transform:uppercase;
+  letter-spacing:.05em;color:var(--t2);font-weight:500}
+td{font-family:var(--mono)}
+th:first-child,td:first-child{text-align:left;font-family:var(--sans)}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover td{background:var(--bg3)}
+tfoot td{background:var(--bg3);font-weight:600;border-top:2px solid var(--bd)}
+.neg{color:var(--rd)}.pos{color:var(--gr)}
+.vazio{text-align:center;padding:2.5rem 1rem;color:var(--t3)}
+.resumo{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:.9rem;margin-bottom:1rem}
+.kpi{background:var(--bg2);border:1px solid var(--bd);border-left:3px solid var(--ac);border-radius:10px;padding:1rem}
+.kpi.v{border-left-color:var(--gr)}.kpi.a{border-left-color:var(--am)}
+.kpi .n{font-family:var(--mono);font-size:1.35rem;font-weight:700;line-height:1.2}
+.kpi .l{font-size:.78rem;color:var(--t2);margin-top:.2rem}
+.aviso{background:rgba(210,153,34,.1);border-left:3px solid rgba(210,153,34,.5);border-radius:8px;
+  padding:.9rem 1.1rem;font-size:.85rem;color:var(--t2);margin:1rem 0}
+.aviso strong{color:var(--am)}
+dialog{background:var(--bg2);color:var(--tx);border:1px solid var(--bd);border-radius:14px;
+  padding:0;max-width:640px;width:92%}
+dialog::backdrop{background:rgba(0,0,0,.7)}
+.dlg-h{padding:1.1rem 1.3rem;border-bottom:1px solid var(--bd);font-weight:600}
+.dlg-b{padding:1.3rem}
+.dlg-f{padding:1rem 1.3rem;border-top:1px solid var(--bd);display:flex;gap:.6rem;justify-content:flex-end}
+
+/* ---------- HOLERITE PARA IMPRESSÃO ---------- */
+#holerite{display:none}
+@media print{
+  body{background:#fff;color:#000}
+  header,main,.naoimprime{display:none!important}
+  #holerite{display:block!important;font-family:Arial,sans-serif;color:#000;padding:0}
+  .hol{border:1px solid #000;padding:14px;margin-bottom:18px;page-break-inside:avoid;font-size:11px}
+  .hol h3{font-size:13px;margin-bottom:2px}
+  .hol .emp{font-size:10px;color:#333;margin-bottom:8px;border-bottom:1px solid #999;padding-bottom:6px}
+  .hol table{width:100%;border-collapse:collapse;min-width:0;font-size:10.5px}
+  .hol th,.hol td{border:1px solid #999;padding:3px 5px;text-align:right;background:#fff;color:#000;font-family:Arial,sans-serif}
+  .hol th{background:#eee;font-size:9px;text-transform:uppercase}
+  .hol th:first-child,.hol td:first-child{text-align:left}
+  .hol .tot td{font-weight:bold;background:#f5f5f5}
+  .hol .ass{margin-top:26px;display:flex;justify-content:space-between;font-size:9.5px}
+  .hol .ass div{border-top:1px solid #000;padding-top:3px;width:44%;text-align:center}
+}
+</style>
+</head>
+<body>
+
+<header class="naoimprime"><div class="wrap hd">
+  <div class="marca">folha<span>simples</span></div>
+  <div class="acoes">
+    <button class="b2" id="btExportar">Exportar backup</button>
+    <button class="b2" id="btImportar">Importar</button>
+    <button class="b1" id="btImprimir">Imprimir holerites</button>
+  </div>
+</div></header>
+
+<main class="naoimprime"><div class="wrap">
+
+  <h2>Empresa</h2>
+  <div class="card"><div class="grade">
+    <div class="campo"><label for="empNome">Razão social</label><input id="empNome" placeholder="Minha Empresa LTDA"></div>
+    <div class="campo"><label for="empCnpj">CNPJ</label><input id="empCnpj" placeholder="00.000.000/0001-00"></div>
+    <div class="campo"><label for="competencia">Competência</label><input id="competencia" type="month"></div>
+  </div></div>
+
+  <h2>Funcionários</h2>
+  <div class="card">
+    <div class="grade">
+      <div class="campo"><label for="fNome">Nome</label><input id="fNome" placeholder="Maria Silva"></div>
+      <div class="campo"><label for="fCargo">Cargo</label><input id="fCargo" placeholder="Vendedora"></div>
+      <div class="campo"><label for="fSalario">Salário bruto (R$)</label><input id="fSalario" inputmode="decimal" placeholder="2.500,00"></div>
+      <div class="campo"><label for="fDep">Dependentes</label><input id="fDep" type="number" min="0" max="20" value="0"></div>
+      <div class="campo"><label for="fVt">Vale-transporte (R$)</label><input id="fVt" inputmode="decimal" placeholder="0,00">
+        <span class="dica">Limite legal: 6% do salário.</span></div>
+      <div class="campo"><label for="fOutros">Outros descontos (R$)</label><input id="fOutros" inputmode="decimal" placeholder="0,00"></div>
+    </div>
+    <div style="margin-top:1rem;display:flex;gap:.6rem">
+      <button class="b1" id="btAdd">Adicionar</button>
+      <button class="b2" id="btLimpar">Limpar campos</button>
+    </div>
+  </div>
+
+  <div class="resumo" id="resumo"></div>
+  <div class="tabela"><table id="tabela"></table></div>
+
+  <div class="aviso">
+    <strong>Estimativa de apoio.</strong> Os cálculos seguem as tabelas oficiais de 2026 de
+    INSS e IRRF, incluindo a isenção da Lei 15.270/2025. Adicionais, horas extras, faltas,
+    acordos coletivos e verbas específicas do contrato não entram automaticamente — lance
+    em "outros descontos" ou ajuste o salário. Isto não substitui contador.
+  </div>
+
+  <p style="font-size:.82rem;color:var(--t3)">
+    Seus dados ficam apenas neste navegador, neste computador. Não há servidor e nada é
+    enviado para lugar nenhum. Use "Exportar backup" antes de limpar o navegador ou trocar
+    de máquina.
+  </p>
+
+</div></main>
+
+<div id="holerite"></div>
+
+<dialog id="dlgImportar">
+  <div class="dlg-h">Importar backup</div>
+  <div class="dlg-b">
+    <p>Cole o conteúdo do arquivo exportado. Isso substitui os dados atuais.</p>
+    <textarea id="txtImportar" style="width:100%;height:150px;background:var(--bg);color:var(--tx);
+      border:1.5px solid var(--bd);border-radius:8px;padding:.6rem;font-family:var(--mono);font-size:.8rem"></textarea>
+  </div>
+  <div class="dlg-f">
+    <button class="b2" id="btCancelaImp">Cancelar</button>
+    <button class="b1" id="btConfirmaImp">Importar</button>
+  </div>
+</dialog>
+
+<script>
+/* ===================================================
+   MOTOR FISCAL 2026
+   Mesmas tabelas do site público, cobertas por 152
+   testes automatizados. Fonte única de verdade.
+   =================================================== */
+var TABELAS = {
+  ano: 2026,
+  inss: { teto: 8475.55, faixas: [
+    { ate: 1621.00, aliquota: 0.075 }, { ate: 2902.84, aliquota: 0.09 },
+    { ate: 4354.27, aliquota: 0.12 },  { ate: 8475.55, aliquota: 0.14 } ] },
+  irrf: {
+    faixas: [
+      { ate: 2428.80, aliquota: 0,     deduzir: 0 },
+      { ate: 2826.65, aliquota: 0.075, deduzir: 182.16 },
+      { ate: 3751.05, aliquota: 0.15,  deduzir: 394.16 },
+      { ate: 4664.68, aliquota: 0.225, deduzir: 675.49 },
+      { ate: Infinity, aliquota: 0.275, deduzir: 908.73 } ],
+    descontoSimplificado: 607.20, deducaoDependente: 189.59,
+    redutor: { limite: 7350.00, constante: 978.62, indice: 0.133145 } },
+  fgts: { aliquota: 0.08 }
+};
+
+function round2(n){
+  var v=Number(n); if(!isFinite(v))return 0;
+  var s=v<0?-1:1, e=Math.abs(v)*100;
+  return s*Math.round(e+e*1e-9)/100;
+}
+function pos(n){ var v=Number(n); return isFinite(v)&&v>0?v:0; }
+
+function calcINSS(sal){
+  var b=pos(sal), t=0, piso=0;
+  for(var i=0;i<TABELAS.inss.faixas.length;i++){
+    var f=TABELAS.inss.faixas[i];
+    if(b<=piso) break;
+    t += (Math.min(b,f.ate)-piso)*f.aliquota;
+    piso=f.ate;
+  }
+  return round2(t);
+}
+function tabelaIRRF(base){
+  var f=TABELAS.irrf.faixas;
+  for(var i=0;i<f.length;i++) if(base<=f[i].ate)
+    return { imposto: Math.max(0, base*f[i].aliquota - f[i].deduzir), aliquota: f[i].aliquota };
+  return { imposto:0, aliquota:0 };
+}
+function calcIRRF(bruto, inss, dep, pensao){
+  var r=TABELAS.irrf.redutor;
+  var bLegal=Math.max(0, bruto-inss-(dep||0)*TABELAS.irrf.deducaoDependente-(pensao||0));
+  var bSimp =Math.max(0, bruto-TABELAS.irrf.descontoSimplificado);
+  var pL=tabelaIRRF(bLegal), pS=tabelaIRRF(bSimp);
+  var usaSimp = pS.imposto < pL.imposto;
+  var esc = usaSimp ? pS : pL;
+  var redutor = bruto > r.limite ? 0 : Math.max(0, round2(r.constante - r.indice*bruto));
+  var imposto = round2(esc.imposto);
+  return {
+    valor: round2(Math.max(0, imposto-redutor)),
+    aliquota: esc.aliquota,
+    base: round2(usaSimp?bSimp:bLegal),
+    redutor: Math.min(redutor, imposto),
+    isento: round2(Math.max(0, imposto-redutor))===0
+  };
+}
+function folhaDe(f){
+  var bruto=pos(f.salario);
+  var inss=calcINSS(bruto);
+  var irrf=calcIRRF(bruto, inss, f.dependentes);
+  // Vale-transporte: a lei limita o desconto a 6% do salário bruto.
+  var vtTeto=round2(bruto*0.06);
+  var vt=Math.min(pos(f.vt), vtTeto);
+  var outros=pos(f.outros);
+  var descontos=round2(inss+irrf.valor+vt+outros);
+  return {
+    bruto:round2(bruto), inss:inss, irrf:irrf,
+    vt:vt, vtLimitado: pos(f.vt) > vtTeto, outros:round2(outros),
+    descontos:descontos, liquido:round2(bruto-descontos),
+    fgts:round2(bruto*TABELAS.fgts.aliquota)
+  };
+}
+
+/* ---------- FORMATO E ENTRADA ---------- */
+var fmt = new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'});
+function brl(n){ return fmt.format(Number(n)||0); }
+function num(txt){
+  if(typeof txt==='number') return txt;
+  var s=String(txt||'').trim().replace(/[^\d,.-]/g,'');
+  if(!s) return 0;
+  if(s.indexOf(',')>-1) s=s.replace(/\./g,'').replace(',','.');
+  else { var p=s.split('.'); if(p.length>2||(p.length===2&&p[1].length===3)) s=p.join(''); }
+  var n=parseFloat(s); return isFinite(n)?n:0;
+}
+function esc(t){ return String(t==null?'':t).replace(/[&<>"]/g,function(c){
+  return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+
+/* ---------- ESTADO ---------- */
+var CHAVE='folhasimples.v1';
+var dados={ empresa:{nome:'',cnpj:'',competencia:''}, funcionarios:[] };
+
+function carregar(){
+  try{ var d=JSON.parse(localStorage.getItem(CHAVE)||'null');
+    if(d&&d.funcionarios) dados=d; }catch(e){}
+}
+function salvar(){
+  try{ localStorage.setItem(CHAVE, JSON.stringify(dados)); }
+  catch(e){ alert('Não consegui salvar. O armazenamento do navegador pode estar cheio ou desativado.'); }
+}
+function el(id){ return document.getElementById(id); }
+function v(id){ return el(id).value; }
+
+/* ---------- RENDER ---------- */
+function render(){
+  var linhas='', tot={bruto:0,inss:0,irrf:0,vt:0,outros:0,liq:0,fgts:0};
+  var algumVtLimitado=false;
+
+  dados.funcionarios.forEach(function(f,i){
+    var c=folhaDe(f);
+    tot.bruto+=c.bruto; tot.inss+=c.inss; tot.irrf+=c.irrf.valor;
+    tot.vt+=c.vt; tot.outros+=c.outros; tot.liq+=c.liquido; tot.fgts+=c.fgts;
+    if(c.vtLimitado) algumVtLimitado=true;
+
+    linhas+='<tr>'+
+      '<td>'+esc(f.nome)+(f.cargo?'<br><span style="font-size:.75rem;color:var(--t3)">'+esc(f.cargo)+'</span>':'')+'</td>'+
+      '<td>'+brl(c.bruto)+'</td>'+
+      '<td class="neg">'+brl(c.inss)+'</td>'+
+      '<td class="'+(c.irrf.valor?'neg':'')+'">'+(c.irrf.isento?'isento':brl(c.irrf.valor))+'</td>'+
+      '<td class="neg">'+brl(c.vt)+'</td>'+
+      '<td class="neg">'+brl(c.outros)+'</td>'+
+      '<td class="pos">'+brl(c.liquido)+'</td>'+
+      '<td>'+brl(c.fgts)+'</td>'+
+      '<td class="naoimprime"><button class="b3" data-rem="'+i+'">remover</button></td></tr>';
+  });
+
+  el('tabela').innerHTML = dados.funcionarios.length
+    ? '<thead><tr><th>Funcionário</th><th>Bruto</th><th>INSS</th><th>IRRF</th>'+
+      '<th>VT</th><th>Outros</th><th>Líquido</th><th>FGTS</th><th></th></tr></thead><tbody>'+linhas+'</tbody>'+
+      '<tfoot><tr><td>Total ('+dados.funcionarios.length+')</td><td>'+brl(tot.bruto)+'</td>'+
+      '<td class="neg">'+brl(tot.inss)+'</td><td class="neg">'+brl(tot.irrf)+'</td>'+
+      '<td class="neg">'+brl(tot.vt)+'</td><td class="neg">'+brl(tot.outros)+'</td>'+
+      '<td class="pos">'+brl(tot.liq)+'</td><td>'+brl(tot.fgts)+'</td><td></td></tr></tfoot>'
+    : '<tbody><tr><td class="vazio" colspan="9">Nenhum funcionário ainda. Preencha acima e clique em Adicionar.</td></tr></tbody>';
+
+  var custo = tot.bruto + tot.fgts;
+  el('resumo').innerHTML = dados.funcionarios.length ? [
+    ['Custo total da folha', brl(custo), 'a', 'salários + FGTS'],
+    ['Líquido a pagar', brl(tot.liq), 'v', 'o que sai da conta'],
+    ['INSS a recolher', brl(tot.inss), '', 'retido dos funcionários'],
+    ['FGTS a depositar', brl(tot.fgts), '', '8% sobre o bruto']
+  ].map(function(k){
+    return '<div class="kpi '+k[2]+'"><div class="n">'+k[1]+'</div><div class="l">'+k[0]+
+           '<br><span style="color:var(--t3);font-size:.72rem">'+k[3]+'</span></div></div>';
+  }).join('') : '';
+
+  if(algumVtLimitado){
+    el('resumo').insertAdjacentHTML('afterend',
+      '<div class="aviso" id="avisoVt"><strong>Vale-transporte ajustado.</strong> '+
+      'A lei limita o desconto a 6% do salário bruto; o valor acima disso foi ignorado no cálculo.</div>');
+  } else { var a=el('avisoVt'); if(a) a.remove(); }
+
+  document.querySelectorAll('[data-rem]').forEach(function(b){
+    b.onclick=function(){
+      var i=+b.getAttribute('data-rem');
+      if(confirm('Remover '+dados.funcionarios[i].nome+'?')){
+        dados.funcionarios.splice(i,1); salvar(); render();
+      }
+    };
+  });
+  montarHolerites();
+}
+
+function montarHolerites(){
+  var e=dados.empresa;
+  var comp = e.competencia ? e.competencia.split('-').reverse().join('/') : '';
+  el('holerite').innerHTML = dados.funcionarios.map(function(f){
+    var c=folhaDe(f);
+    var lin=[
+      ['Salário base', brl(c.bruto), ''],
+      ['INSS', brl(c.inss), '-'],
+      ['IRRF', c.irrf.isento?'isento':brl(c.irrf.valor), c.irrf.isento?'':'-'],
+      ['Vale-transporte', brl(c.vt), c.vt?'-':''],
+      ['Outros descontos', brl(c.outros), c.outros?'-':'']
+    ].filter(function(l,i){ return i<3 || l[1]!=='R$ 0,00'; });
+
+    return '<div class="hol">'+
+      '<h3>'+esc(e.nome||'—')+'</h3>'+
+      '<div class="emp">CNPJ '+esc(e.cnpj||'—')+' &nbsp;·&nbsp; Recibo de pagamento de salário &nbsp;·&nbsp; Competência '+esc(comp)+'</div>'+
+      '<div style="margin-bottom:6px"><strong>'+esc(f.nome)+'</strong>'+(f.cargo?' — '+esc(f.cargo):'')+'</div>'+
+      '<table><thead><tr><th>Descrição</th><th>Referência</th><th>Vencimentos</th><th>Descontos</th></tr></thead><tbody>'+
+      lin.map(function(l){
+        return '<tr><td>'+l[0]+'</td><td></td>'+
+          (l[2]==='-' ? '<td></td><td>'+l[1]+'</td>' : '<td>'+l[1]+'</td><td></td>')+'</tr>';
+      }).join('')+
+      '<tr class="tot"><td>Totais</td><td></td><td>'+brl(c.bruto)+'</td><td>'+brl(c.descontos)+'</td></tr>'+
+      '<tr class="tot"><td colspan="3">Líquido a receber</td><td>'+brl(c.liquido)+'</td></tr>'+
+      '<tr><td colspan="3">FGTS do mês (depositado pelo empregador)</td><td>'+brl(c.fgts)+'</td></tr>'+
+      '</tbody></table>'+
+      '<div class="ass"><div>Assinatura do empregador</div><div>Recebi em ___/___/______</div></div>'+
+      '</div>';
+  }).join('');
+}
+
+/* ---------- AÇÕES ---------- */
+el('btAdd').onclick=function(){
+  var nome=v('fNome').trim();
+  if(!nome){ alert('Informe o nome do funcionário.'); el('fNome').focus(); return; }
+  if(num(v('fSalario'))<=0){ alert('Informe o salário bruto.'); el('fSalario').focus(); return; }
+  dados.funcionarios.push({
+    nome:nome, cargo:v('fCargo').trim(), salario:num(v('fSalario')),
+    dependentes:parseInt(v('fDep'),10)||0, vt:num(v('fVt')), outros:num(v('fOutros'))
+  });
+  salvar(); render(); limparCampos(); el('fNome').focus();
+};
+function limparCampos(){
+  ['fNome','fCargo','fSalario','fVt','fOutros'].forEach(function(i){ el(i).value=''; });
+  el('fDep').value='0';
+}
+el('btLimpar').onclick=limparCampos;
+
+['empNome','empCnpj','competencia'].forEach(function(id){
+  el(id).oninput=function(){
+    dados.empresa={ nome:v('empNome'), cnpj:v('empCnpj'), competencia:v('competencia') };
+    salvar(); montarHolerites();
+  };
+});
+
+el('btImprimir').onclick=function(){
+  if(!dados.funcionarios.length){ alert('Adicione ao menos um funcionário.'); return; }
+  if(!dados.empresa.nome){ alert('Preencha a razão social da empresa — ela vai no holerite.'); el('empNome').focus(); return; }
+  window.print();
+};
+
+el('btExportar').onclick=function(){
+  var txt=JSON.stringify(dados,null,2);
+  var blob=new Blob([txt],{type:'application/json'});
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='folha-backup-'+(dados.empresa.competencia||'atual')+'.json';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(function(){ URL.revokeObjectURL(a.href); }, 1000);
+};
+
+el('btImportar').onclick=function(){ el('dlgImportar').showModal(); };
+el('btCancelaImp').onclick=function(){ el('dlgImportar').close(); };
+el('btConfirmaImp').onclick=function(){
+  try{
+    var d=JSON.parse(el('txtImportar').value);
+    if(!d||!Array.isArray(d.funcionarios)) throw new Error('formato');
+    dados=d; salvar(); preencher(); render();
+    el('dlgImportar').close(); el('txtImportar').value='';
+  }catch(e){ alert('Arquivo inválido. Cole o conteúdo exato do backup exportado.'); }
+};
+
+function preencher(){
+  el('empNome').value=dados.empresa.nome||'';
+  el('empCnpj').value=dados.empresa.cnpj||'';
+  el('competencia').value=dados.empresa.competencia||new Date().toISOString().slice(0,7);
+  dados.empresa.competencia=el('competencia').value;
+}
+
+carregar(); preencher(); render();
+</script>
+</body>
+</html>

@@ -158,6 +158,40 @@
     else principal.appendChild(secao);
   }
 
+  /* ---------- PRODUCT CTA ---------- */
+  /**
+   * Only on the pages whose visitors plausibly run a payroll for other
+   * people. Someone checking their own net salary is not a buyer, and
+   * putting an ad in front of them is noise that costs trust.
+   */
+  var PRODUTO = {
+    paginas: ['salario-liquido', 'decimo-terceiro', 'ferias', 'clt-vs-pj'],
+    titulo: 'Você calcula a folha de outras pessoas?',
+    texto: 'O Folha Simples faz esta mesma conta para vários funcionários de uma vez e ' +
+           'imprime o holerite de cada um. Roda offline — os salários não saem do seu computador.',
+    rotulo: 'Ver o Folha Simples'
+  };
+
+  function montarProduto() {
+    if (PRODUTO.paginas.indexOf(atual) === -1) return;
+
+    var principal = document.querySelector('main');
+    if (!principal) return;
+
+    var caminho = (emSubpasta ? '../' : '') + 'produtos/folha-de-pagamento.html';
+    var secao = document.createElement('aside');
+    secao.className = 'produto-cta';
+    secao.innerHTML =
+      '<div class="produto-rot">Ferramenta paga</div>' +
+      '<h3>' + PRODUTO.titulo + '</h3>' +
+      '<p>' + PRODUTO.texto + '</p>' +
+      '<a href="' + caminho + '">' + PRODUTO.rotulo + ' →</a>';
+
+    var anuncio = principal.querySelector('.espaco-anuncio[data-slot="rodape"]');
+    if (anuncio) principal.insertBefore(secao, anuncio);
+    else principal.appendChild(secao);
+  }
+
   /* ---------- INPUT HELPERS ---------- */
   /**
    * Parse a number the way a Brazilian would type it.
@@ -268,6 +302,7 @@
   function iniciar() {
     montarTopo();
     montarRelacionadas();
+    montarProduto();
     montarRodape();
   }
 

@@ -1,4 +1,11 @@
 User-agent: *
 Allow: /
 
+# O programa vendido e a página de entrega não entram em busca.
+# Isto é obscuridade, não segurança: sem servidor não há como
+# gatear de verdade. Para um produto de R$ 97 é proporcional, e
+# quem copiaria o link não teria comprado.
+Disallow: /produtos/folha-simples
+Disallow: /produtos/obrigado.html
+
 Sitemap: https://kaiohomem.github.io/sitemap.xml
