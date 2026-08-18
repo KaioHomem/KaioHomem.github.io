@@ -166,11 +166,52 @@ function varrer(arquivo) {
   });
 }
 
-[DIR, path.join(RAIZ, 'painel')].forEach(function (pasta) {
+[DIR, path.join(RAIZ, 'painel'), path.join(RAIZ, 'produtos')].forEach(function (pasta) {
   if (!fs.existsSync(pasta)) return;
   fs.readdirSync(pasta)
     .filter(function (n) { return /\.(js|html|json)$/.test(n); })
     .forEach(function (n) { varrer(path.join(pasta, n)); });
+});
+
+/* ---------- CURRENCY COMPARED AS TEXT ---------- */
+// Intl.NumberFormat('pt-BR') separates the symbol with a NON-BREAKING
+// space (U+00A0), so brl(0) is "R$\u00a00,00" and never equals the
+// "R$ 0,00" anyone types into a comparison. The test silently returns
+// false forever, which is the worst kind of failure: no error, no alarm,
+// just a branch that never runs.
+//
+// This shipped once — the holerite dropped zeroed rows by comparing the
+// formatted string, so every payslip carried a dead "Outros descontos
+// R$ 0,00" line. Compare the number instead.
+var CIFRAO_LITERAL = /[=!]==?\s*(['"])R\$[^'"]*\1|(['"])R\$[^'"]*\2\s*[=!]==?/;
+
+function varrerCifrao(arquivo) {
+  var achados = [];
+  ler(arquivo).split('\n').forEach(function (linha, i) {
+    // Comentários que explicam a armadilha citam a comparação de propósito.
+    // Um gate que dispara na própria documentação ensina todo mundo a
+    // ignorar o gate.
+    var t = linha.trim();
+    if (t.indexOf('//') === 0 || t.indexOf('*') === 0 || t.indexOf('/*') === 0) return;
+    if (CIFRAO_LITERAL.test(linha)) achados.push(i + 1);
+  });
+
+  // Uma checagem por arquivo, não por linha: contar linha a linha inflaria
+  // o total em trinta vezes e transformaria o número final em ruído.
+  exigir(
+    achados.length === 0,
+    'COMPARAÇÃO COM MOEDA FORMATADA em ' + path.relative(RAIZ, arquivo) +
+    ', linha(s) ' + achados.join(', ') +
+    '. Intl usa espaço não separável (U+00A0), então a comparação nunca casa. ' +
+    'Compare o número, não o texto.'
+  );
+}
+
+[DIR, path.join(RAIZ, 'painel'), path.join(RAIZ, 'produtos')].forEach(function (pasta) {
+  if (!fs.existsSync(pasta)) return;
+  fs.readdirSync(pasta)
+    .filter(function (n) { return /\.(js|html)$/.test(n); })
+    .forEach(function (n) { varrerCifrao(path.join(pasta, n)); });
 });
 
 /* ---------- RESULT ---------- */

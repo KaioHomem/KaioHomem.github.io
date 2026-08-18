@@ -341,13 +341,21 @@ function montarHolerites(){
   var comp = e.competencia ? e.competencia.split('-').reverse().join('/') : '';
   el('holerite').innerHTML = dados.funcionarios.map(function(f){
     var c=folhaDe(f);
+    // Cada linha declara a coluna a que pertence — 'v' vencimento, 'd'
+    // desconto — em vez de deduzir isso do valor. Um desconto de R$ 0,00
+    // continua sendo um desconto, e não pode migrar para a coluna de
+    // vencimentos só porque zerou.
+    //
+    // O filtro compara o número, não o texto formatado: Intl.NumberFormat
+    // separa o símbolo com espaço não separável (U+00A0), então
+    // brl(0) !== 'R$ 0,00' e a comparação por string nunca casava.
     var lin=[
-      ['Salário base', brl(c.bruto), ''],
-      ['INSS', brl(c.inss), '-'],
-      ['IRRF', c.irrf.isento?'isento':brl(c.irrf.valor), c.irrf.isento?'':'-'],
-      ['Vale-transporte', brl(c.vt), c.vt?'-':''],
-      ['Outros descontos', brl(c.outros), c.outros?'-':'']
-    ].filter(function(l,i){ return i<3 || l[1]!=='R$ 0,00'; });
+      ['Salário base',     brl(c.bruto),  'v', c.bruto],
+      ['INSS',             brl(c.inss),   'd', c.inss],
+      ['IRRF',             c.irrf.isento?'isento':brl(c.irrf.valor), 'd', c.irrf.valor],
+      ['Vale-transporte',  brl(c.vt),     'd', c.vt],
+      ['Outros descontos', brl(c.outros), 'd', c.outros]
+    ].filter(function(l,i){ return i<3 || l[3]>0; });
 
     return '<div class="hol">'+
       '<h3>'+esc(e.nome||'—')+'</h3>'+
@@ -356,7 +364,7 @@ function montarHolerites(){
       '<table><thead><tr><th>Descrição</th><th>Referência</th><th>Vencimentos</th><th>Descontos</th></tr></thead><tbody>'+
       lin.map(function(l){
         return '<tr><td>'+l[0]+'</td><td></td>'+
-          (l[2]==='-' ? '<td></td><td>'+l[1]+'</td>' : '<td>'+l[1]+'</td><td></td>')+'</tr>';
+          (l[2]==='d' ? '<td></td><td>'+l[1]+'</td>' : '<td>'+l[1]+'</td><td></td>')+'</tr>';
       }).join('')+
       '<tr class="tot"><td>Totais</td><td></td><td>'+brl(c.bruto)+'</td><td>'+brl(c.descontos)+'</td></tr>'+
       '<tr class="tot"><td colspan="3">Líquido a receber</td><td>'+brl(c.liquido)+'</td></tr>'+
