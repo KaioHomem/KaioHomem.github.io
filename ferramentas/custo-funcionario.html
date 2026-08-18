@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Quanto custa um funcionário CLT — calculadora de encargos 2026</title>
+<meta name="description" content="Calcule o custo real de um funcionário CLT em 2026: INSS patronal, RAT, terceiros, FGTS, 13º e férias. Veja quanto cada R$ 1,00 de salário custa de verdade no Simples e no Lucro Presumido.">
+<link rel="canonical" href="https://kaiohomem.github.io/ferramentas/custo-funcionario.html">
+
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://kaiohomem.github.io/ferramentas/custo-funcionario.html">
+<meta property="og:title" content="Quanto custa um funcionário CLT">
+<meta property="og:description" content="Encargos, FGTS, 13º e férias somados: o custo real de contratar, com as regras de 2026.">
+<meta property="og:locale" content="pt_BR">
+<meta name="twitter:card" content="summary">
+
+<meta http-equiv="Content-Security-Policy" content="
+  default-src 'self';
+  script-src 'self' https://pagead2.googlesyndication.com https://*.googlesyndication.com https://*.doubleclick.net https://*.google.com https://*.gstatic.com;
+  style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+  font-src https://fonts.gstatic.com;
+  img-src 'self' data: https:;
+  frame-src https://*.googlesyndication.com https://*.doubleclick.net;
+  connect-src 'self' https://*.google.com https://*.doubleclick.net;
+  object-src 'none'; base-uri 'self'; form-action 'self';
+">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏭</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tools.css">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Calculadora de Custo de Funcionário",
+  "url": "https://kaiohomem.github.io/ferramentas/custo-funcionario.html",
+  "applicationCategory": "FinanceApplication",
+  "operatingSystem": "Any",
+  "inLanguage": "pt-BR",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "BRL" }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Quanto custa um funcionário além do salário?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Depende do regime tributário. Uma empresa do Simples Nacional nos anexos I, II, III ou V paga cerca de 24% acima do salário, porque a contribuição previdenciária patronal já está dentro do DAS e sobra o FGTS mais as provisões de 13º e férias. Uma empresa do Lucro Presumido ou Real paga cerca de 54% acima, somando os 20% de INSS patronal, o RAT e as contribuições a terceiros."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Empresa do Simples Nacional paga INSS patronal?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Nos anexos I, II, III e V não paga por fora: a contribuição patronal está incluída na alíquota do DAS. No anexo IV é diferente — a CPP de 20% mais o RAT são recolhidos separadamente, fora do DAS. Em nenhum anexo o Simples paga contribuições a terceiros."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "O 13º e as férias entram no custo mensal?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Sim, como provisão. Ao longo de um ano o empregador paga doze salários, mais um 13º, mais o terço constitucional sobre o mês de férias. O mês de férias em si não é custo adicional: o funcionário recebe sem trabalhar, mas aquele mês seria pago de qualquer forma. Só o terço é acréscimo."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "O vale-transporte é custo da empresa?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Só a parte que passa de 6% do salário base. A empresa compra o passe inteiro, mas pode descontar do funcionário até 6% do salário. Se o vale custa menos que esse teto, o desconto cobre tudo e o custo líquido para a empresa é zero."
+      }
+    }
+  ]
+}
+</script>
+</head>
+<body data-ferramenta="custo-funcionario">
+
+<header class="topo" id="topo"></header>
+
+<main class="wrap">
+
+  <div class="cabecalho">
+    <div class="trilha"><a href="index.html">ferramentas</a> / custo de funcionário</div>
+    <div class="selo">regras de 2026</div>
+    <h1>Quanto custa um funcionário de verdade</h1>
+    <p class="resumo">
+      O salário é a parte visível. Some INSS patronal, RAT, terceiros, FGTS, 13º e o terço
+      de férias e o número muda bastante — e muda de novo conforme o regime tributário
+      da empresa.
+    </p>
+  </div>
+
+  <div class="espaco-anuncio" data-slot="topo"></div>
+
+  <section class="cartao">
+    <form id="formulario" autocomplete="off">
+      <div class="grade">
+
+        <div class="campo">
+          <label for="salario">Salário bruto mensal (R$)</label>
+          <input class="entrada" type="text" id="salario" inputmode="decimal" placeholder="3.000,00" value="3.000,00">
+        </div>
+
+        <div class="campo">
+          <label for="regime">Regime tributário da empresa</label>
+          <select class="entrada" id="regime">
+            <option value="simples">Simples Nacional — anexos I, II, III ou V</option>
+            <option value="simplesIV">Simples Nacional — anexo IV</option>
+            <option value="normal">Lucro Presumido ou Lucro Real</option>
+          </select>
+          <span class="dica">Nos anexos I, II, III e V a parte patronal já está no DAS.</span>
+        </div>
+
+        <div class="campo" id="campoRat">
+          <label for="rat">Grau de risco (RAT)</label>
+          <select class="entrada" id="rat">
+            <option value="0.01">1% — risco leve (escritório, comércio)</option>
+            <option value="0.02" selected>2% — risco médio</option>
+            <option value="0.03">3% — risco grave (indústria, construção)</option>
+          </select>
+          <span class="dica">Definido pelo CNAE da empresa.</span>
+        </div>
+
+        <div class="campo" id="campoFap">
+          <label for="fap">FAP</label>
+          <input class="entrada" type="text" id="fap" inputmode="decimal" placeholder="1,00" value="1,00">
+          <span class="dica">Multiplica só o RAT. Entre 0,5 e 2,0.</span>
+        </div>
+
+        <div class="campo" id="campoTerceiros">
+          <label for="terceiros">Terceiros (%)</label>
+          <input class="entrada" type="text" id="terceiros" inputmode="decimal" placeholder="5,8" value="5,8">
+          <span class="dica">Sistema S, INCRA e salário-educação. Costuma dar 5,8%.</span>
+        </div>
+
+        <div class="campo">
+          <label for="beneficios">Benefícios mensais (R$)</label>
+          <input class="entrada" type="text" id="beneficios" inputmode="decimal" placeholder="0,00" value="0,00">
+          <span class="dica">Vale-refeição, plano de saúde — o custo cheio da empresa.</span>
+        </div>
+
+        <div class="campo">
+          <label for="vt">Vale-transporte mensal (R$)</label>
+          <input class="entrada" type="text" id="vt" inputmode="decimal" placeholder="0,00" value="0,00">
+          <span class="dica">Valor do passe. O desconto de 6% já é aplicado.</span>
+        </div>
+
+        <div class="campo">
+          <label>Opções</label>
+          <div class="campo check">
+            <input type="checkbox" id="multa" checked>
+            <label for="multa">Provisionar a multa de 40% do FGTS</label>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="botoes">
+        <button type="button" class="btn" id="calcular">Calcular</button>
+        <button type="button" class="btn btn-vazado" id="limpar">Limpar</button>
+      </div>
+    </form>
+
+    <div class="resultado" id="resultado" aria-live="polite"></div>
+  </section>
+
+  <div class="espaco-anuncio" data-slot="resultado"></div>
+  <div class="bloco-afiliados"></div>
+
+  <article class="conteudo">
+
+    <h2>Por que o salário não é o custo</h2>
+    <p>
+      Quem contrata pela primeira vez combina um salário de R$ 3.000 e provisiona R$ 3.000
+      por mês. Aí chega dezembro com o 13º, chegam as férias com o terço, e o caixa não
+      fecha. Nada disso é surpresa jurídica — é só uma conta que ninguém fez no começo.
+    </p>
+
+    <h3>A base não são doze salários</h3>
+    <p>
+      Ao longo de um ano o empregador paga <strong>doze salários mensais</strong>, mais um
+      <strong>13º</strong>, mais o <strong>terço constitucional</strong> sobre o mês de
+      férias. São 13,33 salários por ano, ou 40/3 se preferir a fração exata.
+    </p>
+    <p>
+      O mês de férias não entra como custo adicional, e essa é a parte que mais gera conta
+      errada. O funcionário recebe sem trabalhar, mas aquele mês seria pago de qualquer
+      forma — ele substitui um mês normal, não se soma a ele. Só o terço é acréscimo.
+      Quem conta o mês de férias inteiro infla o custo em cerca de 8%.
+    </p>
+
+    <h3>Sobre essa base incidem os encargos</h3>
+    <p>
+      E o terço de férias entra na base de INSS patronal: o STF decidiu isso no
+      <strong>Tema 985</strong>, com efeitos a partir de setembro de 2020. Por muito tempo
+      se calculou de outro jeito, e material antigo na internet ainda ensina o jeito antigo.
+    </p>
+
+    <h2>O que cada regime paga</h2>
+
+    <h3>Simples Nacional — anexos I, II, III e V</h3>
+    <p>
+      A contribuição previdenciária patronal, o RAT e os terceiros já estão dentro da
+      alíquota do DAS. Não se paga nada disso por fora. Sobra o <strong>FGTS de 8%</strong>
+      e as provisões — por isso o custo fica perto de 24% acima do salário, e não dos 68%
+      que se lê por aí.
+    </p>
+
+    <h3>Simples Nacional — anexo IV</h3>
+    <p>
+      O anexo IV é a exceção: construção civil, limpeza, vigilância e advocacia, entre
+      outras. A <strong>CPP de 20% e o RAT são recolhidos separadamente</strong>, fora do
+      DAS. Terceiros continuam não sendo devidos — o Simples é isento em todos os anexos.
+    </p>
+
+    <h3>Lucro Presumido e Lucro Real</h3>
+    <ul>
+      <li><strong>20% de CPP</strong> — a contribuição patronal, sobre toda a folha</li>
+      <li><strong>1%, 2% ou 3% de RAT</strong> — conforme o grau de risco do CNAE, multiplicado pelo FAP do estabelecimento</li>
+      <li><strong>Até 5,8% de terceiros</strong> — Sistema S, INCRA, salário-educação</li>
+      <li><strong>8% de FGTS</strong></li>
+    </ul>
+
+    <h3>O FAP multiplica só o RAT</h3>
+    <p>
+      O Fator Acidentário de Prevenção vai de 0,5 a 2,0 e premia ou pune a empresa pelo
+      histórico de acidentes. Ele incide <strong>apenas sobre o RAT</strong> — nunca sobre
+      os 20% da CPP. Com RAT de 2% e FAP 2,0, o RAT vira 4%; a CPP continua 20%.
+    </p>
+
+    <h2>A multa de 40% do FGTS</h2>
+    <p>
+      Na dispensa sem justa causa o empregador paga 40% sobre tudo que depositou de FGTS
+      naquele contrato. Não é custo do mês, mas é custo do contrato, e quem não provisiona
+      descobre isso no pior momento. Aqui ela entra como provisão mensal e pode ser
+      desligada.
+    </p>
+
+    <h2>O vale-transporte quase sempre custa zero</h2>
+    <p>
+      A empresa compra o passe inteiro, mas pode descontar do funcionário
+      <strong>até 6% do salário base</strong>. Se o vale custa menos que esse teto, o
+      desconto cobre tudo e o custo líquido é zero. Só o que passa de 6% sai do caixa da
+      empresa — o que costuma acontecer com salários baixos em cidades grandes.
+    </p>
+
+    <h2>O que esta conta não cobre</h2>
+    <p>
+      A <strong>desoneração da folha</strong> (CPRB) ficou de fora. Ela vale para dezessete
+      setores nomeados em lei, está em reoneração gradual até 2028 pela Lei 14.973/2024, e
+      troca a folha pela receita bruta como base. Quem está dentro sabe que está; para todo
+      o resto, mostrar essa opção só confundiria.
+    </p>
+    <p>
+      Também ficam de fora acordos coletivos, adicionais de periculosidade e insalubridade,
+      horas extras habituais e afastamentos. Todos empurram o custo para cima.
+    </p>
+
+    <div class="aviso">
+      <p>
+        <strong>Isto é estimativa de planejamento.</strong> As alíquotas de RAT e de
+        terceiros dependem do CNAE e do FPAS da empresa, e o FAP é publicado por
+        estabelecimento. Confirme os três com seu contador antes de fechar um orçamento.
+      </p>
+    </div>
+
+  </article>
+
+  <section class="relacionadas" id="relacionadas"></section>
+
+</main>
+
+<footer class="rodape" id="rodape"></footer>
+
+<script src="nucleo.js"></script>
+<script src="app.js"></script>
+<script src="pg-custo.js"></script>
+<script src="consentimento.js"></script>
+<script src="monetizacao.js"></script>
+</body>
+</html>

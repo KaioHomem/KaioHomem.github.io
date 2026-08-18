@@ -459,6 +459,81 @@ eq('sem juros, Price = principal dividido pelo prazo',
 verdadeiro('entrada cobrindo tudo não gera parcelas',
   F.financiamento({ valor: 1000, entrada: 1000, meses: 12, taxaMensal: 0.01 }).price.parcelas.length === 0);
 
+/* ---------- CUSTO DO FUNCIONÁRIO ---------- */
+console.log('\nCUSTO DO FUNCIONÁRIO');
+
+(function () {
+  var S = 3000;
+
+  // A base de encargos é 40/3 salários por ano: doze meses, o 13º e o
+  // terço de férias. O mês de férias NÃO é adicional — o funcionário é
+  // pago sem trabalhar, mas substitui um mês que seria pago de qualquer
+  // jeito. Contar treze salários e mais um mês de férias é o erro mais
+  // comum nesta conta, e infla o resultado em 8%.
+  eq('base anual é 40/3 salários', F.custoFuncionario({ salario: S }).baseAnual, S * 40 / 3);
+
+  var simples = F.custoFuncionario({ salario: S, regime: 'simples' });
+  var normal  = F.custoFuncionario({ salario: S, regime: 'normal', rat: 0.02, fap: 1, terceiros: 0.058 });
+  var anexoIV = F.custoFuncionario({ salario: S, regime: 'simplesIV', rat: 0.02, fap: 1 });
+
+  // No Simples anexos I, II, III e V a CPP, o RAT e os terceiros já estão
+  // dentro do DAS. Cobrar de novo aqui dobraria a resposta.
+  eq('Simples I/II/III/V não paga encargo previdenciário à parte', simples.encargos.total, 0);
+  eq('Simples: sobra FGTS e a provisão da multa', simples.mensal, S * (40 / 3) * (1 + 0.08 + 0.032) / 12);
+
+  // 20% + RAT 2% + terceiros 5,8%.
+  eq('regime normal soma 27,8% de encargo', normal.encargos.aliquota, 0.278, 0.0001);
+
+  // Anexo IV recolhe CPP e RAT por fora, mas o Simples é isento de
+  // terceiros em todos os anexos.
+  eq('anexo IV paga CPP e RAT, não terceiros', anexoIV.encargos.terceiros, 0);
+  eq('anexo IV soma 22% de encargo', anexoIV.encargos.aliquota, 0.22, 0.0001);
+
+  verdadeiro('Simples custa menos que o regime normal', simples.mensal < normal.mensal);
+  verdadeiro('anexo IV fica entre os dois',
+    anexoIV.mensal > simples.mensal && anexoIV.mensal < normal.mensal);
+
+  // O FAP multiplica só o RAT, nunca os 20% da CPP. Aplicá-lo à alíquota
+  // inteira é um erro plausível que dobraria o efeito.
+  var fapDobro = F.custoFuncionario({ salario: S, regime: 'normal', rat: 0.02, fap: 2, terceiros: 0.058 });
+  eq('FAP 2,0 dobra apenas o RAT', fapDobro.encargos.aliquota, 0.298, 0.0001);
+  eq('FAP não mexe na CPP', fapDobro.encargos.cpp, normal.encargos.cpp);
+
+  // O FAP é legalmente limitado a [0,5 ; 2,0].
+  eq('FAP acima do teto é grampeado em 2,0',
+    F.custoFuncionario({ salario: S, regime: 'normal', rat: 0.02, fap: 9, terceiros: 0.058 }).encargos.aliquota,
+    0.298, 0.0001);
+
+  // Vale-transporte: a empresa compra o passe inteiro e pode descontar
+  // até 6% do salário. Abaixo desse teto o desconto cobre tudo e o custo
+  // líquido é zero — não é o valor do passe.
+  eq('VT abaixo de 6% do salário não custa nada à empresa',
+    F.custoFuncionario({ salario: S, valeTransporte: 100 }).beneficios.vtMensal, 0);
+  eq('VT acima do teto custa só o excedente',
+    F.custoFuncionario({ salario: S, valeTransporte: 250 }).beneficios.vtMensal, 250 - 180);
+
+  // A multa de 40% incide sobre o saldo do FGTS, não sobre o salário.
+  eq('multa do FGTS é 40% do depósito', normal.fgts.multa, normal.fgts.deposito * 0.40);
+  verdadeiro('dá para não provisionar a multa',
+    F.custoFuncionario({ salario: S, provisionarMulta: false }).fgts.multa === 0);
+
+  // Benefício é custo cheio: não tem encargo, mas também não tem desconto.
+  var comBeneficio = F.custoFuncionario({ salario: S, regime: 'simples', beneficios: 500 });
+  eq('benefício entra pelo valor cheio, sem encargo',
+    comBeneficio.mensal, simples.mensal + 500);
+
+  // O multiplicador é o número que o empregador leva embora.
+  eq('multiplicador é o custo mensal sobre o salário',
+    normal.multiplicador, normal.mensal / S, 0.0001);
+  eq('custo-hora usa as 220h da jornada padrão',
+    normal.custoHora, normal.mensal / 220);
+
+  // Salário zero não pode virar divisão por zero nem NaN.
+  var zero = F.custoFuncionario({ salario: 0 });
+  eq('salário zero custa zero', zero.mensal, 0);
+  eq('salário zero não gera multiplicador infinito', zero.multiplicador, 0);
+})();
+
 /* ---------- RESULT ---------- */
 console.log('\n' + '-'.repeat(52));
 if (falhas === 0) {

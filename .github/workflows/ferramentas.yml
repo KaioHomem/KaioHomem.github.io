@@ -5,10 +5,15 @@ on:
     branches: ["main"]
     paths:
       - 'ferramentas/**'
+      - 'produtos/**'
+      - 'package.json'
       - '.github/workflows/ferramentas.yml'
   pull_request:
     paths:
       - 'ferramentas/**'
+      - 'produtos/**'
+      - 'package.json'
+      - '.github/workflows/ferramentas.yml'
   # First day of every month, 09:00 UTC.
   schedule:
     - cron: '0 9 1 * *'
@@ -43,6 +48,37 @@ jobs:
       # rebaixar a página.
       - name: Auditoria de links, acessibilidade e peso
         run: node ferramentas/auditoria.js
+
+      # Gate: o produto vendido carrega uma cópia das tabelas fiscais,
+      # porque precisa rodar offline. Cópia que ninguém compara com o
+      # original é cópia que envelhece errado — e um holerite errado é o
+      # pior defeito possível num programa de folha.
+      - name: Conferir o motor embutido no produto
+        run: node produtos/verificar-motor.js
+
+  navegador:
+    name: Verificar as páginas no navegador
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Instalar dependências de verificação
+        run: npm install --no-audit --no-fund
+
+      - name: Baixar o Chromium
+        run: npx playwright install --with-deps chromium
+
+      # Gate: os outros gates leem arquivos. Este abre as páginas num
+      # navegador de verdade, onde mora uma classe inteira de defeito que
+      # a leitura estática não alcança — erro de JavaScript que apaga a
+      # tela, botão que não calcula, página que rola sozinha para o lugar
+      # errado. Foi escrito depois de dois desses passarem batido.
+      - name: Abrir as dez páginas num Chromium
+        run: node ferramentas/verificar-paginas.js
 
   manutencao:
     name: Manutenção mensal

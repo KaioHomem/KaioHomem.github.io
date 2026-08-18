@@ -15,6 +15,7 @@
     { id: 'seguro-desemprego', arquivo: 'seguro-desemprego.html', nome: 'Seguro-desemprego' },
     { id: 'horas-extras',    arquivo: 'horas-extras.html',    nome: 'Horas extras' },
     { id: 'clt-vs-pj',       arquivo: 'clt-vs-pj.html',       nome: 'CLT vs PJ' },
+    { id: 'custo-funcionario', arquivo: 'custo-funcionario.html', nome: 'Custo de funcionário' },
     { id: 'juros-compostos', arquivo: 'juros-compostos.html', nome: 'Juros compostos' },
     { id: 'financiamento',   arquivo: 'financiamento.html',   nome: 'Financiamento' }
   ];
@@ -42,6 +43,24 @@
         '<a href="index.html" class="marca">ferramentas<span>.</span></a>' +
         '<nav aria-label="Ferramentas">' + links + '</nav>' +
       '</div>';
+
+    // No celular o menu vira uma faixa rolável, e a partir da oitava
+    // ferramenta o link da página atual nasce fora da tela: o visitante
+    // não vê onde está.
+    //
+    // Aqui a faixa é movida direto pelo scrollLeft, e não por
+    // scrollIntoView: mesmo com block:'nearest' o scrollIntoView subiu a
+    // cadeia de ancestrais e rolou o documento inteiro — no financiamento
+    // a página abria 821px abaixo do topo. Mexer só no contêiner não tem
+    // como mover a página.
+    var nav = alvo.querySelector('nav');
+    var ativo = nav && nav.querySelector('a.ativo');
+    if (nav && ativo && nav.scrollWidth > nav.clientWidth) {
+      nav.scrollLeft = Math.max(
+        0,
+        ativo.offsetLeft - (nav.clientWidth - ativo.offsetWidth) / 2
+      );
+    }
   }
 
   function montarRodape() {
@@ -246,6 +265,15 @@
     var el = document.getElementById(id);
     if (!el) return;
     el.classList.add('visivel');
+
+    // Toda página roda um cálculo sozinha ao abrir, para o visitante já
+    // ver um exemplo pronto. Rolar nesse primeiro cálculo o jogava para
+    // além do título e do formulário, direto num resultado de valores
+    // padrão que ele não pediu — no celular, um salto de 821px logo na
+    // chegada. Só a partir do segundo cálculo houve um clique.
+    var primeiro = !el.getAttribute('data-ja-mostrado');
+    el.setAttribute('data-ja-mostrado', '1');
+    if (primeiro) return;
 
     var reduzirMovimento = window.matchMedia &&
       window.matchMedia('(prefers-reduced-motion: reduce)').matches;

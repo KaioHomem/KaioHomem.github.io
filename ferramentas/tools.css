@@ -414,6 +414,24 @@ details p { margin: 0.7rem 0 0; font-size: 0.89rem; }
 @media (max-width: 560px) {
   .consent-botoes { width: 100%; }
   .consent-botoes .btn { flex: 1; justify-content: center; }
+
+  /* Com dez ferramentas o menu quebrava em cinco linhas e comia 216px —
+     um quarto da tela de um celular gasto em navegação antes de aparecer
+     qualquer conteúdo. Numa faixa rolável ele cabe em uma linha e o
+     conteúdo volta para cima. */
+  .topo-inner { flex-direction: column; align-items: flex-start; gap: 0.55rem; }
+  .topo nav {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    max-width: 100%;
+    gap: 1rem;
+    padding-bottom: 0.25rem;
+    /* Sem isto o iOS deixa a faixa cortada na borda direita da tela. */
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .topo nav::-webkit-scrollbar { display: none; }
+  .topo nav a { white-space: nowrap; }
 }
 
 /* ---------- FOOTER ---------- */
