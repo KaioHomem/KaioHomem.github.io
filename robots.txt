@@ -9,4 +9,8 @@ Disallow: /produtos/folha-simples
 Disallow: /produtos/obrigado.html
 Disallow: /produtos/demo.html
 
+# Material de marketing: os cartões existem para ser publicados no
+# Instagram, não para competir com as páginas do site na busca.
+Disallow: /marketing/
+
 Sitemap: https://kaiohomem.github.io/sitemap.xml
