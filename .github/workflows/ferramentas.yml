@@ -19,6 +19,13 @@ on:
     - cron: '0 9 1 * *'
   workflow_dispatch:
 
+# Um push novo torna a execução anterior irrelevante. Sem isto ela
+# continua rodando até terminar — ou, se travar, até o teto de seis
+# horas do GitHub.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: write
   issues: write
@@ -27,6 +34,7 @@ jobs:
   testes:
     name: Verificar cálculos
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
 
@@ -66,6 +74,7 @@ jobs:
   navegador:
     name: Verificar as páginas no navegador
     runs-on: ubuntu-latest
+    timeout-minutes: 12
     steps:
       - uses: actions/checkout@v4
 
@@ -90,6 +99,7 @@ jobs:
   manutencao:
     name: Manutenção mensal
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     needs: testes
     if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
     steps:
