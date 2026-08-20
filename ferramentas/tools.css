@@ -21,9 +21,10 @@
   --red:          #f85149;
   --text:         #e6edf3;
   --text-2:       #8b949e;
-  --text-3:       #6e7681;
+  --text-3:       #87909b;   /* 5.85:1 sobre --bg, 5.35 sobre --bg-2, 4.71 sobre --bg-3 */
 
-  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-sans: 'IBM Plex Sans', system-ui, -apple-system, sans-serif;
+  --font-titulo: 'IBM Plex Sans', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
 
   --radius:    8px;
@@ -263,11 +264,20 @@ tbody tr:hover td { background: var(--bg-3); }
 .legenda span { display: inline-flex; align-items: center; gap: 0.4rem; }
 .ponto { width: 11px; height: 11px; border-radius: 3px; display: inline-block; }
 
+/* ---------- TÍTULOS ---------- */
+/* Serifada nos títulos e sem negrito: em serifada o peso 700 fecha os
+   contraformas e vira mancha. O contraste com a sans do corpo é o que
+   dá personalidade — era o que faltava quando tudo era Inter. */
+h1, h2, .cabecalho h1, .heroi h1 {
+  font-family: var(--font-titulo);
+  font-weight: 600;
+  letter-spacing: -0.022em;
+}
+
 /* ---------- NOTICES ---------- */
 .aviso {
   background: var(--amber-dim);
-  border: 1px solid rgba(210, 153, 34, 0.3);
-  border-left-width: 3px;
+  border: 1px solid rgba(210, 153, 34, 0.35);
   border-radius: var(--radius);
   padding: 0.85rem 1.1rem;
   font-size: 0.85rem;

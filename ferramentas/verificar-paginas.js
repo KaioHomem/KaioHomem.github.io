@@ -97,6 +97,60 @@ var TELA = { width: 390, height: 844 };
         arquivo + ': o link ativo do menu está fora da tela (x=' + Math.round(ativo.x) + ').');
     }
 
+    // Contraste medido no navegador, com as cores computadas de verdade.
+    // Nenhum analisador estático acerta isto: as cores vêm de variáveis
+    // CSS num arquivo externo, e fundo semitransparente só existe depois
+    // de composto com o que está atrás. Ferramenta que lê o HTML sozinha
+    // assume fundo branco e acusa dezenas de falhas que não existem.
+    var reprovados = await page.evaluate(function () {
+      function comp(f, t) { var a = f[3]; return [0,1,2].map(function(i){
+        return Math.round(f[i]*a + t[i]*(1-a)); }); }
+      function rgba(s) {
+        var n = (s.match(/[\d.]+/g) || []).map(Number);
+        return [n[0]||0, n[1]||0, n[2]||0, n.length > 3 ? n[3] : 1];
+      }
+      function fundo(el) {
+        var camadas = [], n = el;
+        while (n && n !== document.documentElement) {
+          var c = rgba(getComputedStyle(n).backgroundColor);
+          if (c[3] > 0) { camadas.push(c); if (c[3] === 1) break; }
+          n = n.parentElement;
+        }
+        var raiz = rgba(getComputedStyle(document.documentElement).backgroundColor);
+        var base = raiz[3] === 1 ? raiz.slice(0, 3) : [255, 255, 255];
+        for (var i = camadas.length - 1; i >= 0; i--) base = comp(camadas[i], base);
+        return base;
+      }
+      function lum(c) {
+        var v = c.map(function (x) { x /= 255;
+          return x <= 0.03928 ? x/12.92 : Math.pow((x+0.055)/1.055, 2.4); });
+        return 0.2126*v[0] + 0.7152*v[1] + 0.0722*v[2];
+      }
+
+      var fora = [];
+      document.querySelectorAll('p, li, span, h1, h2, h3, a, label, td, th').forEach(function (el) {
+        var txt = (el.textContent || '').trim();
+        if (!txt || el.offsetParent === null) return;
+        var cs = getComputedStyle(el);
+        var cor = rgba(cs.color);
+        if (cor[3] < 0.9) return;
+        var bg = fundo(el);
+        var L1 = lum(cor.slice(0,3)), L2 = lum(bg);
+        var r = (Math.max(L1,L2) + 0.05) / (Math.min(L1,L2) + 0.05);
+        var px = parseFloat(cs.fontSize);
+        var grande = px >= 24 || (px >= 18.66 && parseInt(cs.fontWeight,10) >= 700);
+        var exigido = grande ? 3 : 4.5;
+        if (r < exigido - 0.01) {
+          fora.push(r.toFixed(2) + ':1 (precisa ' + exigido + ') ' +
+                    Math.round(px) + 'px "' + txt.slice(0, 30) + '"');
+        }
+      });
+      return fora.slice(0, 4);
+    });
+
+    exigir(reprovados.length === 0,
+      arquivo + ': texto abaixo do contraste mínimo da WCAG AA — ' + reprovados.join(' | '));
+
     // E o botão precisa calcular de verdade.
     var antes = await page.textContent('#resultado');
     await page.click('#calcular');

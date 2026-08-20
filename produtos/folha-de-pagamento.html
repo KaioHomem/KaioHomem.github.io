@@ -29,7 +29,7 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📋</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../ferramentas/tools.css">
 
 <script type="application/ld+json">
@@ -78,7 +78,7 @@
   background:radial-gradient(closest-side,rgba(88,166,255,.22),transparent 72%);
   filter:blur(28px);z-index:0}
 .heroi-tela img{position:relative;z-index:1;width:100%;height:auto;
-  border:1px solid var(--border);border-radius:var(--radius-lg);
+  border-radius:var(--radius-lg);
   box-shadow:0 24px 60px rgba(0,0,0,.5);display:block}
 @media (max-width:900px){
   .heroi{grid-template-columns:1fr;gap:2rem;padding-top:1.5rem}
@@ -93,7 +93,7 @@
 /* O número do erro precisa parar o olho: é o argumento inteiro da página
    numa linha só. */
 .numero-choque{display:flex;flex-direction:column;gap:.3rem;margin:1.4rem 0 1.6rem;
-  padding-left:1.1rem;border-left:4px solid var(--red)}
+  padding:1.1rem 1.3rem;background:rgba(248,81,73,.09);border-radius:var(--radius)}
 .numero-choque strong{font-family:var(--font-mono);font-size:clamp(2rem,5vw,3rem);
   color:var(--red);line-height:1;letter-spacing:-.02em}
 .numero-choque span{color:var(--text-2);font-size:1rem}
@@ -103,7 +103,7 @@
 .provas{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
   gap:1rem;margin:1.6rem 0}
 .provas div{background:var(--bg-2);border:1px solid var(--border);
-  border-left:3px solid var(--green);border-radius:var(--radius);padding:1.1rem}
+  border-radius:var(--radius);padding:1.1rem}
 .provas strong{display:block;font-family:var(--font-mono);font-size:1.9rem;
   font-weight:700;color:var(--green);line-height:1.1}
 .provas span{display:block;font-size:.84rem;color:var(--text-2);margin-top:.4rem;line-height:1.45}
@@ -201,7 +201,7 @@
   </div>
 
   <div class="caixa-demo">
-    <h3>Teste com os seus números antes de decidir</h3>
+    <h2 style="margin-top:0">Teste com os seus números antes de decidir</h2>
     <p>
       A demonstração roda aqui no navegador e vai até dois funcionários. O cálculo é
       exatamente o mesmo da versão completa — é o mesmo arquivo, gerado a partir dele.
