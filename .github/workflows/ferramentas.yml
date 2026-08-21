@@ -50,7 +50,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
 
       # Gate: wrong fiscal maths must never reach the published site.
       - name: Rodar suíte de testes
@@ -92,7 +92,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
 
       # npm ci em vez de npm install: instala exatamente o que está no
       # lockfile. Com install, cada execução podia resolver uma versão
@@ -129,12 +129,16 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
 
       - name: Instalar dependências de verificação
         run: npm ci --no-audit --no-fund
 
-      # O puppeteer traz o próprio Chromium; o npm ci acima já o baixou.
+      # O puppeteer procura primeiro um Chrome do sistema (`channel:
+      # 'chrome'`) e só depois o que ele mesmo baixa. O runner do GitHub
+      # já vem com Chrome, então o download do postinstall é dispensável
+      # — e sem ele o `npm ci` leva 5s em vez de um minuto.
+      #
       # Gate: uma classe de defeito visual que nenhum teste de cálculo
       # alcança — tarja colorida na lateral do cartão, fonte batida,
       # linha de 118 caracteres, caixa-alta em frase inteira, título que
@@ -159,7 +163,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
 
       - name: Conferir se as tabelas fiscais estão em dia
         id: tabelas
