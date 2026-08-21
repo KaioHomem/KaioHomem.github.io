@@ -71,6 +71,22 @@ var EQUIPE = [
   console.log('resumo:', (await page.textContent('#resumo')).replace(/\s+/g, ' ').trim());
   await page.locator('main').screenshot({ path: path.join(SAIDA, 'tela-folha.png') });
 
+  // O herói da página de venda: os quatro números do resumo e as
+  // primeiras linhas da tabela, que é o que responde "o que este
+  // programa faz" numa olhada. O recorte é ancorado nos elementos, não
+  // num número mágico — quando o produto muda de altura, o corte
+  // acompanha em vez de virar a tela vazia do formulário.
+  var caixa = await page.evaluate(function () {
+    var r = document.querySelector('#resumo').getBoundingClientRect();
+    return { x: 0, y: r.top + window.scrollY - 12, largura: document.body.clientWidth };
+  });
+  await page.screenshot({
+    path: path.join(SAIDA, 'tela-heroi.png'),
+    clip: { x: caixa.x, y: caixa.y, width: caixa.largura,
+            height: Math.round(caixa.largura / 2.13) },
+    fullPage: true
+  });
+
   // O 13º é o argumento que a página de venda passou a fazer, então
   // precisa de imagem própria: dizer que calcula e não mostrar é o mesmo
   // problema que a página tinha antes de ter qualquer captura.

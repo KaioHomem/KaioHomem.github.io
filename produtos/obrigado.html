@@ -26,8 +26,18 @@
   font-weight:600;font-size:1.1rem;padding:1.1rem 2.4rem;border-radius:var(--radius);
   text-decoration:none;margin:1rem 0}
 .baixar:hover{background:#4ac860;color:var(--bg)}
-.passo{background:var(--bg-2);border:1px solid var(--border);border-left:3px solid var(--accent);
-  border-radius:var(--radius);padding:1rem 1.2rem;margin-bottom:.8rem}
+/* Lista ordenada de verdade: a numeração vem do <ol>, não digitada à mão
+   dentro de um <strong> que também serve para dar ênfase no meio da
+   frase. E sem tarja lateral de 3px — o número já ordena. */
+/* `.conteudo li::before` do tools.css desenha um ▸ e tem especificidade
+   maior que `.passo::before`: sem o `li.` na frente, o número do passo
+   não aparecia e vinha a setinha da lista comum no lugar. */
+.passos{list-style:none;counter-reset:passo;margin:0;padding:0}
+li.passo{background:var(--bg-2);border:1px solid var(--border);border-radius:var(--radius);
+  padding:1rem 1.2rem 1rem 2.7rem;margin-bottom:.8rem;
+  counter-increment:passo;position:relative}
+li.passo::before{content:counter(passo) ".";position:absolute;left:1.2rem;
+  font-family:var(--font-mono);color:var(--accent);font-weight:600}
 .passo strong{color:var(--text)}
 </style>
 </head>
@@ -52,15 +62,17 @@
   <article class="conteudo">
     <h2>Como usar</h2>
 
-    <div class="passo"><strong>1.</strong> Salve o arquivo numa pasta que você não vá apagar —
-      Documentos, por exemplo. Ele é único e não precisa de instalação.</div>
-    <div class="passo"><strong>2.</strong> Dê dois cliques. Ele abre no seu navegador e já funciona,
-      inclusive sem internet.</div>
-    <div class="passo"><strong>3.</strong> Preencha a empresa, adicione os funcionários e clique em
-      <strong>Imprimir holerites</strong>. Na janela de impressão, escolha
-      "Salvar como PDF" se quiser o arquivo em vez do papel.</div>
-    <div class="passo"><strong>4.</strong> Antes de trocar de computador ou limpar o navegador, use
-      <strong>Exportar backup</strong>. É o que preserva seus dados.</div>
+    <ol class="passos">
+      <li class="passo">Salve o arquivo numa pasta que você não vá apagar —
+        Documentos, por exemplo. Ele é único e não precisa de instalação.</li>
+      <li class="passo">Dê dois cliques. Ele abre no seu navegador e já funciona,
+        inclusive sem internet.</li>
+      <li class="passo">Preencha a empresa, adicione os funcionários e clique em
+        <strong>Imprimir holerites</strong>. Na janela de impressão, escolha
+        "Salvar como PDF" se quiser o arquivo em vez do papel.</li>
+      <li class="passo">Antes de trocar de computador ou limpar o navegador, use
+        <strong>Exportar backup</strong>. É o que preserva seus dados.</li>
+    </ol>
 
     <div class="aviso">
       <p>

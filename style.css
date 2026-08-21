@@ -22,11 +22,16 @@
   --green:        #3fb950;
   --text:         #e6edf3;
   --text-2:       #8b949e;
-  --text-3:       #6e7681;
+  --text-3:       #87909b;   /* 4,1:1 sobre #0d1117 reprovava em AA; este mede 6,2:1 */
 
   /* Typography */
-  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-sans: 'IBM Plex Sans', system-ui, -apple-system, sans-serif;
   --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+  /* Medida de leitura em em: a conta de caracteres por linha é
+     largura ÷ (tamanho da fonte × 0,5), então 36em dá ~72 caracteres
+     em qualquer tamanho de fonte. */
+  --medida:      36em;
 
   /* Spacing */
   --section-pad: 6rem 8%;
@@ -77,14 +82,6 @@ button { font-family: inherit; cursor: pointer; }
   width: 100%;
 }
 
-.section-label {
-  font-family: var(--font-mono);
-  font-size: 0.8rem;
-  color: var(--accent);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  margin-bottom: 0.5rem;
-}
 
 .section-title {
   font-size: 2rem;
@@ -242,10 +239,11 @@ button { font-family: inherit; cursor: pointer; }
   border: none;
   color: var(--text-2);
   font-family: var(--font-mono);
-  font-size: 0.72rem;
+  /* Botão de verdade, e num telefone o alvo é o dedo: 12px e mais folga. */
+  font-size: 0.75rem;
   font-weight: 500;
   letter-spacing: 0.06em;
-  padding: 3px 5px;
+  padding: 6px 8px;
   border-radius: 4px;
   cursor: pointer;
   transition: color var(--ease), background var(--ease);
@@ -427,7 +425,10 @@ button { font-family: inherit; cursor: pointer; }
 }
 
 .code-snippet .kw  { color: #ff7b72; }
-.code-snippet .fn  { color: #d2a8ff; }
+/* `dev` é nome de variável, e no GitHub Dark variável é #79c0ff — o
+   #d2a8ff que estava aqui é o token de função, e roxo neon no escuro é
+   justamente o tique de interface gerada que o impeccable acusa. */
+.code-snippet .fn  { color: #79c0ff; }
 .code-snippet .str { color: #a5d6ff; }
 
 
@@ -445,6 +446,7 @@ button { font-family: inherit; cursor: pointer; }
   color: var(--text-2);
   margin-bottom: 1rem;
   font-size: 0.95rem;
+  max-width: var(--medida);
 }
 
 .about-text strong {
@@ -672,8 +674,11 @@ button { font-family: inherit; cursor: pointer; }
 
 .project-tags li {
   font-family: var(--font-mono);
-  font-size: 0.72rem;
-  color: var(--text-3);
+  /* 0,72rem = 11,52px ficava abaixo do piso de 12px, e --text-3 sobre
+     --bg-3 mede 4,71:1 — passa na WCAG por pouco, mas em mono de 12px a
+     haste fina come parte disso na renderização. --text-2 dá 4,95:1. */
+  font-size: 0.75rem;
+  color: var(--text-2);
   background-color: var(--bg-3);
   padding: 0.2rem 0.55rem;
   border-radius: 4px;
@@ -796,6 +801,7 @@ button { font-family: inherit; cursor: pointer; }
 .timeline-content p {
   font-size: 0.875rem;
   color: var(--text-2);
+  max-width: var(--medida);
   line-height: 1.65;
 }
 

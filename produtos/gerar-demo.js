@@ -49,17 +49,22 @@ demo = demo.replace(
 // Uma faixa fixa no topo, para ninguém confundir a demo com o produto
 // nem sair achando que comprou.
 var FAIXA =
-  '<div class="faixa-demo naoimprime">' +
+  '<div class="faixa-demo naoimprime"><p>' +
     '<strong>Você está na demonstração.</strong> Ela vai até ' + LIMITE +
     ' funcionários e marca os holerites. Todo o resto é igual — o cálculo é o mesmo. ' +
     '<a href="folha-de-pagamento.html">Ver a versão completa →</a>' +
-  '</div>';
+  '</p></div>';
 
+// Cores do próprio produto (--bg3, --bd, --tx, --ac), não uma paleta
+// avulsa: a faixa é a primeira coisa que o visitante vê e não pode
+// parecer colada de outro site. O <p> interno segura a medida de
+// leitura — a faixa ocupa a largura toda, o texto não.
 var ESTILO_FAIXA =
-  '.faixa-demo{background:#1f2937;border-bottom:1px solid #374151;color:#e5e7eb;' +
-  'padding:.75rem 1rem;font-size:.86rem;text-align:center;line-height:1.5}' +
-  '.faixa-demo a{color:#60a5fa;font-weight:600;white-space:nowrap}' +
-  '.faixa-demo strong{color:#fff}\n';
+  '.faixa-demo{background:var(--bg3);border-bottom:1px solid var(--bd);color:var(--tx);' +
+  'padding:.75rem 1rem;font-size:var(--t-base);line-height:1.5}' +
+  '.faixa-demo p{max-width:var(--medida);margin:0 auto;text-align:center}' +
+  '.faixa-demo a{color:var(--ac);font-weight:600;white-space:nowrap}' +
+  '.faixa-demo strong{color:var(--tx)}\n';
 
 demo = demo.replace('.marca{font-weight:700', ESTILO_FAIXA + '.marca{font-weight:700');
 demo = demo.replace('<body>', '<body>\n\n' + FAIXA);

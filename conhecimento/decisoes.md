@@ -5,6 +5,44 @@ alguém ter mudado de ideia costuma valer mais que a conclusão atual.
 
 ---
 
+## 2026-08-21 — Vendorizar o impeccable e medir contraste no pixel
+
+**Decisão:** commitar o skill do impeccable em `.claude/skills/` e trocar
+o medidor de contraste do `verificar-paginas.js` por medição no pixel
+pintado.
+
+**Por quê (vendorização):** `npx impeccable install` baixa as skills de
+`impeccable.style`, e o proxy de saída responde 403. Só o motor de
+detecção vem pelo npm. O código é Apache 2.0 e está no GitHub, de onde
+foi clonado. Sem o diretório no repositório, a CI não roda o detector e a
+próxima sessão esbarra no mesmo 403.
+
+**Por quê (contraste):** o medidor anterior subia a árvore somando
+`backgroundColor`. Acertava fundo semitransparente e errava três coisas
+que o site usa — gradiente, `backdrop-filter` e `opacity` em ancestral.
+
+O que a troca achou: `opacity: 0.75` nos cartões travados do painel
+derrubava o selo para 3,55:1 e a nota para 3,71:1. As cores declaradas
+passavam folgado; quem mais precisava ler aquele cartão era justamente
+quem ainda não tinha conectado nada.
+
+**Onde o detector do impeccable erra, e por que os dois gates ficam:** ele
+lê a parada de um gradiente (`rgba(...,0.12)`) sem aplicar o alfa e acusa
+1,0:1 em texto que mede de 5,4 a 6,9:1 no pixel. Foram 30 falsos
+positivos nesse formato. O gate do repositório cobre contraste com mais
+precisão; o do impeccable cobre uma classe que o nosso não vê — tarja
+lateral, fonte batida, linha longa, caixa-alta em frase, título que pula
+nível, escada de tipos achatada.
+
+**Custo:** 3,5 MB no repositório; a versão vendorizada envelhece e precisa
+ser atualizada à mão (o passo a passo está em
+`.claude/skills/impeccable/COMO-VEIO-PARAR-AQUI.md`).
+
+**Gatilho para reabrir:** se o download deixar de ser bloqueado, dá para
+trocar o diretório por uma devDependency npm e apagar 3,5 MB.
+
+---
+
 ## 2026-08-18 — Adiar bump, upsell e migração de plataforma
 
 **Decisão:** não construir order bump, upsell nem migrar para

@@ -11,6 +11,13 @@
   --bg-2:         #161b22;
   --bg-3:         #21262d;
   --border:       #30363d;
+  /* Medida de leitura: em em, não em ch nem rem. A conta de caracteres
+     por linha é largura ÷ (tamanho da fonte × 0,5), então 36em dá ~72
+     caracteres em qualquer tamanho de fonte — o alvo é 65 a 75. Em ch
+     o número varia com a fonte: o "0" do IBM Plex Sans é largo, e 68ch
+     estava rendendo 87 caracteres. */
+  --medida:       36em;
+
   --accent:       #58a6ff;
   --accent-dim:   rgba(88, 166, 255, 0.12);
   --accent-hover: #79b8ff;
@@ -91,12 +98,24 @@ main { padding: 2.5rem 0 4rem; }
 .trilha a { color: var(--text-3); }
 .trilha a:hover { color: var(--accent); }
 h1 { font-size: clamp(1.6rem, 4vw, 2.2rem); font-weight: 700; line-height: 1.25; margin-bottom: 0.6rem; }
-.resumo { color: var(--text-2); max-width: 62ch; }
+.resumo { color: var(--text-2); max-width: var(--medida); }
 
 h2 { font-size: 1.3rem; font-weight: 600; margin: 2.5rem 0 0.9rem; }
 h3 { font-size: 1.02rem; font-weight: 600; margin: 1.5rem 0 0.5rem; }
 p { margin-bottom: 0.9rem; color: var(--text-2); }
-.conteudo p, .conteudo li { max-width: 68ch; }
+
+/* A medida de leitura vale para todo texto corrido, não só o que está
+   dentro de .conteudo — o rodapé, as legendas e os avisos também são
+   texto para ler. Medi com Range no navegador: a 692px o parágrafo
+   saía com 86 a 88 caracteres por linha. */
+.conteudo p, .conteudo li, .conteudo dd,
+.aviso p, .destaque-privacidade p, .urgencia p, .passo,
+.tela-legenda, .caixa-demo p, .rodape p, .p-sub, .p-cartao-nota {
+  max-width: var(--medida);
+}
+/* Texto centralizado precisa da margem automática, senão o max-width
+   empurra tudo para a esquerda. */
+.preco-caixa p, .preco-caixa .sub { max-width: var(--medida); margin-inline: auto; }
 .conteudo ul { margin: 0 0 1rem 0; }
 .conteudo li {
   color: var(--text-2);
@@ -126,7 +145,7 @@ p { margin-bottom: 0.9rem; color: var(--text-2); }
 
 .campo { display: flex; flex-direction: column; gap: 0.35rem; }
 .campo label { font-size: 0.82rem; color: var(--text-2); font-weight: 500; }
-.campo .dica { font-size: 0.74rem; color: var(--text-3); }
+.campo .dica { font-size: 0.75rem; color: var(--text-3); }
 
 .entrada {
   background: var(--bg);
@@ -177,18 +196,24 @@ select.entrada { font-family: var(--font-sans); cursor: pointer; }
   to   { opacity: 1; transform: translateY(0); }
 }
 
+/* Tinta chapada, não degradê em 135°. O véu diagonal que ia da cor a
+   transparent é enfeite de template — e ainda fazia o detector ler a
+   parada `rgba(...,0.12)` sem aplicar o alfa, acusando 1,0:1 em texto
+   que mede de 5,4 a 6,9:1 no pixel pintado. Vale para os três blocos
+   tingidos: .destaque, .par-destaque e .produto-cta. */
 .destaque {
-  background: linear-gradient(135deg, var(--green-dim), transparent);
+  background: var(--green-dim);
   border: 1px solid rgba(63, 185, 80, 0.35);
   border-radius: var(--radius-lg);
   padding: 1.4rem 1.5rem;
   margin-bottom: 1.2rem;
 }
+/* Sem caixa-alta: este rótulo carrega frase — "Para empatar, você
+   precisa faturar" tem 34 caracteres. */
 .destaque .rotulo {
   font-family: var(--font-mono);
   font-size: 0.76rem;
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
+  letter-spacing: 0.02em;
   color: var(--text-2);
   margin-bottom: 0.3rem;
 }
@@ -202,7 +227,7 @@ select.entrada { font-family: var(--font-sans); cursor: pointer; }
 .destaque .nota { font-size: 0.83rem; color: var(--text-2); margin: 0.4rem 0 0; }
 
 .destaque.neutro {
-  background: linear-gradient(135deg, var(--accent-dim), transparent);
+  background: var(--accent-dim);
   border-color: rgba(88, 166, 255, 0.35);
 }
 .destaque.neutro .valor { color: var(--accent); }
@@ -226,12 +251,16 @@ select.entrada { font-family: var(--font-sans); cursor: pointer; }
 .linha .val { font-family: var(--font-mono); color: var(--text); white-space: nowrap; }
 .linha .val.neg { color: var(--red); }
 .linha .val.pos { color: var(--green); }
+/* Sem caixa-alta: metade destes rótulos é frase, não etiqueta —
+   "Depositado pelo empregador (não é desconto)" tem 43 caracteres, e
+   caixa-alta apaga a silhueta das palavras, que é como a gente lê. O
+   fundo e a fonte mono já separam o divisor do resto da lista. */
 .linha.grupo {
   background: var(--bg-3);
   font-family: var(--font-mono);
-  font-size: 0.74rem;
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
+  font-size: 0.75rem;
+  letter-spacing: 0.02em;
+  font-weight: 500;
   color: var(--text-2);
 }
 .linha.total { background: var(--bg-3); font-weight: 600; }
@@ -239,16 +268,28 @@ select.entrada { font-family: var(--font-sans); cursor: pointer; }
 .linha .sub { display: block; font-size: 0.75rem; color: var(--text-3); }
 
 /* ---------- TABLE ---------- */
-.tabela-rolagem { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius-lg); }
+/* A moldura ganha recuo e a tabela deixa de encostar nela. Sem isto os
+   cantos arredondados de 14px cortavam a faixa do cabeçalho num canto
+   quadrado — moldura redonda com conteúdo quadrado por baixo. */
+.tabela-rolagem {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 0.5rem;
+}
+.tabela-rolagem table { border-radius: var(--radius); overflow: hidden; }
+.tabela-rolagem tr:last-child th,
+.tabela-rolagem tr:last-child td { border-bottom: none; }
 table { width: 100%; border-collapse: collapse; font-size: 0.85rem; min-width: 460px; }
-th, td { padding: 0.55rem 0.9rem; text-align: right; border-bottom: 1px solid var(--border); }
+th, td { padding: 0.75rem 0.9rem; text-align: right; border-bottom: 1px solid var(--border); }
+/* Idem no cabeçalho de tabela: "Faltas injustificadas no período" não
+   é etiqueta de uma palavra. O fundo --bg-3 já separa o cabeçalho. */
 th {
   background: var(--bg-3);
   color: var(--text-2);
   font-family: var(--font-mono);
-  font-size: 0.72rem;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
+  font-size: 0.75rem;
+  letter-spacing: 0.02em;
   font-weight: 500;
   position: sticky;
   top: 0;
@@ -292,7 +333,7 @@ h1, h2, .cabecalho h1, .heroi h1 {
   align-items: center;
   gap: 0.4rem;
   font-family: var(--font-mono);
-  font-size: 0.72rem;
+  font-size: 0.75rem;
   color: var(--text-3);
   border: 1px solid var(--border);
   border-radius: 100px;
@@ -315,7 +356,10 @@ h1, h2, .cabecalho h1, .heroi h1 {
 }
 .item-ferramenta:hover { border-color: var(--accent); transform: translateY(-3px); }
 .item-ferramenta .icone { font-size: 1.4rem; line-height: 1; margin-bottom: 0.3rem; }
-.item-ferramenta h3 { margin: 0; color: var(--text); font-size: 1rem; }
+/* Na lista principal os cartões são h2 (vêm direto do h1 da página) e
+   dentro de "Continue a conta" são h3 (vêm do h2 daquela seção). Mesmo
+   visual, hierarquia certa em cada lugar. */
+.item-ferramenta h2, .item-ferramenta h3 { margin: 0; color: var(--text); font-size: 1rem; font-weight: 600; }
 .item-ferramenta p { margin: 0; font-size: 0.86rem; color: var(--text-2); }
 .item-ferramenta .seta { margin-top: auto; padding-top: 0.7rem; font-size: 0.83rem; color: var(--accent); }
 
@@ -328,18 +372,18 @@ h1, h2, .cabecalho h1, .heroi h1 {
 
 /* ---------- PRODUCT CTA ---------- */
 .produto-cta{
-  background: linear-gradient(135deg, var(--accent-dim), transparent);
+  background: var(--accent-dim);
   border: 1px solid rgba(88, 166, 255, 0.3);
   border-radius: var(--radius-lg);
   padding: 1.5rem 1.6rem;
   margin: 2.5rem 0 1rem;
 }
 .produto-rot{
-  font-family: var(--font-mono); font-size: .7rem; text-transform: uppercase;
+  font-family: var(--font-mono); font-size: .75rem; text-transform: uppercase;
   letter-spacing: .08em; color: var(--text-3); margin-bottom: .4rem;
 }
 .produto-cta h3{ margin: 0 0 .4rem; font-size: 1.05rem; color: var(--text); }
-.produto-cta p{ margin: 0 0 .9rem; font-size: .89rem; max-width: 64ch; }
+.produto-cta p{ margin: 0 0 .9rem; font-size: .89rem; max-width: var(--medida); }
 .produto-cta a{ font-size: .9rem; font-weight: 500; }
 
 /* ---------- FAQ ---------- */
@@ -388,7 +432,7 @@ details p { margin: 0.7rem 0 0; font-size: 0.89rem; }
 .cartao-afiliado .cta { color: var(--accent); font-size: 0.84rem; display: inline-block; margin-top: 0.5rem; }
 .rotulo-publicidade {
   font-family: var(--font-mono);
-  font-size: 0.68rem;
+  font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.09em;
   color: var(--text-3);
@@ -472,7 +516,7 @@ details p { margin: 0.7rem 0 0; font-size: 0.89rem; }
 }
 .tabela-simples th {
   font-family: var(--font-mono);
-  font-size: 0.74rem;
+  font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--text-3);
@@ -489,7 +533,7 @@ details p { margin: 0.7rem 0 0; font-size: 0.89rem; }
   color: var(--text-3);
 }
 .rodape-links { display: flex; gap: 1.1rem; flex-wrap: wrap; margin-bottom: 0.9rem; }
-.rodape p { font-size: 0.82rem; color: var(--text-3); margin-bottom: 0.5rem; max-width: 68ch; }
+.rodape p { font-size: 0.82rem; color: var(--text-3); margin-bottom: 0.5rem; max-width: var(--medida); }
 
 @media print {
   .topo, .botoes, .espaco-anuncio, .bloco-afiliados, .rodape-links { display: none; }

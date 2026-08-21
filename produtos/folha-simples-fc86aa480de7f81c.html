@@ -47,43 +47,69 @@
 :root{
   --bg:#0d1117;--bg2:#161b22;--bg3:#21262d;--bd:#30363d;
   --ac:#58a6ff;--gr:#3fb950;--rd:#f85149;--am:#d29922;
-  --tx:#e6edf3;--t2:#8b949e;--t3:#6e7681;
-  --sans:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
+  /* --t3 era #6e7681: 4,1:1 sobre o fundo, reprovado em AA. */
+  --tx:#e6edf3;--t2:#8b949e;--t3:#87909b;
+  /* O programa é um arquivo só e não baixa nada: nomear uma fonte da web
+     aqui só funcionaria para quem já a tem instalada. Pilha do sistema —
+     sem Roboto nem Helvetica, que são as fontes de todo mundo. */
+  --sans:system-ui,-apple-system,'Segoe UI','Noto Sans',sans-serif;
   --mono:'JetBrains Mono','SF Mono',Consolas,monospace;
+  /* Medida de leitura: largura ÷ (tamanho da fonte × 0,5) é a conta de
+     caracteres por linha, então 36em dá ~72 em qualquer tamanho. */
+  --medida:36em;
+  /* Escada de tipos: quatro degraus com razão de 1,25 para cima. Antes
+     eram dez tamanhos espremidos entre 12px e 21,6px — isso não é
+     hierarquia, é ruído, e o leitor não consegue dizer o que é mais
+     importante. */
+  --t-micro:.75rem;    /* 12px — rótulo, dica, cabeçalho de tabela */
+  --t-base:.9375rem;   /* 15px — formulário, botão, tabela, corpo     */
+  --t-titulo:1.1875rem;/* 19px — marca e títulos de seção             */
+  --t-display:1.6rem;  /* 25,6px — a marca e os números do resumo     */
 }
-body{font-family:var(--sans);background:var(--bg);color:var(--tx);line-height:1.6;-webkit-font-smoothing:antialiased}
-.wrap{max-width:1080px;margin:0 auto;padding:0 1.2rem}
-header{border-bottom:1px solid var(--bd);background:rgba(13,17,23,.9);position:sticky;top:0;z-index:40;backdrop-filter:blur(8px)}
+body{font-family:var(--sans);font-size:var(--t-base);background:var(--bg);color:var(--tx);line-height:1.6;-webkit-font-smoothing:antialiased}
+/* 1200px, não 1080: com o corpo em 15px a tabela de nove colunas passou
+   de 1.040px e a coluna do "remover" ficava atrás da rolagem lateral.
+   O texto corrido não alarga junto — quem segura a medida de leitura é
+   o --medida, não a largura do contêiner. */
+.wrap{max-width:1200px;margin:0 auto;padding:0 1.2rem}
+/* 0,94 e blur maior, igual ao cabeçalho do site: a 0,9 o conteúdo que
+   passava por baixo ainda se lia através da faixa, e o detector chegou a
+   medir 1,9:1 na marca contra o que estava rolando atrás. */
+header{border-bottom:1px solid var(--bd);background:rgba(13,17,23,.94);position:sticky;top:0;z-index:40;backdrop-filter:blur(16px) saturate(140%)}
 .hd{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.9rem 0;flex-wrap:wrap}
-.marca{font-weight:700;font-size:1.05rem}.marca span{color:var(--ac)}
+.marca{font-weight:700;font-size:var(--t-display)}.marca span{color:var(--ac)}
 .meses-edit{background:var(--bg);color:var(--tx);border:1px solid var(--bd);border-radius:6px;
-  padding:.2rem .35rem;font-family:var(--mono);font-size:.8rem;text-align:center}
+  padding:.2rem .35rem;font-family:var(--mono);font-size:var(--t-micro);text-align:center}
 .marca-demo{margin-top:10px;padding:6px 0;border-top:1px dashed #999;color:#666;
   font-size:11px;letter-spacing:.14em;text-align:center;text-transform:uppercase}
 .acoes{display:flex;gap:.5rem;flex-wrap:wrap}
 main{padding:1.8rem 0 4rem}
-h2{font-size:1.15rem;font-weight:600;margin:2rem 0 .8rem}
+h2{font-size:var(--t-titulo);font-weight:600;margin:2rem 0 .8rem}
 h2:first-child{margin-top:0}
 p{color:var(--t2);margin-bottom:.8rem}
-.rot{font-family:var(--mono);font-size:.7rem;text-transform:uppercase;letter-spacing:.07em;color:var(--t3);margin-bottom:.4rem}
+.rot{font-family:var(--mono);font-size:var(--t-micro);text-transform:uppercase;letter-spacing:.07em;color:var(--t3);margin-bottom:.4rem}
 .card{background:var(--bg2);border:1px solid var(--bd);border-radius:12px;padding:1.3rem;margin-bottom:1rem}
 .grade{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.9rem}
 .campo{display:flex;flex-direction:column;gap:.3rem}
-.campo label{font-size:.8rem;color:var(--t2);font-weight:500}
-.campo .dica{font-size:.72rem;color:var(--t3)}
+.campo label{font-size:var(--t-micro);color:var(--t2);font-weight:500}
+.campo .dica{font-size:var(--t-micro);color:var(--t3)}
 input,select{background:var(--bg);border:1.5px solid var(--bd);border-radius:8px;color:var(--tx);
-  font-family:var(--mono);font-size:.9rem;padding:.55rem .7rem;width:100%}
+  font-family:var(--mono);font-size:var(--t-base);padding:.55rem .7rem;width:100%}
 input:focus,select:focus{outline:none;border-color:var(--ac);background:var(--bg3)}
 select{font-family:var(--sans)}
-button{font-family:inherit;cursor:pointer;border:none;border-radius:8px;font-size:.87rem;font-weight:500;padding:.55rem 1.1rem;transition:.2s}
+button{font-family:inherit;cursor:pointer;border:none;border-radius:8px;font-size:var(--t-base);font-weight:500;padding:.55rem 1.1rem;transition:.2s}
 .b1{background:var(--ac);color:var(--bg)}.b1:hover{background:#79b8ff}
 .b2{background:transparent;color:var(--tx);border:1.5px solid var(--bd)}.b2:hover{border-color:var(--ac)}
-.b3{background:transparent;color:var(--rd);border:1.5px solid rgba(248,81,73,.35);padding:.35rem .8rem;font-size:.8rem}
+.b3{background:transparent;color:var(--rd);border:1.5px solid rgba(248,81,73,.35);padding:.35rem .8rem;font-size:var(--t-micro)}
 .b3:hover{background:rgba(248,81,73,.1)}
-.tabela{overflow-x:auto;border:1px solid var(--bd);border-radius:12px}
-table{width:100%;border-collapse:collapse;font-size:.87rem;min-width:720px}
+/* Recuo na moldura: sem ele a tabela encosta na borda arredondada e o
+   canto da faixa do cabeçalho fica quadrado dentro de um canto redondo. */
+.tabela{overflow-x:auto;border:1px solid var(--bd);border-radius:12px;padding:.5rem}
+.tabela table{border-radius:8px;overflow:hidden}
+.tabela tr:last-child th,.tabela tr:last-child td{border-bottom:none}
+table{width:100%;border-collapse:collapse;font-size:var(--t-base);min-width:720px}
 th,td{padding:.65rem .85rem;text-align:right;border-bottom:1px solid var(--bd)}
-th{background:var(--bg3);font-family:var(--mono);font-size:.68rem;text-transform:uppercase;
+th{background:var(--bg3);font-family:var(--mono);font-size:var(--t-micro);text-transform:uppercase;
   letter-spacing:.05em;color:var(--t2);font-weight:500}
 td{font-family:var(--mono)}
 th:first-child,td:first-child{text-align:left;font-family:var(--sans)}
@@ -91,15 +117,20 @@ tbody tr:last-child td{border-bottom:none}
 tbody tr:hover td{background:var(--bg3)}
 tfoot td{background:var(--bg3);font-weight:600;border-top:2px solid var(--bd)}
 .neg{color:var(--rd)}.pos{color:var(--gr)}
-.vazio{text-align:center;padding:2.5rem 1rem;color:var(--t3)}
+/* td.vazio, não .vazio: `td:first-child{text-align:left}` tem
+   especificidade maior e estava vencendo — o estado vazio aparecia
+   encostado na esquerda em vez de centralizado. */
+td.vazio{text-align:center;padding:2.5rem 1.2rem;color:var(--t3)}
 .resumo{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:.9rem;margin-bottom:1rem}
-.kpi{background:var(--bg2);border:1px solid var(--bd);border-left:3px solid var(--ac);border-radius:10px;padding:1rem}
-.kpi.v{border-left-color:var(--gr)}.kpi.a{border-left-color:var(--am)}
-.kpi .n{font-family:var(--mono);font-size:1.35rem;font-weight:700;line-height:1.2}
-.kpi .l{font-size:.78rem;color:var(--t2);margin-top:.2rem}
-.aviso{background:rgba(210,153,34,.1);border-left:3px solid rgba(210,153,34,.5);border-radius:8px;
-  padding:.9rem 1.1rem;font-size:.85rem;color:var(--t2);margin:1rem 0}
+/* A cor classifica o número, não uma tarja de 3px na lateral do cartão. */
+.kpi{background:var(--bg2);border:1px solid var(--bd);border-radius:10px;padding:1rem}
+.kpi .n{font-family:var(--mono);font-size:var(--t-display);font-weight:700;line-height:1.2;color:var(--ac)}
+.kpi.v .n{color:var(--gr)}.kpi.a .n{color:var(--am)}
+.kpi .l{font-size:var(--t-micro);color:var(--t2);margin-top:.2rem}
+.aviso{background:rgba(210,153,34,.1);border:1px solid rgba(210,153,34,.35);border-radius:8px;
+  padding:.9rem 1.1rem;font-size:var(--t-base);color:var(--t2);margin:1rem 0;max-width:var(--medida)}
 .aviso strong{color:var(--am)}
+.nota-privacidade{font-size:var(--t-base);color:var(--t3);max-width:var(--medida)}
 dialog{background:var(--bg2);color:var(--tx);border:1px solid var(--bd);border-radius:14px;
   padding:0;max-width:640px;width:92%}
 dialog::backdrop{background:rgba(0,0,0,.7)}
@@ -182,7 +213,7 @@ dialog::backdrop{background:rgba(0,0,0,.7)}
 
   <div class="aviso" id="avisoGeral"></div>
 
-  <p style="font-size:.82rem;color:var(--t3)">
+  <p class="nota-privacidade">
     Seus dados ficam apenas neste navegador, neste computador. Não há servidor e nada é
     enviado para lugar nenhum. Use "Exportar backup" antes de limpar o navegador ou trocar
     de máquina.
@@ -197,7 +228,7 @@ dialog::backdrop{background:rgba(0,0,0,.7)}
   <div class="dlg-b">
     <p>Cole o conteúdo do arquivo exportado. Isso substitui os dados atuais.</p>
     <textarea id="txtImportar" style="width:100%;height:150px;background:var(--bg);color:var(--tx);
-      border:1.5px solid var(--bd);border-radius:8px;padding:.6rem;font-family:var(--mono);font-size:.8rem"></textarea>
+      border:1.5px solid var(--bd);border-radius:8px;padding:.6rem;font-family:var(--mono);font-size:var(--t-micro)"></textarea>
   </div>
   <div class="dlg-f">
     <button class="b2" id="btCancelaImp">Cancelar</button>
@@ -456,7 +487,7 @@ function render(){
     if(c.vtLimitado) algumVtLimitado=true;
 
     linhas+='<tr>'+
-      '<td>'+esc(f.nome)+(f.cargo?'<br><span style="font-size:.75rem;color:var(--t3)">'+esc(f.cargo)+'</span>':'')+'</td>'+
+      '<td>'+esc(f.nome)+(f.cargo?'<br><span style="font-size:var(--t-micro);color:var(--t3)">'+esc(f.cargo)+'</span>':'')+'</td>'+
       '<td>'+brl(c.bruto)+'</td>'+
       '<td class="neg">'+brl(c.inss)+'</td>'+
       '<td class="'+(c.irrf.valor?'neg':'')+'">'+(c.irrf.isento?'isento':brl(c.irrf.valor))+'</td>'+
@@ -484,7 +515,7 @@ function render(){
     ['FGTS a depositar', brl(tot.fgts), '', '8% sobre o bruto']
   ].map(function(k){
     return '<div class="kpi '+k[2]+'"><div class="n">'+k[1]+'</div><div class="l">'+k[0]+
-           '<br><span style="color:var(--t3);font-size:.72rem">'+k[3]+'</span></div></div>';
+           '<br><span style="color:var(--t3);font-size:var(--t-micro)">'+k[3]+'</span></div></div>';
   }).join('') : '';
 
   if(algumVtLimitado){
@@ -513,7 +544,7 @@ function renderDecimo(){
     tot.p1+=c.primeira; tot.p2+=c.segunda; tot.liq+=c.liquido; tot.fgts+=c.fgts;
 
     linhas+='<tr>'+
-      '<td>'+esc(f.nome)+(f.cargo?'<br><span style="font-size:.75rem;color:var(--t3)">'+esc(f.cargo)+'</span>':'')+'</td>'+
+      '<td>'+esc(f.nome)+(f.cargo?'<br><span style="font-size:var(--t-micro);color:var(--t3)">'+esc(f.cargo)+'</span>':'')+'</td>'+
       '<td><input class="meses-edit" type="number" min="0" max="12" value="'+c.meses+
         '" data-meses="'+i+'" style="width:3.4rem"></td>'+
       '<td>'+brl(c.bruto)+'</td>'+
@@ -541,7 +572,7 @@ function renderDecimo(){
     ['INSS a recolher', brl(tot.inss), '', 'base própria, não soma ao mês']
   ].map(function(k){
     return '<div class="kpi '+k[2]+'"><div class="n">'+k[1]+'</div><div class="l">'+k[0]+
-           '<br><span style="color:var(--t3);font-size:.72rem">'+k[3]+'</span></div></div>';
+           '<br><span style="color:var(--t3);font-size:var(--t-micro)">'+k[3]+'</span></div></div>';
   }).join('') : '';
 
   var a=el('avisoVt'); if(a) a.remove();
@@ -577,7 +608,7 @@ function renderFerias(){
     if(Math.max(0,parseInt(f.diasVendidos,10)||0) > c.diasVendidos) algumLimitado=true;
 
     linhas+='<tr>'+
-      '<td>'+esc(f.nome)+(f.cargo?'<br><span style="font-size:.75rem;color:var(--t3)">'+esc(f.cargo)+'</span>':'')+'</td>'+
+      '<td>'+esc(f.nome)+(f.cargo?'<br><span style="font-size:var(--t-micro);color:var(--t3)">'+esc(f.cargo)+'</span>':'')+'</td>'+
       '<td>'+c.diasGozados+(c.diasVendidos?' + '+c.diasVendidos+' vend.':'')+'</td>'+
       '<td>'+brl(c.base)+'</td>'+
       '<td class="neg">'+brl(c.inss)+'</td>'+
@@ -604,7 +635,7 @@ function renderFerias(){
     ['Abono pecuniário', brl(tot.abono), '', 'indenizatório: sem INSS, IRRF ou FGTS']
   ].map(function(k){
     return '<div class="kpi '+k[2]+'"><div class="n">'+k[1]+'</div><div class="l">'+k[0]+
-           '<br><span style="color:var(--t3);font-size:.72rem">'+k[3]+'</span></div></div>';
+           '<br><span style="color:var(--t3);font-size:var(--t-micro)">'+k[3]+'</span></div></div>';
   }).join('') : '';
 
   var a=el('avisoVt'); if(a) a.remove();

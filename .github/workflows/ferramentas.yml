@@ -6,12 +6,22 @@ on:
     paths:
       - 'ferramentas/**'
       - 'produtos/**'
+      - 'painel/**'
+      - 'index.html'
+      - 'privacidade.html'
+      - 'style.css'
+      - '.claude/skills/impeccable/**'
       - 'package.json'
       - '.github/workflows/ferramentas.yml'
   pull_request:
     paths:
       - 'ferramentas/**'
       - 'produtos/**'
+      - 'painel/**'
+      - 'index.html'
+      - 'privacidade.html'
+      - 'style.css'
+      - '.claude/skills/impeccable/**'
       - 'package.json'
       - '.github/workflows/ferramentas.yml'
   # First day of every month, 09:00 UTC.
@@ -74,7 +84,9 @@ jobs:
   navegador:
     name: Verificar as páginas no navegador
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    # São 19 páginas, e o contraste de uma parte delas é medido com
+    # recorte do elemento. Localmente dá 4 minutos.
+    timeout-minutes: 18
     steps:
       - uses: actions/checkout@v4
 
@@ -105,8 +117,34 @@ jobs:
       # a leitura estática não alcança — erro de JavaScript que apaga a
       # tela, botão que não calcula, página que rola sozinha para o lugar
       # errado. Foi escrito depois de dois desses passarem batido.
-      - name: Abrir as dez páginas num Chromium
+      - name: Abrir as páginas num Chromium
         run: node ferramentas/verificar-paginas.js
+
+  design:
+    name: Detector de design
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Instalar dependências de verificação
+        run: npm ci --no-audit --no-fund
+
+      # O puppeteer traz o próprio Chromium; o npm ci acima já o baixou.
+      # Gate: uma classe de defeito visual que nenhum teste de cálculo
+      # alcança — tarja colorida na lateral do cartão, fonte batida,
+      # linha de 118 caracteres, caixa-alta em frase inteira, título que
+      # pula de h1 para h3, escada de tipos sem degrau.
+      #
+      # Não substitui o verificar-paginas.js: o contraste de lá é medido
+      # no pixel pintado com a opacidade acumulada dos ancestrais, e é
+      # mais preciso que o daqui.
+      - name: Rodar o detector de design
+        run: node ferramentas/verificar-design.js
 
   manutencao:
     name: Manutenção mensal
