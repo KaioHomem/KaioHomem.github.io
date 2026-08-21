@@ -10,9 +10,11 @@
     "motor": "node produtos/verificar-motor.js",
     "paginas": "node ferramentas/verificar-paginas.js",
     "sitemap": "node ferramentas/gerar-sitemap.js",
-    "verificar": "npm run teste && npm run consistencia && npm run auditoria && npm run motor && npm run paginas"
+    "verificar": "npm run teste && npm run consistencia && npm run auditoria && npm run motor && npm run paginas && npm run design",
+    "design": "node ferramentas/verificar-design.js"
   },
   "devDependencies": {
-    "playwright": "^1.49.0"
+    "playwright": "^1.49.0",
+    "puppeteer": "^25.8.0"
   }
 }

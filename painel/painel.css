@@ -64,7 +64,7 @@
   color: var(--text-2);
   font-size: 0.87rem;
   margin-bottom: 1.1rem;
-  max-width: 70ch;
+  max-width: var(--medida);
 }
 .p-sub code, .p-rodape code {
   font-family: var(--font-mono);
@@ -82,20 +82,27 @@
   gap: 0.9rem;
 }
 
+/* O status vem da borda inteira, de 1px, e do selo — não de uma tarja
+   de 3px na lateral, que é o tique de interface gerada mais fácil de
+   reconhecer. */
 .p-cartao {
   background: var(--bg-2);
   border: 1px solid var(--border);
-  border-left-width: 3px;
   border-radius: var(--radius-lg);
   padding: 1.1rem 1.2rem;
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
 }
-.p-cartao.ok      { border-left-color: var(--green); }
-.p-cartao.atencao { border-left-color: var(--amber); }
-.p-cartao.alerta  { border-left-color: var(--red); }
-.p-cartao.travado { border-left-color: var(--border); opacity: 0.75; }
+.p-cartao.ok      { border-color: rgba(63, 185, 80, 0.45); }
+.p-cartao.atencao { border-color: rgba(210, 153, 34, 0.45); }
+.p-cartao.alerta  { border-color: rgba(248, 81, 73, 0.45); }
+/* Nada de opacity para dizer "ainda não conectado": a 0,75 o selo caía
+   para 3,55:1 e a nota para 3,71:1, medidos no pixel pintado — abaixo do
+   4,5:1 da WCAG AA. Quem mais precisa ler este cartão é justamente quem
+   ainda não conectou. A borda tracejada carrega o estado sem apagar o
+   texto. */
+.p-cartao.travado { border-style: dashed; }
 
 .p-cartao-topo {
   display: flex;
@@ -105,7 +112,7 @@
 }
 .p-cartao-rotulo {
   font-family: var(--font-mono);
-  font-size: 0.72rem;
+  font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--text-2);
@@ -125,7 +132,7 @@
 /* ---------- BADGES ---------- */
 .p-selo {
   font-family: var(--font-mono);
-  font-size: 0.66rem;
+  font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--text-3);
@@ -140,7 +147,7 @@
 
 .p-tag {
   font-family: var(--font-mono);
-  font-size: 0.62rem;
+  font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.07em;
   color: var(--accent);
@@ -153,7 +160,7 @@
 
 .p-badge {
   font-family: var(--font-mono);
-  font-size: 0.62rem;
+  font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   border-radius: 100px;
@@ -166,18 +173,18 @@
 /* ---------- NEXT STEP ---------- */
 .p-proximo {
   margin-top: 2.4rem;
-  background: linear-gradient(135deg, var(--accent-dim), transparent);
+  background: var(--accent-dim);
   border: 1px solid rgba(88, 166, 255, 0.32);
   border-radius: var(--radius-lg);
   padding: 1.5rem 1.6rem;
 }
 .p-proximo.ok {
-  background: linear-gradient(135deg, var(--green-dim), transparent);
+  background: var(--green-dim);
   border-color: rgba(63, 185, 80, 0.32);
 }
 .p-proximo-rotulo {
   font-family: var(--font-mono);
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--text-2);
@@ -221,15 +228,14 @@
 /* ---------- CONNECTIONS ---------- */
 .p-aviso-seg {
   background: var(--amber-dim);
-  border: 1px solid rgba(210, 153, 34, 0.3);
-  border-left-width: 3px;
+  border: 1px solid rgba(210, 153, 34, 0.35);
   border-radius: var(--radius);
   padding: 1rem 1.2rem;
   font-size: 0.86rem;
   color: var(--text-2);
   line-height: 1.65;
   margin-bottom: 1.8rem;
-  max-width: 78ch;
+  max-width: var(--medida);
 }
 .p-aviso-seg strong { color: var(--amber); }
 
@@ -255,7 +261,7 @@
 .p-conexao-corpo { padding: 1.3rem 1.4rem; }
 .p-conexao-corpo h4 {
   font-family: var(--font-mono);
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.07em;
   color: var(--text-3);
@@ -289,7 +295,7 @@
 
 .p-aviso {
   background: var(--amber-dim);
-  border-left: 3px solid rgba(210, 153, 34, 0.5);
+  border: 1px solid rgba(210, 153, 34, 0.35);
   border-radius: var(--radius);
   padding: 0.8rem 1rem;
   font-size: 0.84rem;
@@ -331,7 +337,7 @@
   font-size: 0.8rem;
   color: var(--text-3);
   margin-bottom: 0.5rem;
-  max-width: 78ch;
+  max-width: var(--medida);
   line-height: 1.65;
 }
 
