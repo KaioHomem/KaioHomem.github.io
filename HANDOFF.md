@@ -121,7 +121,40 @@ vira `algo.pages.dev` a menos que se compre um domínio, e isso quebra as
 URLs do sitemap. Com tráfego em ~0, **este é o momento mais barato que vai
 existir para trocar.**
 
-> **Nada disso foi implementado.** A decisão é do dono e está pendente.
+### Estado: construído, não migrado
+
+A arquitetura foi aprovada e **implementada**. O que existe hoje:
+
+- `dist/` gerado por allowlist (`ferramentas/publico.js`), com os arquivos
+  pagos fora dele
+- `worker/index.js` — serve o site e entrega o produto, mesma origem
+- autorização cumulativa: sessão válida, paga, metadata `app`+`produto`, e
+  preço registrado. **Não existe parâmetro de produto na API** — quem escolhe
+  o arquivo é a sessão paga, não o navegador
+- 20 testes da entrega com o Stripe simulado; 6 testes ao contrário do gate
+  anti-vazamento
+- bundle medido: **35,48 KiB comprimido**, contra o teto de 3 MB do grátis
+
+**Nada foi feito nas contas.** O repositório continua público, o Pages
+continua no ar, não há chave de Stripe em lugar nenhum.
+
+### A ordem da migração — e por que ela termina no repositório privado
+
+Tornar o repositório privado **primeiro** derruba o site: no plano gratuito
+o GitHub Pages despublica ao virar privado. O substituto precisa estar de pé
+e conferido antes.
+
+1. implementar ✅
+2. CI verde ✅
+3. criar a conta Cloudflare e conectar o repositório
+4. testar a URL de preview
+5. Stripe em modo de teste, simular uma compra ponta a ponta
+6. configurar produção
+7. confirmar o site funcionando na Cloudflare
+8. **então** tornar o repositório privado
+9. **então** desligar o GitHub Pages
+
+Os passos 3 a 9 são do dono. O `ATIVAR-VENDA.md` detalha cada um.
 
 ### 2. Os quatro links do Stripe estão vazios
 
@@ -194,7 +227,7 @@ servem de porta de entrada.
 | Branch de trabalho | `claude/visual-pagina-venda`, **12 commits** à frente de `main` |
 | PR | [#6](https://github.com/KaioHomem/KaioHomem.github.io/pull/6), **draft**, `mergeable_state: clean`, CI verde em `1d24475` |
 | Sitemap | 16 URLs; a página de oferta entrou, os arquivos do produto ficam de fora |
-| Entrega do produto | **decisão pendente** — ver bloqueio 1 |
+| Entrega do produto | **construída e verde**, aguardando migração — ver bloqueio 1 |
 
 **Nenhuma métrica de conversão deste negócio existe.** Qualquer número sobre
 desempenho é hipótese ou benchmark de mercado, nunca fato. Isso está registrado
@@ -313,8 +346,18 @@ está em dia com o base e com o módulo, sem reescrever nada.
 │   ├── verificar-consistencia.js  455 checagens (inclui o gate de link do Stripe)
 │   ├── verificar-paginas.js ... 143 checagens de navegador em 22 páginas
 │   ├── verificar-design.js .... detector do impeccable nas 22 páginas
-│   ├── auditoria.js ........... 327 checagens de peso, SEO, meta, orçamento
+│   ├── publico.js ............. ⭐ ALLOWLIST: o que pode ser publicado
+│   ├── gerar-dist.js .......... constrói o dist/ a partir dele
+│   ├── verificar-publicacao.js  reprova produto pago no dist/
+│   ├── testar-gate-publicacao.js  prova que o gate acima reprova mesmo
+│   ├── auditoria.js ........... 327 checagens, agora sobre o dist/
 │   └── gerar-sitemap.js ....... usa a data do commit de cada arquivo como lastmod
+│
+├── worker/ .................... a entrega gateada
+│   ├── index.js ............... ⭐ serve o dist/ e o /api/baixar
+│   └── testes.js .............. 20 testes, Stripe simulado
+├── wrangler.toml .............. config do Worker; NENHUM segredo aqui
+├── dist/ ...................... gerado, fora do git; é o que se publica
 │
 ├── produtos/ .................. o que se vende
 │   ├── folha-de-pagamento.html ...... PÁGINA DE VENDA (R$ 97)
@@ -322,6 +365,7 @@ está em dia com o base e com o módulo, sem reescrever nada.
 │   ├── pagamento.js ................. ⚠️ link do Stripe + order bump — EDITAR AQUI
 │   ├── funil.js ..................... ⚠️ upsell + downsell — EDITAR AQUI
 │   ├── comparador-rescisao.js ....... comparador ao vivo na oferta, usa nucleo.js
+│   ├── entrega.js ................... fala com /api/status e monta o botão
 │   ├── obrigado.html ................ entrega do base + upsell
 │   ├── obrigado-completo.html ....... entrega do completo
 │   ├── demo.html .................... demonstração gratuita, limitada a 2 funcionários
@@ -369,9 +413,14 @@ Individualmente:
 
 | Comando | O que faz | Quanto passa hoje |
 |---|---|---|
+| `npm run dist` | constrói o diretório publicado | 61 arquivos |
 | `npm run teste` | testes do motor fiscal | 187/187 |
-| `npm run consistencia` | links, textos, configuração, gate do Stripe | 455 |
-| `npm run auditoria` | peso, SEO, meta tags, orçamento de bytes | 327 |
+| `npm run consistencia` | links, textos, configuração, Stripe, Worker | 491 |
+| `npm run auditoria` | peso, SEO, meta, orçamento — **no dist/** | 327 |
+| `npm run entrega` | autorização do download, Stripe simulado | 20/20 |
+| `npm run publicacao` | nada pago no dist/ | 325 |
+| `npm run gate-publicacao` | prova que o gate acima reprova | 6/6 |
+| `npm run bundle` | mede o Worker (`wrangler --dry-run`) | 35,48 KiB |
 | `npm run motor` | paridade produto × núcleo | ~9.820 cenários |
 | `npm run completo` | build completo em dia com base + módulo | — |
 | `npm run paginas` | navegador real, 22 páginas | 143 |
@@ -430,7 +479,7 @@ Estas não são preferências. Cada uma nasceu de um erro concreto.
 
 ## Armadilhas conhecidas
 
-Treze coisas que já custaram tempo. Se algo parecer inexplicável, procure aqui
+Dezesseis coisas que já custaram tempo. Se algo parecer inexplicável, procure aqui
 antes de investigar do zero.
 
 1. **Portar função do núcleo de memória.** O `custoDemissao` foi portado sem
@@ -486,7 +535,24 @@ antes de investigar do zero.
     título; existe `data-titulo` para sobrescrever e `data-sempre` para a página
     de oferta mostrar a oferta mesmo sem link configurado.
 
-13. **`custo-demissao.html` já entrega de graça a conta que o módulo cobraria.**
+13. **CSP com `connect-src 'none'` numa página que precisa de `fetch`.** As
+    duas páginas de obrigado tinham isso, e a entrega nova usa `fetch` para
+    perguntar o estado da sessão. Teria sido bloqueado no navegador de todo
+    comprador. Pego lendo o arquivo antes de editar — nenhum gate pega CSP.
+
+14. **Injetar `fetch` por valor num teste que troca o simulado depois.** O
+    Worker guardava a função que existia no momento da carga, então o teste
+    do "Stripe fora do ar" rodava contra o Stripe são e passava verde
+    testando a coisa errada. Mesma família do `undefined` contra `undefined`.
+    Injete uma indireção que resolve na hora da chamada.
+
+15. **Não existe assinatura de conteúdo que separe o produto base da demo.**
+    Medido: zero identificadores e zero frases exclusivas. `gerar-demo.js`
+    troca `var DEMO=null` por `var DEMO={limite:2}` e não remove nada. Quem
+    for endurecer o gate anti-vazamento procurando um trecho do base não vai
+    achar — o que protege o base é o hash exato. Mude a demo primeiro.
+
+16. **`custo-demissao.html` já entrega de graça a conta que o módulo cobraria.**
     Descoberto antes de escrever a página de oferta. O valor do módulo teve de
     ser reconstruído em cima da **comparação dos cinco desfechos**, não da conta
     de uma rescisão. Se alguém for reescrever a oferta, checar primeiro o que a
@@ -563,9 +629,9 @@ ele; do quarto em diante é trabalho normal.
 2. **Criar o link de pagamento e colar em `produtos/pagamento.js`.** Um campo.
    É o commit que liga a receita.
 
-3. **Decidir a arquitetura de entrega** — ver bloqueio 1 e o achado que o
-   sustenta. A recomendação é Cloudflare Pages + Worker + repositório privado,
-   R$ 0/mês. A decisão é sua e **nada foi implementado**.
+3. **Executar a migração** — os passos 3 a 9 do bloqueio 1. O código está
+   pronto e verde; o que falta são ações nas suas contas, na ordem que
+   termina com o repositório privado, não começa.
 
 4. **Mesclar o PR #6.** Está verde e limpo. Depois dele, rebasear #2 (que
    conflita), #3 e #4.

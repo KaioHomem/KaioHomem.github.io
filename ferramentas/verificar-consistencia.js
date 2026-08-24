@@ -330,6 +330,56 @@ function varrerCifrao(arquivo) {
   });
 })();
 
+/* ---------- O WORKER E A FONTE DE VERDADE NÃO PODEM DIVERGIR ----------
+
+   O nome dos arquivos pagos aparece em dois lugares: declarado em
+   publico.js e importado no worker/index.js. São dois porque o Worker
+   roda noutro runtime e não dá para ele exigir o módulo de Node.
+
+   Duas cópias de um nome é sempre uma esperando para envelhecer. Se
+   alguém regerar o produto com outro hash e ajustar só um dos lados, o
+   Wrangler falha no deploy — mas só lá na frente, e o gate aqui é mais
+   barato que descobrir na hora de publicar. */
+(function () {
+  var publico = require('./publico');
+  var worker = fs.readFileSync(path.join(RAIZ, 'worker', 'index.js'), 'utf8');
+
+  Object.keys(publico.PAGOS).forEach(function (chave) {
+    var arquivo = publico.PAGOS[chave].arquivo;
+    var nome = path.basename(arquivo);
+    checagens++;
+    if (worker.indexOf(nome) === -1) {
+      problemas.push('worker/index.js não importa "' + nome + '", que publico.js ' +
+                     'declara como o produto "' + chave + '". Um dos dois está velho.');
+    }
+
+    // E o arquivo declarado tem de existir de verdade.
+    checagens++;
+    if (!fs.existsSync(path.join(RAIZ, arquivo))) {
+      problemas.push('publico.js declara o produto "' + chave + '" em ' + arquivo +
+                     ', que não existe.');
+    }
+  });
+
+  // Nenhum segredo no arquivo versionado do Wrangler. `vars` é público
+  // por natureza; chave do Stripe entra como secret, fora do repositório.
+  var wrangler = fs.readFileSync(path.join(RAIZ, 'wrangler.toml'), 'utf8');
+  checagens++;
+  if (/\b(sk_live_|sk_test_|rk_live_)/.test(wrangler)) {
+    problemas.push('wrangler.toml contém o que parece ser uma chave do Stripe. ' +
+                   'Ela nunca pode ser versionada — use `wrangler secret put`.');
+  }
+
+  // O diretório de assets tem de ser o dist/, e não a raiz. Apontar
+  // `directory` para "." publicaria o repositório inteiro, produto pago
+  // incluído — em um caractere.
+  checagens++;
+  if (!/directory\s*=\s*"\.\/dist"/.test(wrangler)) {
+    problemas.push('wrangler.toml não aponta os assets para ./dist. ' +
+                   'Qualquer outro diretório publica mais do que deveria.');
+  }
+})();
+
 /* ---------- RESULT ---------- */
 console.log('\n' + '-'.repeat(52));
 if (problemas.length === 0) {

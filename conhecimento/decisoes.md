@@ -5,6 +5,95 @@ alguém ter mudado de ideia costuma valer mais que a conclusão atual.
 
 ---
 
+## 2026-08-24 (noite) — A entrega gateada, construída
+
+**Decisão:** um Worker único da Cloudflare com Static Assets serve o site e
+entrega o produto pago, e o site publicado passa a ser um `dist/` gerado a
+partir de um allowlist. Aprovada pelo dono depois de ele conferir a
+documentação da Cloudflare e do Stripe por conta própria.
+
+Nada foi migrado. Código, build, testes e documentação prontos e verdes; as
+ações nas contas são do dono.
+
+**Duas correções dele, e as duas estavam certas.**
+
+*A ordem da migração.* Eu tinha listado "tornar o repositório privado" como
+passo. Ele apontou que isso derruba o site antes de existir substituto —
+GitHub Pages em plano gratuito despublica ao virar privado. A ordem correta
+termina com o repositório privado, não começa: implementar, CI verde,
+Cloudflare configurada, testar preview, testar pagamento em modo de teste,
+produção, confirmar, **então** privado, então desligar o Pages.
+
+*O enquadramento do webhook.* Eu havia escrito "cartão + Pix dispensa
+webhook" como se fosse propriedade do Stripe. Não é. O Stripe recomenda
+webhook como mecanismo confiável, ponto. O que estamos escolhendo é uma
+v0.1 em que o download é **puxado** pelo comprador e o Worker consulta o
+estado naquele instante — e isso funciona porque não há nada a perder no
+caminho se ele fechar o navegador. Para meio de confirmação atrasada a
+premissa cai. É decisão de escopo, e está escrita como tal no
+`ATIVAR-VENDA.md`.
+
+**O buraco que ele achou antes de eu construir.** Conferir só
+`payment_status === "paid"` aceita qualquer sessão paga da conta. Com quatro
+links de pagamento previstos, quem comprasse o mais barato levaria o mais
+caro. A autorização passou a ser cumulativa: sessão válida, paga, `app` e
+`produto` na metadata, e preço registrado para aquele produto.
+
+**A decisão de desenho que fecha o buraco de vez:** *não existe parâmetro de
+produto na API*. O arquivo sai da metadata da sessão paga, que só o Stripe
+escreve. Um endpoint que aceitasse `?produto=completo` seria uma palavra na
+barra de endereço entre R$ 97 e R$ 164 — e validar esse parâmetro depois é
+mais frágil que nunca aceitá-lo. Há um teste que reprova se alguém o
+introduzir.
+
+**Falhar fechado, em dois lugares.** Sem `STRIPE_SECRET_KEY`, e sem lista de
+preços, o endpoint responde 503 em vez de entregar. A tentação de deixar
+passar enquanto não está configurado é exatamente como se entrega um produto
+de graça sem ninguém perceber.
+
+**Allowlist, não denylist.** O `dist/` é construído a partir de uma lista do
+que entra. Um denylist erra por omissão — arquivo novo no lugar errado é
+publicado porque ninguém lembrou de proibi-lo. Um allowlist erra por
+ausência: o arquivo não aparece, alguém percebe, e adiciona. Erro que
+esconde conteúdo é recuperável; erro que publica o produto pago, não.
+
+**O achado que reduz o valor do que foi construído, e precisa ser dito.**
+Ao escolher as assinaturas do gate anti-vazamento, medi quais trechos
+existem no produto base e não na demonstração gratuita. **Zero.** Nenhum
+identificador, nenhuma frase. O motivo é o desenho da demo: `gerar-demo.js`
+troca `var DEMO=null` por `var DEMO={limite:2}` e não remove nada.
+
+Ou seja: a demo é o produto inteiro com um limite por cima, e voltar a linha
+ao original entrega o base de R$ 97. Isso já estava registrado em
+`estado-do-negocio.md` como restrição conhecida, mas ganha peso agora — a
+entrega gateada protege **de verdade** o módulo de rescisão (que não existe
+na demo nem no base) e protege o base apenas contra o caminho preguiçoso.
+
+Não foi corrigido porque não foi pedido, e porque a correção é de produto,
+não de infraestrutura: a demo teria de ser gerada **removendo** código em
+vez de sinalizando um limite. Fica registrado como escolha consciente.
+
+**Três defeitos meus, pegos pelos próprios testes:**
+
+1. As duas páginas de obrigado tinham `connect-src 'none'` na CSP, e a
+   entrega usa `fetch`. Teria sido bloqueado no navegador de todo comprador.
+   Achado ao ler o arquivo antes de editar, não por teste.
+2. O teste do Stripe fora do ar passava contra o Stripe são: o Worker
+   recebia `fetch` por valor ao ser carregado, então trocar o simulado depois
+   não o alcançava. Passava verde testando a coisa errada — a mesma família
+   do `undefined` contra `undefined` de 24/08.
+3. Os identificadores de sessão dos testes eram curtos demais para o formato
+   real do Stripe. A validação estava certa; os fixtures é que não pareciam
+   sessões de verdade. Corrigi os fixtures, não a regra.
+
+**O `robots.txt` perdeu os `Disallow`.** Ele anunciava o caminho do produto
+pago para quem o lesse. Agora o arquivo não é servido, então a linha só
+ensinaria onde ele ficava. Entrega e demonstração continuam fora da busca
+por `noindex` na própria página, que é mais forte — `Disallow` impede
+rastrear, e um robô que não rastreia nunca lê o `noindex`.
+
+---
+
 ## 2026-08-24 (tarde) — A conta que eu ia vender já era gratuita
 
 **O que descobri antes de escrever a página de oferta:** a calculadora

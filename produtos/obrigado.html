@@ -12,7 +12,7 @@
   style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
   font-src https://fonts.gstatic.com;
   img-src 'self' data:;
-  connect-src 'none';
+  connect-src 'self';
   object-src 'none'; base-uri 'self'; form-action 'none';
 ">
 <meta name="referrer" content="strict-origin-when-cross-origin">
@@ -22,10 +22,6 @@
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../ferramentas/tools.css">
 <style>
-.baixar{display:inline-flex;align-items:center;gap:.6rem;background:var(--green);color:var(--bg);
-  font-weight:600;font-size:1.1rem;padding:1.1rem 2.4rem;border-radius:var(--radius);
-  text-decoration:none;margin:1rem 0}
-.baixar:hover{background:#4ac860;color:var(--bg)}
 /* Lista ordenada de verdade: a numeração vem do <ol>, não digitada à mão
    dentro de um <strong> que também serve para dar ênfase no meio da
    frase. E sem tarja lateral de 3px — o número já ordena. */
@@ -67,14 +63,14 @@ li.passo::before{content:counter(passo) ".";position:absolute;left:1.2rem;
     <div class="selo">pagamento confirmado</div>
     <h1>Obrigado. Aqui está o seu arquivo.</h1>
     <p class="resumo">
-      Guarde este endereço — é por aqui que você baixa as versões atualizadas quando as
-      tabelas mudarem em janeiro, sem pagar de novo.
+      Guarde este endereço <strong>inteiro</strong>, com o código depois do
+      <code>?</code> — é por ele que você baixa as versões atualizadas quando as
+      tabelas mudarem em janeiro, sem pagar de novo. O link do recibo que o Stripe
+      mandou por e-mail também serve, e é mais difícil de perder.
     </p>
   </div>
 
-  <a class="baixar" href="folha-simples-fc86aa480de7f81c.html" download="folha-simples.html">
-    Baixar Folha Simples ↓
-  </a>
+  <div id="entrega" data-rotulo="Folha Simples"></div>
 
   <article class="conteudo">
     <h2>Como usar</h2>
@@ -121,6 +117,7 @@ li.passo::before{content:counter(passo) ".";position:absolute;left:1.2rem;
 
 <script src="../ferramentas/nucleo.js"></script>
 <script src="../ferramentas/app.js"></script>
+<script src="entrega.js"></script>
 <script src="funil.js"></script>
 </body>
 </html>

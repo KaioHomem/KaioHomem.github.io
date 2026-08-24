@@ -1,0 +1,61 @@
+#  ===================================================
+#  CLOUDFLARE WORKER — Folha Simples
+#
+#  Um projeto só: serve o site estático e entrega o
+#  produto pago, na mesma origem.
+#
+#  >>> NÃO HÁ NENHUM SEGREDO NESTE ARQUIVO, e não pode haver.
+#
+#  Ele é versionado. A chave do Stripe entra como secret,
+#  pela linha de comando ou pelo painel:
+#
+#      npx wrangler secret put STRIPE_SECRET_KEY
+#
+#  Secret fica guardado na Cloudflare e não volta para cá.
+#  Os identificadores de preço abaixo são públicos por
+#  natureza (aparecem no checkout), então são `vars`.
+#  ===================================================
+
+name = "folha-simples"
+main = "worker/index.js"
+compatibility_date = "2026-08-24"
+
+#  ---------- O SITE ----------
+#
+#  Só o dist/ sobe como conteúdo público. É gerado por
+#  `node ferramentas/gerar-dist.js` a partir do allowlist em
+#  ferramentas/publico.js, e o gate de publicação reprova o build
+#  se algo pago aparecer aqui dentro.
+#
+#  Os arquivos pagos vivem em produtos/, FORA deste diretório.
+[assets]
+directory = "./dist"
+binding = "ASSETS"
+
+#  ---------- O PRODUTO PAGO DENTRO DO CÓDIGO ----------
+#
+#  A regra abaixo faz o Wrangler tratar esses .html como módulo de
+#  texto: `import produto from '...html'` devolve uma string, que vai
+#  para dentro do bundle compilado. Não é um asset, não tem URL.
+#
+#  O glob é estreito de propósito. Uma regra `**/*.html` arrastaria
+#  qualquer HTML que alguém importasse um dia — e num projeto cujo
+#  produto É um arquivo HTML, uma regra larga é como se engorda um
+#  bundle sem perceber.
+[[rules]]
+type = "Text"
+globs = ["**/folha-simples*.html"]
+fallthrough = false
+
+#  ---------- CONFIGURAÇÃO DA ENTREGA ----------
+#
+#  Preços que dão direito a cada arquivo, separados por vírgula.
+#  Vazio = o endpoint recusa entregar (503) em vez de liberar sem
+#  conferir. Falhar fechado custa um erro claro na configuração;
+#  falhar aberto custa o produto.
+#
+#  Preencher depois de criar os Payment Links, com os price_...
+#  que o Stripe gerar.
+[vars]
+PRECOS_BASE = ""
+PRECOS_COMPLETO = ""

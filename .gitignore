@@ -1,1 +1,10 @@
 node_modules/
+
+# O diretório publicado é gerado: `node ferramentas/gerar-dist.js` o
+# reconstrói inteiro a partir do allowlist. Commitá-lo criaria uma
+# segunda cópia de cada página pública, capaz de divergir da origem —
+# e o build da Cloudflare o gera antes de publicar.
+dist/
+
+# Saída do `wrangler deploy --dry-run`, usada para medir o bundle.
+.wrangler/

@@ -49,7 +49,29 @@ function paginasHtml(dir, encontradas) {
   return encontradas;
 }
 
-var paginas = paginasHtml(RAIZ);
+/* A auditoria olha o que vai para a internet, não a árvore do
+   repositório.
+
+   Antes ela varria a raiz inteira, e isso era certo enquanto a raiz ERA
+   o site. Agora existe um build: auditar a origem enquanto se publica o
+   dist/ auditaria arquivos que ninguém baixa e deixaria passar um link
+   quebrado só no build — que é exatamente o defeito que ela existe para
+   pegar.
+
+   Os dois produtos pagos entram à parte: não estão no dist/ por
+   desenho, mas continuam tendo orçamento de peso a respeitar, porque
+   alguém os baixa. */
+var publico = require('./publico');
+var DIST = path.join(RAIZ, publico.DIST);
+
+if (!fs.existsSync(DIST)) {
+  console.error('Não existe dist/. Rode: node ferramentas/gerar-dist.js');
+  process.exit(1);
+}
+
+var paginas = paginasHtml(DIST).concat(
+  publico.paginasPagas().map(function (p) { return path.join(RAIZ, p); })
+);
 var pesosPorPagina = [];
 console.log('Páginas encontradas: ' + paginas.length + '\n');
 

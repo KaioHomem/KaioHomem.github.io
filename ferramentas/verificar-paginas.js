@@ -20,6 +20,7 @@
 
 var path = require('path');
 var chromium = require('playwright').chromium;
+var publico = require('./publico');
 
 var RAIZ = path.join(__dirname, '..');
 
@@ -278,7 +279,9 @@ async function medirContraste(page) {
     var erros = [];
     page.on('pageerror', function (e) { erros.push(e.message); });
 
-    await page.goto('file://' + path.join(RAIZ, arquivo));
+    // Página pública sai do dist/, que é o que o visitante recebe; a
+    // paga sai da origem, porque por desenho não está no dist/.
+    await page.goto('file://' + publico.caminhoDe(RAIZ, arquivo));
     await page.waitForTimeout(400);
 
     exigir(erros.length === 0, arquivo + ' quebrou no navegador: ' + erros.join(' | '));

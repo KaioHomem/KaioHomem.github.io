@@ -25,6 +25,7 @@
 var path = require('path');
 var fs = require('fs');
 var { execFileSync } = require('child_process');
+var publico = require('./publico');
 
 var RAIZ = path.join(__dirname, '..');
 var DETECTOR = path.join(RAIZ, '.claude', 'skills', 'impeccable', 'scripts', 'detect.mjs');
@@ -68,7 +69,8 @@ var achados = [];
 // Uma chamada só com todas as URLs: o detector aceita vários alvos e
 // reaproveita o navegador. Uma chamada por página abria dezoito
 // Chromiums e o gate estourava dez minutos sozinho.
-var urls = PAGINAS.map(function (p) { return 'file://' + path.join(RAIZ, p); });
+// Mesma regra do verificar-paginas.js: público do dist/, pago da origem.
+var urls = PAGINAS.map(function (p) { return 'file://' + publico.caminhoDe(RAIZ, p); });
 
 var saida;
 try {
