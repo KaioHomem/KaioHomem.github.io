@@ -1,6 +1,8 @@
 # HANDOFF — Folha Simples
 
 Escrito em 2026-08-24, na branch `claude/visual-pagina-venda`.
+**Revisado no mesmo dia**, depois de a premissa de entrega pelo Stripe ser
+verificada contra a documentação oficial e se revelar falsa — ver bloqueio 1.
 
 Este é o documento de entrada. Quem chegar numa sessão nova lê isto antes de
 qualquer outra coisa e não precisa de mais nenhum contexto para continuar.
@@ -25,39 +27,74 @@ Você pediu duas vezes — *"Tire esse repositorio publico agoraa"* e *"nao
 quero ser opencode"* — e **isso não foi feito**. Não foi esquecimento de uma
 sessão só: está aberto desde então.
 
-O que isso significa concretamente:
+O produto pago está exposto em **três lugares ao mesmo tempo**:
 
 - `produtos/folha-simples-fc86aa480de7f81c.html` (47 KB) e
   `produtos/folha-simples-completo-fc86aa480de7f81c.html` (72 KB) estão
-  **listados na árvore do repositório**. São os arquivos que custam R$ 97 e
-  R$ 164.
-- O rodapé do próprio site linka para o repositório:
-  `ferramentas/app.js:121` e `produtos/folha-de-pagamento.html:349`. Ou
-  seja, a página de venda ensina o caminho.
-- O hash no nome do arquivo era a única obscuridade. Numa árvore pública ele
-  aparece listado, então não obscurece nada.
+  **listados na árvore do repositório**. São os arquivos de R$ 97 e R$ 164.
+- O rodapé do site linka para o repositório: `ferramentas/app.js:121` e
+  `produtos/folha-de-pagamento.html:349`. A página de venda ensina o caminho.
+- O `robots.txt` **anuncia o caminho** em voz alta:
+  `Disallow: /produtos/folha-simples`. Ele existe para tirar o arquivo da
+  busca, e o efeito colateral é que qualquer pessoa que abra o robots.txt
+  lê onde o produto mora. O comentário no próprio arquivo já admite:
+  *"Isto é obscuridade, não segurança"*.
 
-**A parte honesta, que muda a decisão:** tornar o repositório privado
-**não protege o arquivo**. O GitHub Pages serve `/produtos/*.html`
-publicamente de qualquer jeito — repositório privado só tira o arquivo da
-listagem e esconde o histórico. Quem souber a URL continua baixando. Proteção
-de verdade exige um servidor ou uma plataforma de entrega que valide a compra,
-e este site não tem nem uma coisa nem outra por decisão de arquitetura.
+O hash no nome era a única obscuridade, e nenhum dos três lugares a preserva.
 
-**E há um custo:** GitHub Pages em repositório privado exige plano pago
-(GitHub Pro). Num plano gratuito, tornar privado **derruba o site**.
+#### A premissa que estava errada aqui
 
-As opções reais, sem ordem de recomendação porque a escolha é sua:
+A versão anterior deste documento dizia que "tirar o arquivo do repositório
+e entregar pelo Stripe" resolveria o problema. **Isso era palpite meu, e é
+falso.**
 
-| Opção | O que resolve | O que custa |
+Verificado na documentação oficial: **o Stripe não hospeda nem entrega
+arquivos digitais.** Não existe campo para anexar arquivo a um produto. A
+página oficial de pós-pagamento de Payment Link lista exatamente duas
+opções — mensagem de confirmação, ou redirecionamento para uma URL sua. Não
+há terceira. O próprio Marketplace do Stripe indica um parceiro (SendOwl)
+para fazer entrega de bem digital, o que uma plataforma não faria se ela
+mesma fizesse.
+
+A pesquisa inteira, com fontes e as cinco arquiteturas comparadas, está em
+[`conhecimento/achados/entrega-do-produto-pago.md`](conhecimento/achados/entrega-do-produto-pago.md).
+
+#### Os dois problemas são separados
+
+Confundir os dois foi o erro da versão anterior:
+
+| Problema | O que resolve |
+|---|---|
+| O arquivo é **servido publicamente** pelo site | Gatear a entrega — exige verificar o pagamento, e verificar exige a chave secreta, que não pode ir para o navegador. **Não existe versão estática disso.** |
+| O arquivo está **legível no repositório** | Repositório privado. Só isso. |
+
+E o segundo esbarra num fato do GitHub: no plano gratuito, o Pages só
+funciona em repositório público, e tornar privado **despublica o site
+automaticamente**.
+
+#### As opções reais
+
+| Opção | Fecha os requisitos? | Custo |
 |---|---|---|
-| Assinar GitHub Pro e tornar privado | Tira o produto e o histórico da listagem pública | ~US$ 4/mês; **não** impede download por URL direta |
-| Migrar hospedagem (Netlify / Cloudflare Pages / Vercel) a partir de repositório privado | Mesmo efeito, sem mensalidade | Uma tarde de migração; DNS; **também não** impede download por URL |
-| Tirar o arquivo do repositório e entregar pelo Stripe (upload de arquivo no próprio produto) | Resolve de verdade: só quem pagou recebe | Muda a página de obrigado; o Stripe passa a hospedar |
-| Não fazer nada e precificar sabendo disso | Zero trabalho | O produto é copiável, e isso já está registrado em `conhecimento/estado-do-negocio.md` |
+| Não fazer nada | Não | R$ 0, e o produto continua copiável |
+| GitHub Pro + repo privado | Só o segundo problema | ~US$ 4/mês; a URL do arquivo continua servindo para qualquer um |
+| Cloudflare Pages + Worker de entrega + repo privado | **Os dois** | **R$ 0/mês** |
+| Serviço pronto (SendOwl, Lemon Squeezy, Gumroad) | Os dois | mensalidade ou taxa maior; em compensação um merchant of record assume a parte fiscal |
 
-A terceira é a única que ataca o problema em vez do sintoma. As duas primeiras
-atendem ao pedido literal ("não ser open source") sem trancar o arquivo.
+**Recomendação: a terceira.** Um fornecedor, uma conta, R$ 0 por mês. O
+Worker é um arquivo de ~60 linhas: recebe o `session_id` que o Stripe passa
+no redirecionamento, pergunta à API do Stripe se aquela sessão foi paga, e
+só então devolve os bytes. A chave secreta mora num secret do Cloudflare,
+nunca no repositório. E o plano gratuito do Cloudflare Pages serve
+repositório privado, o que atende ao "não quero ser open source" **sem
+pagar o GitHub Pro**.
+
+O custo dessa escolha não é dinheiro, é endereço: `kaiohomem.github.io`
+vira `algo.pages.dev` a menos que se compre um domínio, e isso quebra as
+URLs do sitemap. Com tráfego em ~0, **este é o momento mais barato que vai
+existir para trocar.**
+
+> **Nada disso foi implementado.** A decisão é do dono e está pendente.
 
 ### 2. Os quatro links do Stripe estão vazios
 
@@ -76,6 +113,12 @@ Resumo: a conta Stripe (`acct_1TaKZ2RvYSQ7CX5v`) já tem o produto
 o onboarding da conta precisa ser concluído por uma pessoa — nome do negócio,
 telefone, termos de uso, conta bancária. Nenhum processador de pagamento aceita
 que um agente faça isso, e é bom que não aceite.
+
+⚠️ **Correção ao `ATIVAR-VENDA.md`:** aquele arquivo diz *"Eu já tenho acesso
+de escrita à conta"* e oferece criar o link de pagamento pela API. Isso não
+vale mais em toda sessão — o conector do Stripe pede autorização e, quando ele
+não está autorizado, **nenhum agente cria link nenhum**. Conte com criar o
+link você mesmo pelo painel; se o conector estiver ligado, é um bônus.
 
 Enquanto os links estiverem vazios, nada quebra: o botão fica desabilitado com
 um aviso e um e-mail, e as ofertas de funil simplesmente não aparecem. Isso é
@@ -121,8 +164,10 @@ servem de porta de entrada.
 | Vendas | **0** |
 | Stripe | conta criada, produto e preço criados, **link não criado** |
 | Repositório | **público** (ver bloqueio 1) |
-| Branch de trabalho | `claude/visual-pagina-venda`, 11 commits à frente de `main` |
-| PR | [#6](https://github.com/KaioHomem/KaioHomem.github.io/pull/6), **draft**, `mergeable_state: clean`, CI verde |
+| Branch de trabalho | `claude/visual-pagina-venda`, **12 commits** à frente de `main` |
+| PR | [#6](https://github.com/KaioHomem/KaioHomem.github.io/pull/6), **draft**, `mergeable_state: clean`, CI verde em `1d24475` |
+| Sitemap | 16 URLs; a página de oferta entrou, os arquivos do produto ficam de fora |
+| Entrega do produto | **decisão pendente** — ver bloqueio 1 |
 
 **Nenhuma métrica de conversão deste negócio existe.** Qualquer número sobre
 desempenho é hipótese ou benchmark de mercado, nunca fato. Isso está registrado
@@ -135,7 +180,7 @@ Todos em draft, nenhum mesclado:
 
 | PR | Branch | Assunto | Observação |
 |---|---|---|---|
-| [#6](https://github.com/KaioHomem/KaioHomem.github.io/pull/6) | `claude/visual-pagina-venda` | Design do site inteiro, módulo de rescisão, funil | O trabalho desta sessão. CI verde. |
+| [#6](https://github.com/KaioHomem/KaioHomem.github.io/pull/6) | `claude/visual-pagina-venda` | Design do site inteiro, módulo de rescisão, funil | 12 commits. CI verde. O corpo do PR ainda diz "onze commits" — foi escrito antes do HANDOFF entrar. |
 | [#4](https://github.com/KaioHomem/KaioHomem.github.io/pull/4) | `claude/hospedagem-segura` | Cabeçalhos de segurança e política de segredos | |
 | [#3](https://github.com/KaioHomem/KaioHomem.github.io/pull/3) | `claude/agentes-fase-0` | Fundação de agentes e Fase 0 | |
 | [#2](https://github.com/KaioHomem/KaioHomem.github.io/pull/2) | `claude/agente-marketing-roas` | Calculadora de ROAS/CPA e doutrina de tráfego pago | **Conflita com #6** em `ferramentas/app.js` e `ferramentas/index.html` |
@@ -224,7 +269,9 @@ está em dia com o base e com o módulo, sem reescrever nada.
 ├── conhecimento/ .............. MEMÓRIA LONGA — leia antes de pesquisar
 │   ├── INDICE.md .............. achados de pesquisa + fila de perguntas abertas
 │   ├── decisoes.md ............ registro cronológico inverso; decisão revogada NÃO se apaga
-│   └── estado-do-negocio.md ... números reais, infraestrutura, canais, taxas
+│   ├── estado-do-negocio.md ... números reais, infraestrutura, canais, taxas
+│   └── achados/
+│       └── entrega-do-produto-pago.md  ⭐ sustenta o bloqueio 1
 │
 ├── ferramentas/ ............... as 11 calculadoras gratuitas + toda a verificação
 │   ├── nucleo.js .............. ⭐ MOTOR FISCAL — fonte única da verdade (1.116 linhas)
@@ -239,7 +286,7 @@ está em dia com o base e com o módulo, sem reescrever nada.
 │   ├── verificar-consistencia.js  455 checagens (inclui o gate de link do Stripe)
 │   ├── verificar-paginas.js ... 143 checagens de navegador em 22 páginas
 │   ├── verificar-design.js .... detector do impeccable nas 22 páginas
-│   ├── auditoria.js ........... 326 checagens de peso, SEO, meta, orçamento
+│   ├── auditoria.js ........... 327 checagens de peso, SEO, meta, orçamento
 │   └── gerar-sitemap.js ....... usa a data do commit de cada arquivo como lastmod
 │
 ├── produtos/ .................. o que se vende
@@ -297,14 +344,17 @@ Individualmente:
 |---|---|---|
 | `npm run teste` | testes do motor fiscal | 187/187 |
 | `npm run consistencia` | links, textos, configuração, gate do Stripe | 455 |
-| `npm run auditoria` | peso, SEO, meta tags, orçamento de bytes | 326 |
+| `npm run auditoria` | peso, SEO, meta tags, orçamento de bytes | 327 |
 | `npm run motor` | paridade produto × núcleo | ~9.820 cenários |
 | `npm run completo` | build completo em dia com base + módulo | — |
 | `npm run paginas` | navegador real, 22 páginas | 143 |
 | `npm run design` | detector do impeccable, 22 páginas | 22 |
 | `npm run sitemap` | regenera `sitemap.xml` | — |
 
-`npm run paginas` leva ~4 minutos. Já levou 9 — ver armadilha 4.
+`npm run paginas` leva ~4 minutos **neste container**, que é compartilhado.
+No runner do GitHub o mesmo gate fecha em ~40 segundos. Se estranhar a
+diferença, é isso: a prova de que ele rodou é a contagem impressa no fim
+(143 checagens / 22 páginas), não a duração. Já levou 9 minutos — armadilha 4.
 
 O CI (`.github/workflows/ferramentas.yml`) roda `npm run verificar` em Node 22,
 em push para `main`, em pull request, e no primeiro dia de cada mês às 09:00 UTC.
@@ -433,6 +483,10 @@ Registradas para não voltarem por esquecimento. O motivo completo está em
 | Selo de "mais barato" na comparação | 2026-08-24 | Caía em justa causa e lia como recomendação de fraude trabalhista |
 | Manchete medindo dispensa × justa causa | 2026-08-24 | Justa causa é um fato sobre o que aconteceu, não uma opção; a comparação honesta é dispensa × acordo do art. 484-A |
 
+| Entregar o arquivo pago pelo próprio Stripe | 2026-08-24 | **Não existe.** O Stripe não hospeda arquivos; a documentação oficial de pós-pagamento só oferece mensagem ou redirecionamento. Era palpite meu escrito como fato na primeira versão deste documento |
+| Depósito de objetos (R2 / S3) para o arquivo | 2026-08-24 | Os dois arquivos somam 119 KB. Depósito de objetos existe para mover gigabytes; aqui seria mais um serviço e mais um par de credenciais para não ganhar nada |
+| Webhook + e-mail com link assinado, **agora** | 2026-08-24 | É a arquitetura mais robusta e continua sendo o segundo passo certo. Mas são três serviços em vez de um, antes de existir uma única venda |
+
 Também **revogada:** o adiamento de bump/upsell registrado em 2026-08-18. O
 dono pediu duas vezes, e prioridade é dele. Construídos em 2026-08-24.
 
@@ -456,8 +510,17 @@ mudam decisões de produto, não só de marketing:
 
 Existe um subagente para isso: `pesquisa-crescimento`, em
 `.claude/agents/pesquisa-crescimento.md`. Ele grava os achados em
-`conhecimento/achados/` e atualiza o índice. **A pasta está vazia — nenhuma
-pesquisa foi registrada ainda.**
+`conhecimento/achados/` e atualiza o índice.
+
+A pasta tem **um** achado: [`entrega-do-produto-pago.md`](conhecimento/achados/entrega-do-produto-pago.md),
+que é o que sustenta o bloqueio 1.
+
+**Armadilha de pesquisa nesta máquina:** `docs.stripe.com` está bloqueado
+pelo proxy de egresso (403 no CONNECT), e o README do proxy manda reportar o
+host em vez de contornar. A ferramenta de busca alcança o conteúdo das
+mesmas páginas oficiais, então dá para pesquisar — mas é leitura de segunda
+mão, e o achado marca isso explicitamente. Quem for implementar deve reabrir
+os links no navegador.
 
 ---
 
@@ -473,9 +536,9 @@ ele; do quarto em diante é trabalho normal.
 2. **Criar o link de pagamento e colar em `produtos/pagamento.js`.** Um campo.
    É o commit que liga a receita.
 
-3. **Decidir o que fazer com o repositório público** — ver bloqueio 1, escolher
-   uma das quatro opções. A decisão é sua; a recomendação técnica é que só a
-   terceira (entrega pelo Stripe) resolve de verdade.
+3. **Decidir a arquitetura de entrega** — ver bloqueio 1 e o achado que o
+   sustenta. A recomendação é Cloudflare Pages + Worker + repositório privado,
+   R$ 0/mês. A decisão é sua e **nada foi implementado**.
 
 4. **Mesclar o PR #6.** Está verde e limpo. Depois dele, rebasear #2 (que
    conflita), #3 e #4.
