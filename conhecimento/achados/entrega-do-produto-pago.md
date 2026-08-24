@@ -278,3 +278,188 @@ Os limites exatos dos planos gratuitos (100.000 requisições/dia no Workers,
 10 GB no R2, 500 builds/mês no Pages) vieram de páginas comparativas de
 terceiros, **não das tabelas oficiais de preço**. Tratar como ordem de
 grandeza e reconferir antes de depender do número.
+
+---
+
+# Adendo — 2026-08-24, segunda rodada
+
+O dono conferiu a documentação por conta própria, confirmou a direção e
+propôs uma arquitetura **mais simples** que a minha, além de apontar um
+buraco de segurança real na minha proposta. Ele estava certo nas duas
+coisas. Este adendo registra a verificação.
+
+**Mesma ressalva de fonte, agora pior:** além de `docs.stripe.com`,
+`developers.cloudflare.com` **também está bloqueado** pelo proxy de egresso
+desta máquina (403 no CONNECT nos dois). Tudo abaixo veio pela ferramenta de
+busca, que indexa e cita as páginas oficiais. Reabra os links antes de
+implementar.
+
+## O que foi verificado
+
+| Afirmação | Confirmada? | O que a documentação diz |
+|---|---|---|
+| Worker pode hospedar site estático e código no mesmo projeto | **Sim** | O deploy manda código e assets estáticos "numa única operação", como uma unidade integrada |
+| Wrangler importa `.html` como string | **Sim** | `rules` aceita `type` = `ESModule`, `CommonJS`, `CompiledWasm`, **`Text`** ou `Data`; com `Text`, o import vira uma string com o conteúdo do arquivo |
+| Workers Builds conecta repositório do GitHub | **Sim** | Deploy automático a cada push |
+| ...**inclusive privado** | **Sim** | "Both private and public repositories are supported" |
+| Bundle grátis aguenta os produtos | **Sim, com folga absurda** | 3 MB comprimido no plano grátis (64 MB antes de comprimir). Os dois produtos somam 119 KB **antes** de comprimir, e HTML comprime muito bem |
+| Só o diretório de assets vira público | **Sim** | O Wrangler sobe os arquivos **do diretório configurado** para a infraestrutura da Cloudflare |
+
+## Por que a arquitetura do dono é melhor que a minha
+
+Eu propus **Cloudflare Pages + Worker separados**. Ele propôs **um Worker
+único com Static Assets**. A dele ganha, e não é por pouco:
+
+| | Pages + Worker | **Worker + Static Assets** |
+|---|---|---|
+| Projetos na Cloudflare | 2 | **1** |
+| Configuração | 2 painéis, 2 integrações Git | **1 `wrangler.toml`** |
+| Deploy | 2 pipelines que podem dessincronizar | **1 operação atômica** |
+| **CORS** | Necessário — a página num domínio chama a API noutro | **Nenhum.** Mesma origem |
+| Custo | R$ 0 | R$ 0 |
+| Manutenção | 2 coisas para lembrar que existem | 1 |
+| Gate de paridade | Intacto | Intacto |
+
+O ponto do **CORS** é o que decide. Em Pages + Worker os dois vivem em
+domínios diferentes, então a API precisa de `Access-Control-Allow-Origin`
+— e cabeçalho de CORS é exatamente o tipo de coisa que alguém afrouxa para
+`*` num momento de pressa e nunca mais aperta. Na arquitetura de um Worker
+só, `/api/baixar` e `/obrigado.html` são a mesma origem. **O problema deixa
+de existir em vez de ser configurado corretamente.** Isso é sempre melhor.
+
+## O buraco que eu deixei passar
+
+Minha proposta dizia para conferir `payment_status === "paid"`. **Isso não
+basta**, e o dono viu.
+
+Qualquer sessão paga da mesma conta Stripe satisfaz essa condição. Se um dia
+existir um segundo produto mais barato, quem comprar o barato recebe um
+`session_id` que passa no teste e baixa o Folha Simples. O buraco não é
+teórico: ele abre sozinho no dia em que a conta tiver dois produtos, que é
+justamente o plano (base, combo, módulo avulso, parcelado — **quatro**
+links previstos).
+
+A sessão precisa ser validada **contra o produto esperado**, não só contra
+"foi paga".
+
+Duas formas, e vale usar as duas:
+
+1. **`metadata` no Payment Link.** O Stripe copia a metadata configurada no
+   Payment Link para as Checkout Sessions originadas dele. É a checagem
+   principal: explícita, definida por você, e **sobrevive a troca de preço**
+   — se um dia houver promoção, o `price` muda e a metadata não.
+2. **`line_items` expandido.** Confere o `price` de fato comprado. Serve de
+   segunda barreira, mas é frágil sozinha justamente porque quebra quando o
+   preço muda.
+
+Ordem certa: metadata como verdade, `line_items` como conferência.
+
+## Webhook: a pergunta que estava em aberto
+
+O Stripe recomenda webhook para cumprimento confiável. A pergunta era se dá
+para lançar sem ele. **Dá, e a resposta depende inteiramente de quais meios
+de pagamento forem habilitados.**
+
+| Meio | Confirmação | Serve para v0.1 sem webhook? |
+|---|---|---|
+| Cartão | imediata | **Sim** |
+| **Pix** | **instantânea** — o cliente é avisado no checkout que o pagamento está completo | **Sim** |
+| **Boleto** | **1 a 3 dias úteis** | **Não** |
+
+Sobre o boleto a documentação do Stripe é literal: é um *"delayed
+notification payment method"*, e por isso **"you need to use webhooks to
+monitor payment status and handle order fulfillment"**. O evento de
+sucesso chega no dia útil seguinte.
+
+Traduzindo para este produto: com boleto habilitado, o comprador é
+redirecionado para a página de obrigado **antes** de o pagamento constar
+como pago. O endpoint responde 403. A pessoa pagou e não recebeu, e
+descobre isso sozinha, sem ninguém para reclamar.
+
+### Decisão recomendada, e o acoplamento que ela cria
+
+**No lançamento: cartão e Pix. Boleto desligado.**
+
+Com esses dois, `payment_status === "paid"` no endpoint de download é
+suficiente e o webhook fica para a v0.2.
+
+⚠️ **Isto é uma decisão acoplada, e o acoplamento é invisível.** "Não
+precisa de webhook" só é verdade **porque** o boleto está desligado. No dia
+em que alguém ligar o boleto no painel do Stripe — um clique, noutro
+sistema, meses depois — a entrega quebra em silêncio para esses
+compradores, e nada no repositório vai reclamar.
+
+Não dá para colocar um gate de CI em cima de uma configuração do painel do
+Stripe. Então o controle precisa ser escrito onde a pessoa vai estar quando
+tomar a decisão: no `ATIVAR-VENDA.md`, como instrução dura, não como nota
+de rodapé.
+
+## O gate de publicação, e por que ele precisa ser mais forte
+
+O dono propôs um gate que reprova se `folha-simples-*.html` aparecer no
+diretório público do build. **Concordo, e proponho endurecê-lo.**
+
+O motivo de ele ser obrigatório: hoje **não existe build**. A raiz do
+repositório *é* o site. Criar um `dist/` significa criar um passo que copia
+os arquivos públicos para lá — e passo de cópia é precisamente o tipo de
+coisa que um dia copia demais. Um `cp -r` distraído, um glob que cresceu,
+um arquivo novo no lugar errado.
+
+Duas checagens, não uma:
+
+1. **Por nome:** nenhum `folha-simples*.html` dentro de `dist/`.
+2. **Por conteúdo:** nenhum arquivo em `dist/` contém a assinatura que só o
+   produto pago tem. Glob por nome não sobrevive a um arquivo renomeado; a
+   assinatura sobrevive.
+
+E, pela regra 2 do projeto, ele tem de ser **testado ao contrário**: copiar
+o produto para dentro de `dist/` de propósito e confirmar que reprova. Gate
+de publicação que passa quando não deveria entrega o produto de graça sem
+avisar ninguém.
+
+### Um risco irmão que ninguém levantou ainda
+
+Criar `dist/` cria **uma segunda cópia de cada página pública**.
+
+Os gates de hoje (`verificar-paginas.js`, `verificar-design.js`,
+`auditoria.js`) leem os arquivos da árvore do repositório. Depois da
+mudança, o site servido passa a ser o `dist/`. Se os gates continuarem
+lendo a origem, eles testam **uma coisa** e o visitante recebe **outra** —
+exatamente a classe de defeito que o gate de paridade existe para impedir
+no motor fiscal.
+
+Os gates de página precisam passar a ler o `dist/` construído. Isto não é
+detalhe de implementação: é o mesmo erro do produto contra o núcleo, num
+lugar novo.
+
+## Recomendação final
+
+**B — Worker único com Static Assets**, repositório privado, com estas
+condições:
+
+1. `dist/` contém **só** conteúdo público; os `folha-simples-*.html` ficam
+   fora dele e entram no bundle como módulos `Text`
+2. `/api/baixar` confere `payment_status === "paid"` **e** que a sessão
+   corresponde ao produto, via `metadata` do Payment Link com `line_items`
+   como segunda barreira
+3. resposta com `Content-Disposition: attachment` e os bytes no corpo —
+   **nunca um redirecionamento**, que recriaria uma URL pública
+4. `STRIPE_SECRET_KEY` só como secret da Cloudflare
+5. cartão e Pix no lançamento, **boleto desligado**, com o acoplamento
+   escrito no `ATIVAR-VENDA.md`
+6. gate `verificar-publicacao` por nome **e** por conteúdo, testado ao
+   contrário
+7. os gates de página passam a ler o `dist/` construído
+
+## Fontes do adendo
+
+- Cloudflare — Static Assets: <https://developers.cloudflare.com/workers/static-assets/>
+- Cloudflare — configuração e binding de assets: <https://developers.cloudflare.com/workers/static-assets/binding/>
+- Cloudflare — bundling do Wrangler (`rules`, tipo `Text`): <https://developers.cloudflare.com/workers/wrangler/bundling/>
+- Cloudflare — Workers Builds: <https://developers.cloudflare.com/workers/ci-cd/builds/>
+- Cloudflare — integração com GitHub: <https://developers.cloudflare.com/workers/ci-cd/builds/git-integration/github-integration/>
+- Cloudflare — limites da plataforma: <https://developers.cloudflare.com/workers/platform/limits/>
+- Stripe — pagamentos por boleto: <https://docs.stripe.com/payments/boleto/accept-a-payment>
+- Stripe — pagamentos por Pix: <https://docs.stripe.com/payments/pix>
+- Stripe — objeto Checkout Session (`line_items`, `payment_status`): <https://docs.stripe.com/api/checkout/sessions/object>
+- Stripe — criar Payment Link (`metadata`): <https://docs.stripe.com/api/payment-link/create>

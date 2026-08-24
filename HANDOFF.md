@@ -78,16 +78,43 @@ automaticamente**.
 |---|---|---|
 | Não fazer nada | Não | R$ 0, e o produto continua copiável |
 | GitHub Pro + repo privado | Só o segundo problema | ~US$ 4/mês; a URL do arquivo continua servindo para qualquer um |
-| Cloudflare Pages + Worker de entrega + repo privado | **Os dois** | **R$ 0/mês** |
+| **Worker único com Static Assets + repo privado** | **Os dois** | **R$ 0/mês** |
 | Serviço pronto (SendOwl, Lemon Squeezy, Gumroad) | Os dois | mensalidade ou taxa maior; em compensação um merchant of record assume a parte fiscal |
 
-**Recomendação: a terceira.** Um fornecedor, uma conta, R$ 0 por mês. O
-Worker é um arquivo de ~60 linhas: recebe o `session_id` que o Stripe passa
-no redirecionamento, pergunta à API do Stripe se aquela sessão foi paga, e
-só então devolve os bytes. A chave secreta mora num secret do Cloudflare,
-nunca no repositório. E o plano gratuito do Cloudflare Pages serve
-repositório privado, o que atende ao "não quero ser open source" **sem
-pagar o GitHub Pro**.
+**Recomendação: a terceira.** Um projeto na Cloudflare, R$ 0 por mês.
+
+Um Worker único serve o site estático (a partir de `dist/`) **e** roda o
+código de entrega, na mesma origem — então não existe CORS para configurar
+errado. Os arquivos pagos ficam **fora** de `dist/` e entram no bundle como
+módulos `Text`: viram string dentro do código compilado, sem URL que os
+alcance. O bundle grátis aguenta 3 MB comprimido e os dois produtos somam
+119 KB antes de comprimir.
+
+`/api/baixar` recebe o `session_id` que o Stripe passa no redirecionamento,
+pergunta à API do Stripe se a sessão foi paga **e se corresponde a este
+produto** (por `metadata` do Payment Link, com `line_items` como segunda
+barreira), e só então devolve os bytes com `Content-Disposition: attachment`.
+Conferir só `payment_status === "paid"` não basta: qualquer sessão paga da
+conta passaria, e o plano é ter quatro links de pagamento.
+
+A chave secreta mora num secret do Cloudflare. O Workers Builds conecta
+**repositório privado**, o que atende ao "não quero ser open source" sem
+pagar o GitHub Pro.
+
+**Meios de pagamento no lançamento: cartão e Pix. Boleto desligado.** Os
+dois primeiros confirmam na hora, e é isso que torna o webhook dispensável
+na v0.1. O boleto é, nas palavras do Stripe, um *delayed notification
+payment method* — 1 a 3 dias úteis — e com ele ligado o comprador chega à
+página de obrigado antes de o pagamento constar, leva 403 e não recebe o
+que pagou. Esse acoplamento é invisível e precisa estar escrito no
+`ATIVAR-VENDA.md`.
+
+**Dois gates que essa mudança exige** (nenhum existe ainda):
+`verificar-publicacao`, que reprova se o produto pago aparecer em `dist/` —
+por nome **e** por assinatura de conteúdo, porque glob não sobrevive a
+renomeação; e a migração dos gates de página para lerem o `dist/`
+construído, senão eles testam a origem enquanto o visitante recebe o build,
+que é a mesma classe de defeito que o gate de paridade existe para impedir.
 
 O custo dessa escolha não é dinheiro, é endereço: `kaiohomem.github.io`
 vira `algo.pages.dev` a menos que se compre um domínio, e isso quebra as
