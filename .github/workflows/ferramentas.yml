@@ -81,6 +81,13 @@ jobs:
       - name: Conferir se a demonstração está em dia
         run: node produtos/gerar-demo.js --verificar
 
+      # Gate: o build completo — o que quem compra o módulo de rescisão
+      # recebe — é gerado a partir do base mais o módulo. Se alguém
+      # editar um dos dois e esquecer de regerar, o comprador do upsell
+      # leva um arquivo desatualizado sem ninguém perceber.
+      - name: Conferir se o build completo está em dia
+        run: node produtos/gerar-completo.js --verificar
+
   navegador:
     name: Verificar as páginas no navegador
     runs-on: ubuntu-latest

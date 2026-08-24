@@ -5,6 +5,51 @@ alguém ter mudado de ideia costuma valer mais que a conclusão atual.
 
 ---
 
+## 2026-08-24 — Construir upsell e downsell, e o que não dá para construir
+
+**Decisão:** módulo de rescisão como upsell pós-compra, parcelamento
+como downsell, e order bump pelo "produtos recomendados" do Stripe.
+Revoga o adiamento registrado em 18/08 — o dono pediu duas vezes, e
+prioridade é dele.
+
+**O que existe de verdade e o que não existe.** O Payment Link do Stripe
+faz order bump. Não faz upsell de 1 clique nem downsell: os dois exigem
+cobrar de novo sem o cartão ser digitado outra vez, o que precisa de
+servidor. O que foi construído é oferta pós-compra na página de
+obrigado, com o cartão sendo digitado de novo. Converte menos que um OTO
+de verdade e é o que este site comporta.
+
+**Por que rescisão.** É a única coisa que o comprador precisa a seguir e
+o produto não faz — a página de venda já admite isso em texto. O motor
+já estava escrito e testado no `nucleo.js`.
+
+**Por que dois arquivos e não um com trava.** O comprador baixa o HTML e
+pode abrir num editor. `if (comprouOUpsell)` é uma linha que qualquer
+pessoa apaga. `folha-simples-completo-<hash>.html` é gerado do base mais
+o módulo, e o base não contém o código do módulo em lugar nenhum.
+
+**Por que o downsell é parcelamento e não desconto.** O que impede
+alguém de comprar rescisão logo depois de comprar a folha não é preço: é
+que ninguém está demitindo hoje. Isso é objeção de momento, e desconto
+não resolve objeção de momento — só ensina o comprador a recusar a
+primeira oferta para ganhar a segunda. O total parcelado é maior que o à
+vista, e o texto da oferta diz isso em voz alta.
+
+**Erro que quase foi para produção.** Portei o `custoDemissao` de
+memória em vez de ler o retorno real do `nucleo.js`. A forma era outra,
+então a comparação do gate era `undefined` contra `undefined` — e
+`Math.abs(undefined - undefined) > 0.011` é `false`. O gate passava
+verde sem comparar nada. Três defeitos estavam embaixo: custo calculado
+sobre o líquido em vez dos proventos, Simples pagando CPP, e RAT padrão
+de 1% em vez de 2%. Achado só porque o teste ao contrário existia. O
+`conferir()` do gate agora reprova valor não numérico.
+
+**Preços em aberto.** R$ 67 e 2× R$ 37 são o que veio configurado, não
+uma recomendação medida — não há venda nenhuma para calibrar em cima.
+Estão em `produtos/funil.js` para o dono trocar.
+
+---
+
 ## 2026-08-21 — Vendorizar o impeccable e medir contraste no pixel
 
 **Decisão:** commitar o skill do impeccable em `.claude/skills/` e trocar

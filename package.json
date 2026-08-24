@@ -10,8 +10,9 @@
     "motor": "node produtos/verificar-motor.js",
     "paginas": "node ferramentas/verificar-paginas.js",
     "sitemap": "node ferramentas/gerar-sitemap.js",
-    "verificar": "npm run teste && npm run consistencia && npm run auditoria && npm run motor && npm run paginas && npm run design",
-    "design": "node ferramentas/verificar-design.js"
+    "verificar": "npm run teste && npm run consistencia && npm run auditoria && npm run motor && npm run completo && npm run paginas && npm run design",
+    "design": "node ferramentas/verificar-design.js",
+    "completo": "node produtos/gerar-completo.js --verificar"
   },
   "devDependencies": {
     "playwright": "^1.49.0",

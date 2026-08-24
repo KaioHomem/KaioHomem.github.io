@@ -56,7 +56,10 @@ PAGINAS = PAGINAS.concat([
   'ferramentas/index.html',
   'produtos/folha-de-pagamento.html',
   'produtos/demo.html',
-  'produtos/obrigado.html'
+  'produtos/obrigado.html',
+  'produtos/obrigado-completo.html',
+  'produtos/folha-simples-fc86aa480de7f81c.html',
+  'produtos/folha-simples-completo-fc86aa480de7f81c.html'
 ]);
 
 var achados = [];

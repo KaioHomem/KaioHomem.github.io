@@ -39,6 +39,25 @@ new Function('exports', html.slice(ini, fim) +
   'exports.decimoTerceiroDe=decimoTerceiroDe;exports.feriasDe=feriasDe;'
 )(embutido);
 
+// O build completo carrega o mesmo motor mais o módulo de rescisão. Ele
+// é gerado a partir do base, então o que vale conferir aqui é só o que
+// o módulo acrescenta — o resto já foi comparado acima, no base.
+var htmlCompleto = fs.readFileSync(
+  path.join(__dirname, 'folha-simples-completo-fc86aa480de7f81c.html'), 'utf8');
+
+var iniC = htmlCompleto.indexOf('var TABELAS = {');
+var fimC = htmlCompleto.indexOf('/* ---------- FORMATO E ENTRADA ---------- */');
+if (iniC === -1 || fimC === -1 || fimC < iniC) {
+  console.error('Não encontrei o bloco do motor no build completo.');
+  console.error('Rode: node produtos/gerar-completo.js');
+  process.exit(1);
+}
+
+var completo = {};
+new Function('exports', htmlCompleto.slice(iniC, fimC) +
+  '\nexports.rescisaoDe=rescisaoDe;exports.custoDemissaoDe=custoDemissaoDe;'
+)(completo);
+
 var nucleo = require(path.join(RAIZ, 'ferramentas', 'nucleo.js'));
 
 var divergencias = [];
@@ -125,6 +144,104 @@ for (var sf = 500; sf <= 25000; sf += 173) {
   });
 }
 
+// ---------- RESCISÃO (só existe no build completo) ----------
+//
+// Cinco tipos de desligamento, e a diferença entre eles não é de grau: é
+// de quais verbas existem. Justa causa apaga 13º e férias proporcionais;
+// pedido de demissão pode DESCONTAR trinta dias; acordo paga metade do
+// aviso e 20% de multa. Um tipo mal portado passa despercebido na
+// leitura e aparece no bolso de alguém.
+var comparadosResc = 0;
+var TIPOS = ['sem-justa-causa', 'pedido-demissao', 'acordo', 'fim-contrato', 'justa-causa'];
+
+// Anos de casa: 0 e 5 não exercitam nada. O aviso é 30 dias mais 3 por
+// ano completo com teto de 90, então só a partir de 20 anos o teto
+// existe — abaixo disso dá para trocar o 90 por 120 sem ninguém notar.
+// Foi o que aconteceu quando testei ao contrário.
+var ANOS = [0, 5, 20, 30];
+
+// Regimes: no Simples não há CPP nem terceiros, e é o caso da maioria
+// dos compradores. Comparar só um regime deixaria os outros dois sem
+// nenhuma cobertura.
+var REGIMES = ['simples', 'simplesIV', 'normal'];
+
+// Comparar com NaN é o jeito silencioso de não comparar nada:
+// `Math.abs(undefined - undefined) > 0.011` é false, e o gate passa
+// verde sem ter olhado para nada. Foi exatamente assim que uma versão
+// errada do custo de demissão sobreviveu ao primeiro teste ao contrário.
+function conferir(rotulo, onde, produto, motor) {
+  if (!isFinite(produto) || !isFinite(motor)) {
+    divergencias.push(rotulo + ' em ' + onde + ': valor não numérico — ' +
+      'produto ' + produto + ', motor ' + motor +
+      ' (comparação com NaN passa despercebida; isto é um defeito do gate ou do porte)');
+    return;
+  }
+  if (Math.abs(produto - motor) > 0.011) {
+    divergencias.push(rotulo + ' em ' + onde + ': produto ' + produto + ', motor ' + motor);
+  }
+}
+
+for (var salR = 1621; salR <= 12000; salR += 421) {
+  TIPOS.forEach(function (tipo) {
+    [0, 2].forEach(function (dep) {
+      ANOS.forEach(function (anos) {
+        [false, true].forEach(function (vencidas) {
+          REGIMES.forEach(function (regime) {
+            comparadosResc++;
+            var entrada = {
+              salario: salR, tipo: tipo, dependentes: dep,
+              diasTrabalhadosNoMes: 17, anosCompletos: anos,
+              mesesPara13: 7, mesesParaFerias: 7,
+              feriasVencidas: vencidas, saldoFGTS: salR * 2,
+              avisoCumprido: false, regime: regime
+            };
+            var a = completo.rescisaoDe(entrada);
+            var b = nucleo.rescisao(entrada);
+            var onde = tipo + '/' + regime + ' R$' + salR + ' dep' + dep +
+                       ' anos' + anos + (vencidas ? ' venc' : '');
+
+            conferir('rescisão líquido', onde, a.liquido, b.liquido);
+            conferir('rescisão proventos', onde, a.totalProventos, b.totalProventos);
+            conferir('rescisão descontos', onde, a.totalDescontos, b.totalDescontos);
+            conferir('rescisão dias de aviso', onde, a.diasAviso, b.diasAviso);
+            conferir('rescisão FGTS sacável', onde, a.fgtsSacavel, b.fgtsSacavel);
+
+            Object.keys(b.proventos).forEach(function (k) {
+              conferir('provento ' + k, onde, a.proventos[k], b.proventos[k]);
+            });
+            Object.keys(b.descontos).forEach(function (k) {
+              conferir('desconto ' + k, onde, a.descontos[k], b.descontos[k]);
+            });
+
+            if (a.temSeguroDesemprego !== b.temSeguroDesemprego) {
+              divergencias.push('rescisão seguro-desemprego em ' + onde + ': produto ' +
+                a.temSeguroDesemprego + ', motor ' + b.temSeguroDesemprego);
+            }
+
+            // O custo do empregador: o que sai da conta, não o que o
+            // funcionário recebe. É onde mora a diferença entre líquido
+            // e proventos, e onde o regime decide se há CPP.
+            var ca = completo.custoDemissaoDe(entrada);
+            var cb = nucleo.custoDemissao(entrada);
+
+            conferir('custo total', onde, ca.total, cb.total);
+            conferir('custo ao trabalhador', onde, ca.aoTrabalhador, cb.aoTrabalhador);
+            conferir('custo retido do trabalhador', onde, ca.retidoDoTrabalhador, cb.retidoDoTrabalhador);
+            conferir('custo multa do FGTS', onde, ca.multaFGTS, cb.multaFGTS);
+            conferir('custo em salários', onde, ca.emSalarios, cb.emSalarios);
+            Object.keys(cb.encargos).forEach(function (k) {
+              conferir('encargo ' + k, onde, ca.encargos[k], cb.encargos[k]);
+            });
+            if (ca.regime !== cb.regime) {
+              divergencias.push('regime em ' + onde + ': produto ' + ca.regime + ', motor ' + cb.regime);
+            }
+          });
+        });
+      });
+    });
+  });
+}
+
 // Âncoras absolutas, para o caso de os DOIS motores estarem errados juntos.
 var ancoras = [
   ['líquido de R$ 5.000', embutido.folhaDe({ salario: 5000, dependentes: 0 }).liquido, 4498.49],
@@ -141,6 +258,7 @@ ancoras.forEach(function (a) {
 console.log(comparados + ' salários comparados entre o produto e o motor testado.');
 console.log(comparados13 + ' cenários de 13º comparados.');
 console.log(comparadosFer + ' cenários de férias comparados.');
+console.log(comparadosResc + ' cenários de rescisão comparados (5 tipos × 3 regimes × 4 tempos de casa).');
 console.log(ancoras.length + ' âncoras absolutas verificadas.');
 
 if (!divergencias.length) {

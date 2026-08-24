@@ -24,6 +24,9 @@ var RAIZ = path.join(__dirname, '..');
 // requests and produce an alarm that is simply wrong.
 var ORCAMENTO = {
   html: 60 * 1024,
+  // O arquivo que o comprador baixa: roda offline e não busca nada
+  // depois, então o custo é uma transferência única.
+  produto: 120 * 1024,
   cssPorPagina: 60 * 1024,
   jsPorPagina: 90 * 1024
 };
@@ -98,11 +101,21 @@ paginas.forEach(function (pagina) {
   });
 
   // Page weight.
+  //
+  // O produto vendido é um arquivo só, que carrega o motor fiscal, a
+  // interface e os recibos inteiros porque precisa rodar offline — não
+  // há segunda requisição para buscar nada. Baixa-se uma vez e abre-se
+  // do disco pelo resto do ano. Medir isso com o orçamento de uma
+  // página servida geraria um aviso permanente, e aviso permanente é
+  // como todo mundo aprende a ignorar a lista de avisos.
+  var ehProduto = /^produtos\/folha-simples/.test(relativo.split('\\').join('/'));
+  var teto = ehProduto ? ORCAMENTO.produto : ORCAMENTO.html;
+
   checagens++;
   var tamanho = Buffer.byteLength(html, 'utf8');
-  if (tamanho > ORCAMENTO.html) {
+  if (tamanho > teto) {
     aviso(relativo + ' pesa ' + Math.round(tamanho / 1024) + 'KB — acima do orçamento de ' +
-          Math.round(ORCAMENTO.html / 1024) + 'KB.');
+          Math.round(teto / 1024) + 'KB.');
   }
 
   // Language and viewport: cheap to forget, expensive on mobile ranking.

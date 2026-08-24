@@ -50,9 +50,11 @@ var EXTRAS = [
   'produtos/folha-de-pagamento.html',
   'produtos/demo.html',
   'produtos/obrigado.html',
-  // O arquivo que o comprador baixa. É o produto: se algo aqui quebrar,
-  // quebrou na mão de quem pagou.
-  'produtos/folha-simples-fc86aa480de7f81c.html'
+  'produtos/obrigado-completo.html',
+  // Os dois arquivos que o comprador baixa. São o produto: se algo aqui
+  // quebrar, quebrou na mão de quem pagou.
+  'produtos/folha-simples-fc86aa480de7f81c.html',
+  'produtos/folha-simples-completo-fc86aa480de7f81c.html'
 ];
 
 var problemas = [];
