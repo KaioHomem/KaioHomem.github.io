@@ -34,14 +34,16 @@ window.FUNIL = {
   upsell: {
     link: '',
     preco: 'R$ 67',
-    titulo: 'Falta a conta mais cara do ano',
-    // O argumento é o que o produto ainda NÃO faz — e a página de venda
-    // já admite isso em texto. Prometer o que não entrega seria pior.
-    corpo: 'O Folha Simples calcula folha, 13º e férias. Não calcula rescisão — ' +
-           'e rescisão é a conta que reúne saldo de salário, aviso proporcional, ' +
-           '13º, férias, terço e multa do FGTS, cada uma com uma regra própria. ' +
-           'O módulo acrescenta os cinco tipos de desligamento, o custo para a ' +
-           'empresa e o termo pronto para imprimir.',
+    titulo: 'O mesmo contrato tem cinco desfechos',
+    // A conta de UMA rescisão já é gratuita em custo-demissao.html, e o
+    // comprador descobre isso em dois cliques. O argumento tem de ser o
+    // que realmente não existe em outro lugar: comparar os cinco
+    // desfechos, o termo impresso, e tudo dentro do arquivo que ele já
+    // tem, com o cadastro que ele já digitou.
+    corpo: 'A conta de uma rescisão você já faz de graça na calculadora do site. ' +
+           'O que não existe em lugar nenhum é comparar os cinco desfechos do mesmo ' +
+           'contrato lado a lado, imprimir o termo, e ter isso dentro do arquivo que ' +
+           'você acabou de baixar — com os funcionários que você já cadastrou.',
     chamada: 'Adicionar o módulo de rescisão',
     entrega: 'https://kaiohomem.github.io/produtos/obrigado-completo.html'
   },
@@ -70,23 +72,50 @@ window.FUNIL = {
   var caixa = document.getElementById('funil');
   if (!caixa) return;
 
-  function valido(o) {
-    return o && typeof o.link === 'string' && /^https:\/\/buy\.stripe\.com\//.test(o.link);
-  }
-
-  // Sem link de upsell não há oferta nenhuma. O downsell sozinho não faz
-  // sentido: ele existe como resposta a uma recusa.
-  if (!valido(cfg.upsell)) return;
-
   function esc(t) {
     return String(t == null ? '' : t)
       .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;');
   }
 
+  function valido(o) {
+    return o && typeof o.link === 'string' && /^https:\/\/buy\.stripe\.com\//.test(o.link);
+  }
+
+  // Numa página que existe para entregar o arquivo, oferta sem link
+  // configurado não aparece: botão morto logo depois de a pessoa ter
+  // confiado dinheiro é o pior primeiro contato possível.
+  //
+  // Numa página que existe PARA a oferta, o silêncio é pior: sobra um
+  // texto que explica um produto e nunca diz como comprá-lo. Aí a
+  // página se explica em voz alta, do mesmo jeito que a página de venda
+  // já faz enquanto o Stripe não está ligado. É o `data-sempre` no
+  // contêiner que diz qual das duas é.
+  var sempre = caixa.hasAttribute('data-sempre');
+
+  // Numa página que já argumentou o assunto no h1, repetir o mesmo
+  // título dentro da oferta põe dois títulos idênticos na mesma tela.
+  // O contêiner pode dar o seu.
+  var tituloProprio = caixa.getAttribute('data-titulo');
+  function tituloDe(o) { return tituloProprio || o.titulo; }
+
+  if (!valido(cfg.upsell)) {
+    if (!sempre) return;
+    caixa.innerHTML =
+      '<div class="oferta">' +
+        '<h2>' + esc(tituloDe(cfg.upsell)) + '</h2>' +
+        '<p>' + esc(cfg.upsell.corpo) + '</p>' +
+        '<div class="oferta-preco">' + esc(cfg.upsell.preco) + '</div>' +
+        '<p class="sem-link">O pagamento deste módulo ainda não está ativo. ' +
+          'Se quiser agora, escreva para ' +
+          '<a href="mailto:kaiokateto@gmail.com">kaiokateto@gmail.com</a>.</p>' +
+      '</div>';
+    return;
+  }
+
   function oferta(o, id) {
     return '<div class="oferta" id="' + id + '">' +
-      '<h2>' + esc(o.titulo) + '</h2>' +
+      '<h2>' + esc(id === 'ofertaUpsell' ? tituloDe(o) : o.titulo) + '</h2>' +
       '<p>' + esc(o.corpo) + '</p>' +
       '<div class="oferta-preco">' + esc(o.preco) + '</div>' +
       '<a class="baixar oferta-cta" href="' + esc(o.link) + '">' + esc(o.chamada) + ' →</a>' +

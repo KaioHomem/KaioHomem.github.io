@@ -73,6 +73,19 @@ completo = trocar(completo,
 
 // 3) O painel, entre o cadastro e o resumo. Rescisão é uma pessoa por
 //    vez, então ele substitui a tabela em vez de acrescentar colunas.
+var ESTILO_COMPARACAO =
+'#comparacao{margin:2rem 0}' +
+'#comparacao h2{margin-bottom:.4rem}' +
+'.p-comparacao{color:var(--t2);margin-bottom:1rem;max-width:var(--medida)}' +
+'.linha-atual td{background:var(--bg3)}' +
+'.etiq{display:inline-block;font-family:var(--mono);font-size:var(--t-micro);' +
+'padding:.1rem .4rem;border-radius:4px;margin-left:.4rem;vertical-align:middle}' +
+'.etiq-atual{color:var(--ac);border:1px solid rgba(88,166,255,.45)}' +
+'.aviso-comparacao{font-size:var(--t-micro);color:var(--t3);margin:0 0 1rem;' +
+'max-width:var(--medida);line-height:1.6}\n';
+
+completo = trocar(completo, 'td.vazio{', ESTILO_COMPARACAO + 'td.vazio{', 'estilo da comparação');
+
 var ESTILO_MARCAR =
 '.marcar{display:flex;align-items:center;gap:.5rem;font-weight:400;color:var(--t2);' +
 'cursor:pointer;padding:.55rem 0;font-size:var(--t-base)}' +
@@ -130,6 +143,13 @@ completo = trocar(completo,
   '  <div class="resumo" id="resumo"></div>',
   PAINEL + '  <div class="resumo" id="resumo"></div>',
   'painel de rescisão');
+
+// A comparação entra DEPOIS da tabela de verbas: primeiro o dono vê a
+// conta que pediu, depois descobre que existem outras quatro.
+completo = trocar(completo,
+  '  <div class="aviso" id="avisoGeral"></div>',
+  '  <div id="comparacao"></div>\n\n  <div class="aviso" id="avisoGeral"></div>',
+  'bloco da comparação');
 
 // 4) A interface, junto das outras funções de render.
 completo = trocar(completo,

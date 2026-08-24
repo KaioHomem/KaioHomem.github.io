@@ -120,6 +120,7 @@ tfoot td{background:var(--bg3);font-weight:600;border-top:2px solid var(--bd)}
 /* td.vazio, não .vazio: `td:first-child{text-align:left}` tem
    especificidade maior e estava vencendo — o estado vazio aparecia
    encostado na esquerda em vez de centralizado. */
+#comparacao{margin:2rem 0}#comparacao h2{margin-bottom:.4rem}.p-comparacao{color:var(--t2);margin-bottom:1rem;max-width:var(--medida)}.linha-atual td{background:var(--bg3)}.etiq{display:inline-block;font-family:var(--mono);font-size:var(--t-micro);padding:.1rem .4rem;border-radius:4px;margin-left:.4rem;vertical-align:middle}.etiq-atual{color:var(--ac);border:1px solid rgba(88,166,255,.45)}.aviso-comparacao{font-size:var(--t-micro);color:var(--t3);margin:0 0 1rem;max-width:var(--medida);line-height:1.6}
 .marcar{display:flex;align-items:center;gap:.5rem;font-weight:400;color:var(--t2);cursor:pointer;padding:.55rem 0;font-size:var(--t-base)}.marcar input{width:1.1rem;height:1.1rem;flex:none;margin:0}
 td.vazio{text-align:center;padding:2.5rem 1.2rem;color:var(--t3)}
 .resumo{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:.9rem;margin-bottom:1rem}
@@ -254,6 +255,8 @@ dialog::backdrop{background:rgba(0,0,0,.7)}
 
   <div class="resumo" id="resumo"></div>
   <div class="tabela"><table id="tabela"></table></div>
+
+  <div id="comparacao"></div>
 
   <div class="aviso" id="avisoGeral"></div>
 
@@ -986,6 +989,7 @@ function renderRescisao(){
     el('tabela').innerHTML =
       '<tbody><tr><td class="vazio">Cadastre um funcionário acima para calcular a rescisão dele.</td></tr></tbody>';
     el('holerite').innerHTML = '';
+    el('comparacao').innerHTML = '';
     return;
   }
 
@@ -1035,7 +1039,78 @@ function renderRescisao(){
     '</td></tr>'+
     '</tbody>';
 
+  montarComparacao(f);
   montarTermoRescisao();
+}
+
+/* A comparação é o que a calculadora gratuita do site não faz.
+
+   A conta de uma rescisão já está disponível de graça em
+   custo-demissao.html, e vender de novo o que já é gratuito seria
+   mentira verificável em dois cliques. O que não existe em lugar nenhum
+   é esta tabela: os cinco desfechos do mesmo contrato, com o mesmo
+   funcionário e o mesmo tempo de casa, um ao lado do outro.
+
+   É a pergunta que o dono faz ANTES de decidir como encerrar — se o
+   acordo do art. 484-A sai mais barato que a dispensa, quanto se perde
+   esperando o pedido de demissão que não vem — e é uma pergunta de
+   decisão, não de conferência. */
+function compararTipos(f){
+  var TIPOS = [
+    ['sem-justa-causa', 'Dispensa sem justa causa'],
+    ['acordo',          'Acordo entre as partes'],
+    ['pedido-demissao', 'Pedido de demissão'],
+    ['fim-contrato',    'Fim de contrato'],
+    ['justa-causa',     'Dispensa por justa causa']
+  ];
+  return TIPOS.map(function(t){
+    var e = {};
+    for(var k in f) if(Object.prototype.hasOwnProperty.call(f,k)) e[k]=f[k];
+    e.tipo = t[0];
+    var c = custoDemissaoDe(e);
+    return { chave:t[0], nome:t[1], custo:c.total, liquido:c.rescisao.liquido,
+             fgts:c.rescisao.fgtsSacavel, seguro:c.rescisao.temSeguroDesemprego };
+  });
+}
+
+function montarComparacao(f){
+  var linhas = compararTipos(f);
+  var atual = rescisaoAtual.tipo;
+
+  /* Não existe selo de "mais barato" aqui, e a ausência é deliberada.
+     Numa tabela ordenada por custo, o menor valor cai quase sempre em
+     justa causa — e destacá-lo transforma um dado em recomendação de
+     registrar uma dispensa como justa causa para economizar. Isso é
+     fraude trabalhista, custa múltiplos da diferença mostrada, e o
+     aviso ao pé da tabela existe justamente para dizer isso. Um selo
+     verde convidando para o que o aviso proíbe é desenho trabalhando
+     contra o próprio texto.
+
+     Os números estão todos visíveis; quem quiser comparar, compara. */
+
+  el('comparacao').innerHTML =
+    '<h2>O mesmo contrato, cinco desfechos</h2>' +
+    '<p class="p-comparacao">Mesmo funcionário, mesmo tempo de casa, mesmo saldo de FGTS. ' +
+    'Só muda o motivo do desligamento — e é isso que decide quanto sai do caixa.</p>' +
+    '<p class="aviso-comparacao">O motivo é um fato do que aconteceu, não uma escolha de ' +
+    'planejamento. Registrar dispensa como pedido de demissão, ou justa causa sem a falta ' +
+    'que a justifique, é fraude trabalhista e custa muito mais que qualquer diferença desta ' +
+    'tabela. Ela serve para você saber o tamanho da conta antes de conversar.</p>' +
+    '<div class="tabela"><table><thead><tr>' +
+      '<th>Motivo</th><th>Sai do caixa</th><th>Ele recebe</th><th>FGTS que ele saca</th><th>Seguro</th>' +
+    '</tr></thead><tbody>' +
+    linhas.map(function(l){
+      var marca = l.chave === atual
+        ? ' <span class="etiq etiq-atual">selecionado</span>' : '';
+      return '<tr' + (l.chave === atual ? ' class="linha-atual"' : '') + '>' +
+        '<td>' + l.nome + marca + '</td>' +
+        '<td>' + brl(l.custo) + '</td>' +
+        '<td>' + brl(l.liquido) + '</td>' +
+        '<td>' + brl(l.fgts) + '</td>' +
+        '<td>' + (l.seguro ? 'sim' : '—') + '</td>' +
+      '</tr>';
+    }).join('') +
+    '</tbody></table></div>';
 }
 
 function montarTermoRescisao(){

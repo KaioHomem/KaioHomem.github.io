@@ -55,9 +55,6 @@
   transition:transform .3s var(--ease-spring),background-color var(--ease)}
 .btn-comprar:hover{background:#4ac860;color:var(--bg);transform:translateY(-2px)}
 .btn-comprar.indisponivel{background:var(--bg-3);color:var(--text-2);cursor:not-allowed;pointer-events:none}
-.tela{border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;margin:1.5rem 0;background:var(--bg-2)}
-.tela img{width:100%;display:block}
-.tela-legenda{padding:.7rem 1rem;font-size:.82rem;color:var(--text-3);border-top:1px solid var(--border)}
 .destaque-privacidade{background:var(--accent-dim);border:1px solid rgba(88,166,255,.3);
   border-radius:var(--radius-lg);padding:1.5rem;margin:2rem 0}
 .destaque-privacidade h3{margin-top:0;color:var(--accent)}
@@ -120,6 +117,26 @@
   border-radius:var(--radius-lg);padding:1.4rem 1.6rem;margin:2rem 0}
 .urgencia p{margin:0;color:var(--text-2)}
 
+/* O order bump fica entre o preço e o botão, que é onde a decisão de
+   levar mais uma coisa cabe: depois de o comprador aceitar o preço,
+   antes de ele clicar. Enquanto não houver o segundo link do Stripe o
+   bloco fica vazio e a caixa não existe. */
+.bump-caixa{display:grid;grid-template-columns:auto 1fr auto;gap:.8rem;align-items:start;
+  text-align:left;background:var(--bg-2);border:1px solid var(--border);
+  border-radius:var(--radius);padding:.95rem 1.1rem;margin:0 auto 1.2rem;
+  max-width:var(--medida);cursor:pointer;transition:border-color var(--ease)}
+.bump-caixa:hover{border-color:var(--green)}
+.bump-caixa input{width:1.15rem;height:1.15rem;margin-top:.15rem;accent-color:var(--green);
+  flex:none;cursor:pointer}
+.bump-texto{display:block}
+.bump-texto strong{display:block;color:var(--text);font-weight:600}
+.bump-detalhe{display:block;font-size:.84rem;color:var(--text-2);margin-top:.2rem}
+.bump-preco{font-family:var(--font-mono);color:var(--green);font-weight:600;white-space:nowrap}
+@media (max-width:520px){
+  .bump-caixa{grid-template-columns:auto 1fr;gap:.7rem}
+  .bump-preco{grid-column:2;margin-top:.3rem}
+}
+
 .link-demo{font-size:.9rem;color:var(--accent);font-weight:500}
 .caixa-demo{border:1px dashed var(--border);border-radius:var(--radius-lg);padding:1.5rem;margin:2rem 0}
 .caixa-demo h3{margin-top:0}
@@ -161,6 +178,7 @@
     <div class="rotulo" style="font-family:var(--font-mono);font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;color:var(--text-2);margin-bottom:.5rem">Pagamento único</div>
     <div class="valor">R$ 97</div>
     <div class="sub">Sem mensalidade. Sem cadastro. O arquivo é seu para sempre.</div>
+    <div id="bump"></div>
     <div class="botoes-compra">
       <a class="btn-comprar indisponivel" id="btComprar" href="#">Comprar agora →</a>
       <a class="btn-testar" href="demo.html">Testar agora, sem pagar →</a>

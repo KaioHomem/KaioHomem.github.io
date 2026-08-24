@@ -77,6 +77,7 @@ function renderRescisao(){
     el('tabela').innerHTML =
       '<tbody><tr><td class="vazio">Cadastre um funcionário acima para calcular a rescisão dele.</td></tr></tbody>';
     el('holerite').innerHTML = '';
+    el('comparacao').innerHTML = '';
     return;
   }
 
@@ -126,7 +127,78 @@ function renderRescisao(){
     '</td></tr>'+
     '</tbody>';
 
+  montarComparacao(f);
   montarTermoRescisao();
+}
+
+/* A comparação é o que a calculadora gratuita do site não faz.
+
+   A conta de uma rescisão já está disponível de graça em
+   custo-demissao.html, e vender de novo o que já é gratuito seria
+   mentira verificável em dois cliques. O que não existe em lugar nenhum
+   é esta tabela: os cinco desfechos do mesmo contrato, com o mesmo
+   funcionário e o mesmo tempo de casa, um ao lado do outro.
+
+   É a pergunta que o dono faz ANTES de decidir como encerrar — se o
+   acordo do art. 484-A sai mais barato que a dispensa, quanto se perde
+   esperando o pedido de demissão que não vem — e é uma pergunta de
+   decisão, não de conferência. */
+function compararTipos(f){
+  var TIPOS = [
+    ['sem-justa-causa', 'Dispensa sem justa causa'],
+    ['acordo',          'Acordo entre as partes'],
+    ['pedido-demissao', 'Pedido de demissão'],
+    ['fim-contrato',    'Fim de contrato'],
+    ['justa-causa',     'Dispensa por justa causa']
+  ];
+  return TIPOS.map(function(t){
+    var e = {};
+    for(var k in f) if(Object.prototype.hasOwnProperty.call(f,k)) e[k]=f[k];
+    e.tipo = t[0];
+    var c = custoDemissaoDe(e);
+    return { chave:t[0], nome:t[1], custo:c.total, liquido:c.rescisao.liquido,
+             fgts:c.rescisao.fgtsSacavel, seguro:c.rescisao.temSeguroDesemprego };
+  });
+}
+
+function montarComparacao(f){
+  var linhas = compararTipos(f);
+  var atual = rescisaoAtual.tipo;
+
+  /* Não existe selo de "mais barato" aqui, e a ausência é deliberada.
+     Numa tabela ordenada por custo, o menor valor cai quase sempre em
+     justa causa — e destacá-lo transforma um dado em recomendação de
+     registrar uma dispensa como justa causa para economizar. Isso é
+     fraude trabalhista, custa múltiplos da diferença mostrada, e o
+     aviso ao pé da tabela existe justamente para dizer isso. Um selo
+     verde convidando para o que o aviso proíbe é desenho trabalhando
+     contra o próprio texto.
+
+     Os números estão todos visíveis; quem quiser comparar, compara. */
+
+  el('comparacao').innerHTML =
+    '<h2>O mesmo contrato, cinco desfechos</h2>' +
+    '<p class="p-comparacao">Mesmo funcionário, mesmo tempo de casa, mesmo saldo de FGTS. ' +
+    'Só muda o motivo do desligamento — e é isso que decide quanto sai do caixa.</p>' +
+    '<p class="aviso-comparacao">O motivo é um fato do que aconteceu, não uma escolha de ' +
+    'planejamento. Registrar dispensa como pedido de demissão, ou justa causa sem a falta ' +
+    'que a justifique, é fraude trabalhista e custa muito mais que qualquer diferença desta ' +
+    'tabela. Ela serve para você saber o tamanho da conta antes de conversar.</p>' +
+    '<div class="tabela"><table><thead><tr>' +
+      '<th>Motivo</th><th>Sai do caixa</th><th>Ele recebe</th><th>FGTS que ele saca</th><th>Seguro</th>' +
+    '</tr></thead><tbody>' +
+    linhas.map(function(l){
+      var marca = l.chave === atual
+        ? ' <span class="etiq etiq-atual">selecionado</span>' : '';
+      return '<tr' + (l.chave === atual ? ' class="linha-atual"' : '') + '>' +
+        '<td>' + l.nome + marca + '</td>' +
+        '<td>' + brl(l.custo) + '</td>' +
+        '<td>' + brl(l.liquido) + '</td>' +
+        '<td>' + brl(l.fgts) + '</td>' +
+        '<td>' + (l.seguro ? 'sim' : '—') + '</td>' +
+      '</tr>';
+    }).join('') +
+    '</tbody></table></div>';
 }
 
 function montarTermoRescisao(){

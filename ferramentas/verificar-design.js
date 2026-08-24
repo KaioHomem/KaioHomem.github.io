@@ -58,6 +58,7 @@ PAGINAS = PAGINAS.concat([
   'produtos/demo.html',
   'produtos/obrigado.html',
   'produtos/obrigado-completo.html',
+  'produtos/oferta-rescisao.html',
   'produtos/folha-simples-fc86aa480de7f81c.html',
   'produtos/folha-simples-completo-fc86aa480de7f81c.html'
 ]);

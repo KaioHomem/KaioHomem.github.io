@@ -5,6 +5,54 @@ alguém ter mudado de ideia costuma valer mais que a conclusão atual.
 
 ---
 
+## 2026-08-24 (tarde) — A conta que eu ia vender já era gratuita
+
+**O que descobri antes de escrever a página de oferta:** a calculadora
+`ferramentas/custo-demissao.html` já faz, de graça, exatamente o que eu
+tinha escrito na oferta do módulo — verbas, INSS patronal, FGTS, total
+que sai do caixa. Vender "a conta que você não sabe fazer" por R$ 67
+seria mentira verificável em dois cliques, no mesmo site.
+
+**Decisão:** em vez de escrever uma página que exagera, fazer o módulo
+valer o preço. O que ele passa a ter e não existe em lugar nenhum é a
+**comparação dos cinco desfechos do mesmo contrato**, lado a lado. É a
+pergunta que o dono faz antes de decidir como encerrar, não depois. Mais
+o termo impresso, o cadastro já digitado e o funcionamento offline.
+
+A página de oferta diz isso em voz alta, numa seção chamada "O que já é
+de graça", antes de pedir dinheiro — e há uma tabela grátis-contra-módulo
+onde duas das sete linhas dizem "sim" nos dois lados.
+
+**Dois erros de desenho que eu mesmo cometi e corrigi:**
+
+1. A comparação ganhou um selo verde de "mais barato", e ele caía em
+   **justa causa** — lendo como recomendação de registrar dispensa como
+   justa causa para economizar. Isso é fraude trabalhista, e o aviso ao
+   pé da própria tabela dizia isso. Desenho trabalhando contra o próprio
+   texto. O selo saiu.
+
+2. Na página, o número grande em vermelho media dispensa contra justa
+   causa — R$ 25 mil enquadrados como "escolha". Justa causa é um fato
+   sobre o que aconteceu, não uma opção. O número passou a medir
+   **dispensa contra o acordo do art. 484-A**, que é a única comparação
+   da tabela que é decisão de verdade. Número menor e certo.
+
+**Order bump, versão que funciona sem servidor:** uma caixa na página de
+venda que troca qual link de pagamento o botão usa — R$ 97 sozinho ou
+R$ 164 com o módulo. Precisa de um segundo link no Stripe. O
+"produtos recomendados" do Stripe também serve e faz o mesmo dentro do
+checkout; este acontece antes, na página que a pessoa já estava lendo.
+
+**Vazamento que virou gate:** um teste de navegador quebrou antes de
+restaurar o arquivo de configuração e deixou `buy.stripe.com/combo` no
+disco; a execução seguinte leu isso como valor real. O
+`verificar-consistencia.js` agora reprova link de pagamento de teste e
+qualquer link que não seja do Stripe, e os testes restauram em
+`finally`. Um link inventado em produção manda quem confiou dinheiro
+para um 404.
+
+---
+
 ## 2026-08-24 — Construir upsell e downsell, e o que não dá para construir
 
 **Decisão:** módulo de rescisão como upsell pós-compra, parcelamento

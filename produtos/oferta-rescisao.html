@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Módulo de rescisão — Folha Simples</title>
+<meta name="description" content="O mesmo contrato tem cinco desfechos, e a diferença entre eles passa de R$ 20 mil. Compare aqui e veja o que o módulo acrescenta ao Folha Simples.">
+<link rel="canonical" href="https://kaiohomem.github.io/produtos/oferta-rescisao.html">
+
+<meta http-equiv="Content-Security-Policy" content="
+  default-src 'self';
+  script-src 'self';
+  style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+  font-src https://fonts.gstatic.com;
+  img-src 'self' data:;
+  connect-src 'none';
+  object-src 'none'; base-uri 'self'; form-action 'none';
+">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📋</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../ferramentas/tools.css">
+
+<style>
+/* A tabela é a página. Ela abre em tela cheia de leitura, não espremida
+   na medida de texto: são cinco linhas de números que se comparam na
+   horizontal, e estreitar isso destruiria a única coisa que a página faz. */
+.comparador{margin:1.6rem 0 0}
+.entradas{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1rem;
+  background:var(--bg-2);border:1px solid var(--border);border-radius:var(--radius-lg);
+  padding:1.2rem 1.3rem;margin-bottom:1.2rem}
+.tabela-comparacao{overflow-x:auto;border:1px solid var(--border);
+  border-radius:var(--radius-lg);padding:.5rem}
+.tabela-comparacao table{border-radius:var(--radius);overflow:hidden;width:100%;
+  border-collapse:collapse}
+.tabela-comparacao tr:last-child th,.tabela-comparacao tr:last-child td{border-bottom:none}
+.tabela-comparacao .motivo{text-align:left;white-space:nowrap}
+/* A diferença é o argumento inteiro numa célula: ela precisa ser lida
+   como valor, não como enfeite. Vermelho porque é dinheiro a menos
+   saindo, mesma convenção do resto do programa.
+
+   `nowrap` em todas as células de número porque sem ele o sinal e o
+   valor caem em linhas diferentes — "−" em cima e "R$ 3.834,00"
+   embaixo, que lê como duas coisas em vez de uma. */
+/* 0.7rem em vez dos 0.9rem herdados: com seis colunas e nowrap a tabela
+   passava a largura do contêiner por 5px, e a última coluna — que é o
+   argumento da página — ficava com a borda cortada. */
+.tabela-comparacao td,.tabela-comparacao th{white-space:nowrap;padding-left:.7rem;padding-right:.7rem}
+.tabela-comparacao .motivo{white-space:nowrap}
+.dif{color:var(--red)}
+.dif-zero{color:var(--text-3)}
+
+/* A dica só aparece onde a tabela realmente não cabe. Num desktop onde
+   ela cabe inteira, "arraste para o lado" seria instrução para um gesto
+   que não faz nada. */
+.dica-rolagem{display:none;font-size:0.75rem;color:var(--text-3);margin:.5rem 0 0}
+@media (max-width:820px){ .dica-rolagem{display:block} }
+
+.faixa-dif{display:flex;flex-wrap:wrap;align-items:baseline;gap:.5rem 1rem;
+  margin:1.4rem 0 0;padding:1.1rem 1.3rem;background:rgba(248,81,73,.09);
+  border-radius:var(--radius)}
+.faixa-dif strong{font-family:var(--font-mono);font-size:clamp(1.8rem,4.5vw,2.6rem);
+  color:var(--red);line-height:1;letter-spacing:-.02em}
+.faixa-dif span{color:var(--text-2)}
+
+.ja-gratis{border:1px dashed var(--border);border-radius:var(--radius-lg);
+  padding:1.3rem 1.4rem;margin:2.4rem 0}
+.ja-gratis h2{margin-top:0}
+.ja-gratis p{margin-bottom:.6rem}
+
+.o-que-muda{display:grid;gap:.1rem;margin:1.2rem 0 0;border:1px solid var(--border);
+  border-radius:var(--radius-lg);overflow:hidden}
+.o-que-muda div{display:grid;grid-template-columns:1fr auto auto;gap:1rem;
+  align-items:center;padding:.85rem 1.2rem;background:var(--bg-2)}
+.o-que-muda div:nth-child(odd){background:var(--bg)}
+.o-que-muda .col{font-family:var(--font-mono);font-size:0.75rem;color:var(--text-3);
+  min-width:5.5rem;text-align:center}
+.o-que-muda .sim{color:var(--green)}
+.o-que-muda .nao{color:var(--text-3)}
+.o-que-muda .cab{font-family:var(--font-mono);font-size:0.75rem;color:var(--text-3);
+  background:var(--bg-3)}
+
+.oferta{background:var(--green-dim);border:1px solid rgba(63,185,80,.35);
+  border-radius:var(--radius-lg);padding:2rem 1.8rem;margin:2.4rem 0 .6rem}
+.oferta h2{margin-top:0}
+.oferta-preco{font-family:var(--font-mono);font-size:2.4rem;font-weight:700;
+  color:var(--green);line-height:1;margin:.2rem 0 .3rem}
+.oferta-sub{color:var(--text-2);margin-bottom:1.3rem}
+.btn-oferta{display:inline-flex;align-items:center;gap:.6rem;background:var(--green);
+  color:var(--bg);font-weight:600;font-size:1.05rem;padding:1rem 2.2rem;
+  border-radius:var(--radius);text-decoration:none;
+  transition:transform .3s var(--ease-spring),background-color var(--ease)}
+.btn-oferta:hover{background:#4ac860;color:var(--bg);transform:translateY(-2px)}
+.recusa{margin:0 0 2.5rem}
+.btn-recusa{background:none;border:none;padding:.4rem 0;color:var(--text-3);
+  font-size:0.86rem;text-decoration:underline;text-underline-offset:3px}
+.btn-recusa:hover{color:var(--text-2)}
+.sem-link{color:var(--text-2);font-size:0.9rem;margin-top:1rem}
+@media (max-width:560px){
+  .o-que-muda div{grid-template-columns:1fr auto auto;gap:.5rem;padding:.75rem .9rem}
+  .o-que-muda .col{min-width:3.4rem;font-size:0.7rem}
+}
+</style>
+</head>
+<body data-ferramenta="" data-topo="minimo">
+
+<!--
+THESIS: o mesmo contrato tem cinco desfechos e a diferença entre eles é
+maior que o módulo custa. Recusa o padrão da categoria — página de OTO
+com contador, download refém e "esta oferta não aparece de novo".
+OWN-WORLD: o sistema já existente. Fundo #0d1117, IBM Plex Sans, todo
+número em JetBrains Mono, verde para dinheiro que fica, vermelho para
+dinheiro que sai, bordas de 1px, zero degradê.
+STORY: quem acabou de pagar R$ 97 descobre, dito em voz alta, que a
+conta de UMA rescisão já é gratuita neste site — e que o que não existe
+em lugar nenhum é comparar os cinco desfechos e imprimir o termo.
+FIRST VIEWPORT: título de uma linha, três campos, e a tabela viva dos
+cinco desfechos com números de verdade. O preço e a ação logo abaixo,
+sem rolagem extra em telas de 900px.
+FORM: demonstração ao vivo em vez de afirmação; 5ª de sete estruturas.
+FINISH: unreviewed and undocumented is unfinished; this build ends with
+the finish review, the verdict, DESIGN.md, and every shipping raster
+carrying its provenance.
+-->
+
+<header class="topo" id="topo"></header>
+
+<main class="wrap">
+
+  <div class="cabecalho">
+    <h1>O mesmo contrato tem cinco desfechos</h1>
+    <p class="resumo">
+      Mudar o motivo do desligamento muda quanto sai do caixa, quanto ele recebe e se ele
+      saca o FGTS. Ponha um salário e veja a diferença nos números de 2026 — inclusive entre
+      dispensar e fazer o acordo do art. 484-A, que é a escolha que existe de verdade.
+    </p>
+  </div>
+
+  <div class="comparador">
+    <div class="entradas">
+      <div class="campo"><label for="oSalario">Salário bruto (R$)</label>
+        <input id="oSalario" class="entrada" inputmode="decimal" value="3.000,00"></div>
+      <div class="campo"><label for="oAnos">Anos completos de casa</label>
+        <input id="oAnos" class="entrada" type="number" min="0" max="50" value="3"></div>
+      <div class="campo"><label for="oFgts">Saldo do FGTS (R$)</label>
+        <input id="oFgts" class="entrada" inputmode="decimal" value="8.640,00">
+        <span class="dica">Na data do pagamento.</span></div>
+    </div>
+
+    <div class="tabela-comparacao"><table id="tabelaComparacao"></table></div>
+    <p class="dica-rolagem">Arraste a tabela para o lado para ver todas as colunas.</p>
+
+    <div class="faixa-dif">
+      <strong id="difValor">—</strong>
+      <span id="difTexto"></span>
+    </div>
+  </div>
+
+  <article class="conteudo">
+
+    <div class="ja-gratis">
+      <h2>O que já é de graça</h2>
+      <p>
+        A conta de <strong>uma</strong> rescisão você faz sem pagar nada, aqui mesmo no site:
+        a <a href="../ferramentas/custo-demissao.html">calculadora de custo de demissão</a>
+        mostra as verbas, o INSS patronal, o FGTS e o total que sai do caixa. É o mesmo motor
+        que roda nesta página, e vai continuar aberto.
+      </p>
+      <p>
+        Digo isso antes de pedir dinheiro porque você descobriria em dois cliques, e um produto
+        que se vende escondendo o que já é gratuito não merece confiança no resto das contas.
+      </p>
+    </div>
+
+    <h2>O que o módulo acrescenta</h2>
+    <div class="o-que-muda">
+      <div class="cab"><span>&nbsp;</span><span class="col">grátis</span><span class="col">módulo</span></div>
+      <div><span>Calcular uma rescisão</span><span class="col sim">sim</span><span class="col sim">sim</span></div>
+      <div><span>Custo para o empregador</span><span class="col sim">sim</span><span class="col sim">sim</span></div>
+      <div><span>Comparar os cinco desfechos</span><span class="col nao">não</span><span class="col sim">sim</span></div>
+      <div><span>Termo de rescisão para imprimir</span><span class="col nao">não</span><span class="col sim">sim</span></div>
+      <div><span>Usa o cadastro que você já digitou</span><span class="col nao">não</span><span class="col sim">sim</span></div>
+      <div><span>Funciona sem internet</span><span class="col nao">não</span><span class="col sim">sim</span></div>
+      <div><span>Fica salvo com o resto da folha</span><span class="col nao">não</span><span class="col sim">sim</span></div>
+    </div>
+
+    <p>
+      O módulo entra no arquivo que você já baixou: mesmo cadastro, mesma competência,
+      e um modo novo no seletor. Nada para instalar de novo.
+    </p>
+
+    <div class="tela">
+      <img src="tela-rescisao.webp" width="1310" height="615" loading="lazy"
+           alt="Tela do módulo de rescisão: quatro números no topo com o custo total, o líquido do funcionário, os encargos e o FGTS sacável, e abaixo a tabela de verbas.">
+      <div class="tela-legenda">
+        A tela do módulo dentro do programa. O termo de rescisão sai pelo mesmo botão que
+        imprime os holerites.
+      </div>
+    </div>
+
+    <div id="funil" data-sempre data-titulo="Levar isso para dentro do seu arquivo"></div>
+
+    <h2>Perguntas</h2>
+
+    <details>
+      <summary>Preciso baixar tudo de novo?</summary>
+      <p>
+        Você baixa um arquivo novo, que faz tudo o que o antigo fazia mais rescisão. Use
+        <strong>Exportar backup</strong> no antigo e <strong>Importar</strong> no novo para levar
+        os funcionários junto, e depois apague o antigo — duas versões na mesma pasta é como se
+        abre a errada daqui a três meses.
+      </p>
+    </details>
+
+    <details>
+      <summary>E se as tabelas mudarem em janeiro?</summary>
+      <p>
+        A página de download continua sua e a versão atualizada aparece lá, sem pagar de novo.
+        Vale para o módulo igual vale para o programa.
+      </p>
+    </details>
+
+    <details>
+      <summary>Ele transmite alguma coisa para o eSocial?</summary>
+      <p>
+        Não. Ele calcula e imprime. Homologação, guias e transmissão continuam com o seu
+        contador — isto não substitui contador, e a rescisão é justamente o momento em que
+        um erro fica caro.
+      </p>
+    </details>
+
+    <div class="aviso">
+      <p>
+        <strong>Estimativa de apoio.</strong> Os cálculos seguem as tabelas de 2026 e a
+        jurisprudência consolidada — Súmula 305 do TST para o FGTS sobre o aviso indenizado,
+        Tema 478 do STJ para o INSS patronal, Tema 737 para as férias indenizadas. Acordo
+        coletivo, verbas específicas do contrato e adicionais entram à mão.
+      </p>
+    </div>
+
+  </article>
+</main>
+
+<footer class="rodape" id="rodape"></footer>
+
+<script src="../ferramentas/nucleo.js"></script>
+<script src="../ferramentas/app.js"></script>
+<script src="comparador-rescisao.js"></script>
+<script src="funil.js"></script>
+</body>
+</html>

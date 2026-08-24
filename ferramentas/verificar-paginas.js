@@ -51,6 +51,7 @@ var EXTRAS = [
   'produtos/demo.html',
   'produtos/obrigado.html',
   'produtos/obrigado-completo.html',
+  'produtos/oferta-rescisao.html',
   // Os dois arquivos que o comprador baixa. São o produto: se algo aqui
   // quebrar, quebrou na mão de quem pagou.
   'produtos/folha-simples-fc86aa480de7f81c.html',
