@@ -1,0 +1,47 @@
+{
+  "version": 1,
+  "skills": {
+    "ad-copy": {
+      "source": "robpalmer99/claude-code-copywriting-skills",
+      "sourceType": "github",
+      "skillPath": "ad-copy/SKILL.md",
+      "computedHash": "ed16355e2173bba50ff31ecf2c93c38de3b0e7b82d06cf2cf8f229298bd94138"
+    },
+    "compliance-checker": {
+      "source": "robpalmer99/claude-code-copywriting-skills",
+      "sourceType": "github",
+      "skillPath": "compliance-checker/SKILL.md",
+      "computedHash": "631aefdece9428fd2d6923047956a416ff4969828efe89d34b2dce6333cd48c5"
+    },
+    "copychief": {
+      "source": "robpalmer99/claude-code-copywriting-skills",
+      "sourceType": "github",
+      "skillPath": "copychief/SKILL.md",
+      "computedHash": "4c9ef99cb9f23d21c25adb26489008300ab670b66d7353654ee548e3a099d50a"
+    },
+    "direct-response-copy": {
+      "source": "robpalmer99/claude-code-copywriting-skills",
+      "sourceType": "github",
+      "skillPath": "direct-response-copy/SKILL.md",
+      "computedHash": "89895adf5e198e494144938529a7ce010e9df326f7f6c77901c73383dde36b8a"
+    },
+    "find-skills": {
+      "source": "vercel-labs/skills",
+      "sourceType": "github",
+      "skillPath": "skills/find-skills/SKILL.md",
+      "computedHash": "913b9d37d0d54047dd65222bb8c67b2bf04e3cb87dcad1729068d7a8b2c8c396"
+    },
+    "humanizer": {
+      "source": "blader/humanizer",
+      "sourceType": "github",
+      "skillPath": "SKILL.md",
+      "computedHash": "a9e52ffc97e9d8fdda35a6fb3967ace6fbc1ae3a0b7703774ad077fcf1e27153"
+    },
+    "landing-page-copy": {
+      "source": "robpalmer99/claude-code-copywriting-skills",
+      "sourceType": "github",
+      "skillPath": "landing-page-copy/SKILL.md",
+      "computedHash": "e4d51a1553c56b3aaec445e31ff71870eb16321daaaa24749cf1b34b947293b9"
+    }
+  }
+}
