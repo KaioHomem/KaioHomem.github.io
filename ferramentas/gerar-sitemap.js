@@ -22,6 +22,11 @@ var PAGINAS = [
   { caminho: 'index.html',                          url: '/',                                   prioridade: '0.8', frequencia: 'monthly' },
   { caminho: 'ferramentas/index.html',              url: '/ferramentas/',                       prioridade: '0.9', frequencia: 'weekly' },
   { caminho: 'produtos/folha-de-pagamento.html', url: '/produtos/folha-de-pagamento.html', prioridade: '0.9', frequencia: 'monthly' },
+  // A página do módulo é oferta pós-compra, mas funciona sozinha como
+  // comparador dos cinco desfechos — e "quanto custa demitir" e "acordo
+  // 484-A" são buscas de verdade. As páginas de entrega (obrigado) ficam
+  // de fora: são noindex e não servem a quem chega pela busca.
+  { caminho: 'produtos/oferta-rescisao.html',    url: '/produtos/oferta-rescisao.html',    prioridade: '0.7', frequencia: 'monthly' },
   { caminho: 'privacidade.html',                    url: '/privacidade.html',                   prioridade: '0.3', frequencia: 'yearly' },
   { caminho: 'ferramentas/salario-liquido.html',    url: '/ferramentas/salario-liquido.html',   prioridade: '1.0', frequencia: 'monthly' },
   { caminho: 'ferramentas/rescisao.html',           url: '/ferramentas/rescisao.html',          prioridade: '1.0', frequencia: 'monthly' },
