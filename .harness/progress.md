@@ -62,3 +62,19 @@ está fechada: quem roda local descobre o que a CI descobriria.
 
 Verify verde inteiro. Fila sem item vivo: tudo que resta é
 `blocked_human`. Nenhum push, nenhum efeito externo.
+
+## 2026-08-24 — Dogfood
+
+Sessão de contexto limpo recebeu só "siga o HARNESS.md" e reconstruiu
+sozinha: raiz, branch, HEAD, working tree, missão, 14 invariantes, fila,
+bloqueios com motivo, verify canônico e próximo passo. Sem nenhum resumo
+de conversa.
+
+Ela achou uma inconsistência que eu não tinha visto: o `harness:status`
+listava os bloqueados na ordem do array, e isso contradizia a ordem de
+execução escrita no handoff. Duas fontes discordando é o defeito que o
+Harness existe para não ter. Corrigido na origem — o array agora É a
+ordem, e o status diz isso.
+
+Também registrou, com razão, que o verde do `progress.md` é memória e não
+prova. É a disciplina certa.

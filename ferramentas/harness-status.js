@@ -90,7 +90,8 @@ console.log('Item atual   ' + (atual ? atual.id + ' — ' + atual.title +
   var lista = porStatus(s);
   if (!lista.length) return;
   console.log('');
-  console.log(s.toUpperCase() + ' (' + lista.length + ')');
+  console.log(s.toUpperCase() + ' (' + lista.length + ')' +
+              (s === 'blocked_human' ? '  — na ordem de execução' : ''));
   lista.forEach(function (i) {
     console.log('  ' + i.id.padEnd(14) + '[' + i.authority_class + '] ' + i.title);
     // O motivo do bloqueio importa mais que o bloqueio: sem ele, a

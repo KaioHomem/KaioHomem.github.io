@@ -127,6 +127,27 @@
       "checkpoint": "1ab6bda"
     },
     {
+      "id": "STRIPE-001",
+      "title": "Concluir o onboarding da conta Stripe",
+      "status": "blocked_human",
+      "priority": "high",
+      "authority_class": "C",
+      "dependencies": [],
+      "references": [
+        "produtos/ATIVAR-VENDA.md"
+      ],
+      "decision_refs": [],
+      "acceptance_criteria": [
+        "nome do negócio, telefone, termos e conta bancária preenchidos",
+        "a conta aceita criar Payment Link"
+      ],
+      "verification": [
+        "conferência humana no painel do Stripe"
+      ],
+      "blocker": "Ato jurídico em nome de uma pessoa. Nenhum processador aceita que um agente aceite termos ou informe conta bancária.",
+      "checkpoint": null
+    },
+    {
       "id": "CF-001",
       "title": "Criar a conta Cloudflare e conectar o repositório",
       "status": "blocked_human",
@@ -150,28 +171,7 @@
       "verification": [
         "conferência humana no painel da Cloudflare"
       ],
-      "blocker": "Conta externa. Agente não cria conta nem faz deploy. É o primeiro passo humano da migração.",
-      "checkpoint": null
-    },
-    {
-      "id": "STRIPE-001",
-      "title": "Concluir o onboarding da conta Stripe",
-      "status": "blocked_human",
-      "priority": "high",
-      "authority_class": "C",
-      "dependencies": [],
-      "references": [
-        "produtos/ATIVAR-VENDA.md"
-      ],
-      "decision_refs": [],
-      "acceptance_criteria": [
-        "nome do negócio, telefone, termos e conta bancária preenchidos",
-        "a conta aceita criar Payment Link"
-      ],
-      "verification": [
-        "conferência humana no painel do Stripe"
-      ],
-      "blocker": "Ato jurídico em nome de uma pessoa. Nenhum processador aceita que um agente aceite termos ou informe conta bancária.",
+      "blocker": "Conta externa. Agente não cria conta nem faz deploy. Independente de STRIPE-001: os dois podem começar em paralelo.",
       "checkpoint": null
     },
     {
@@ -316,5 +316,5 @@
       "found": "2026-08-24"
     }
   ],
-  "nota_current": "Nulo de propósito: o trabalho local desta missão acabou e todo item restante é blocked_human. O primeiro passo humano é STRIPE-001 ou CF-001 — ver a ordem em .harness/mission.md."
+  "nota_current": "Nulo de propósito: o trabalho local desta missão acabou e todo item restante é blocked_human. A ordem do array É a ordem de execução — o primeiro passo humano é STRIPE-001, e CF-001 pode correr em paralelo. Ver .harness/mission.md."
 }

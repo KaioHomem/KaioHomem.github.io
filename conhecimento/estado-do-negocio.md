@@ -12,7 +12,9 @@ comprador. Sem servidor, sem instalação, sem mensalidade.
 - Faz: folha mensal, **férias** e **13º salário**, com as tabelas de 2026
 - Emite recibo de pagamento por funcionário, imprimível
 - **Não faz**: rescisão, eSocial, transmissão de guias, FGTS Digital
-- Demonstração gratuita em `produtos/demo.html`, limitada a 2 funcionários
+- Demonstração gratuita em `produtos/demo.html`: folha mensal de até 2
+  funcionários. **Não faz 13º nem férias** — desde 24/08 essa capacidade é
+  removida do arquivo na geração, não desligada nele
 - Reembolso: 7 dias, sem justificativa
 
 Motor fiscal coberto por 187 testes automatizados e 3.820 cenários de
@@ -20,8 +22,12 @@ paridade contra o motor das calculadoras públicas.
 
 ## O funil hoje
 
-Calculadoras gratuitas (11) → página de venda → checkout Stripe → entrega
-por redirect para `obrigado.html`.
+Calculadoras gratuitas (11) → página de venda → checkout Stripe → redirect
+para `obrigado.html?session_id=…` → o Worker confere o pagamento no Stripe e
+só então devolve o arquivo. O produto não tem mais URL pública.
+
+⚠️ Construído e verde, **não migrado**: a Cloudflare ainda não existe e o
+site segue no GitHub Pages. Ver `.harness/work-items.json`.
 
 Duas das calculadoras miram quem compra, não quem trabalha:
 **custo de funcionário** e **custo de demissão**. As outras nove atendem
@@ -64,8 +70,13 @@ sobre desempenho é [HIPÓTESE] ou [MERCADO], nunca [FATO].
 
 - Site estático: sem carrinho abandonado, sem OTO de um clique, sem
   detecção server-side de nada
-- Repositório público: o código-fonte do produto é legível por qualquer um,
-  e a demo vira o produto completo trocando uma linha
+- Repositório público: o código-fonte do produto é legível por qualquer um
+  enquanto o repositório não for privado (ver `.harness/work-items.json`,
+  `GH-001`)
+- ~~A demo vira o produto completo trocando uma linha~~ — **deixou de valer em
+  2026-08-24.** O 13º e as férias saem do arquivo na geração; não há flag para
+  reativar. O gate `npm run separacao` prova a ausência. Motivo e alternativas
+  em `decisoes.md`
 - Sem CNPJ: a conta Stripe é de pessoa física
 
 ## Taxas de plataforma
