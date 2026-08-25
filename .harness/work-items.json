@@ -277,20 +277,44 @@
     },
     {
       "id": "PUSH-001",
-      "title": "Publicar os commits locais e tratar o PR #6",
-      "status": "blocked_human",
+      "title": "Publicar os commits locais e validar no CI remoto",
+      "status": "done",
       "priority": "medium",
       "authority_class": "C",
       "dependencies": [],
       "references": [],
       "decision_refs": [],
       "acceptance_criteria": [
-        "push autorizado pelo dono"
+        "push autorizado pelo dono, sem force e sem branch nova",
+        "CI remota verde nos quatro jobs",
+        "os gates novos comprovadamente executaram — conferido no log, não pelo selo"
       ],
       "verification": [
-        "CI verde no PR"
+        "gh: PR #6 check runs",
+        "logs de cada job"
       ],
-      "blocker": "Esta missão proíbe efeito remoto. Os commits ficam locais até autorização explícita.",
+      "blocker": null,
+      "checkpoint": "c1baa6d"
+    },
+    {
+      "id": "MERGE-001",
+      "title": "Mesclar o PR #6 na main",
+      "status": "blocked_human",
+      "priority": "medium",
+      "authority_class": "C",
+      "dependencies": [
+        "PUSH-001"
+      ],
+      "references": [],
+      "decision_refs": [],
+      "acceptance_criteria": [
+        "PR #6 sai de rascunho e é mesclado",
+        "depois dele, rebasear os PRs #2, #3 e #4 — ver backlog PR-CLEANUP"
+      ],
+      "verification": [
+        "PR #6 com state merged"
+      ],
+      "blocker": "Merge continua proibido. A autorização de 25/08 cobriu apenas o push para validar no CI, e disse explicitamente que merge segue vedado.",
       "checkpoint": null
     }
   ],
@@ -314,6 +338,11 @@
       "id": "DEMO-META-DUPLICADA",
       "note": "produtos/demo.html carrega duas tags <meta name=robots>, uma do gerador e outra herdada do produto. Inofensivo e cosmético.",
       "found": "2026-08-24"
+    },
+    {
+      "id": "PR-CORPO",
+      "note": "O corpo do PR #6 ficou velho: diz \"Onze commits\" (são 18) e cita 455 consistência / 326 auditoria, que hoje são 521 / 327. Não foi corrigido porque editar a descrição é escrita remota fora do que a autorização cobria. Vale ajustar antes de pedir revisão humana.",
+      "found": "2026-08-25"
     }
   ],
   "nota_current": "Nulo de propósito: o trabalho local desta missão acabou e todo item restante é blocked_human. A ordem do array É a ordem de execução — o primeiro passo humano é STRIPE-001, e CF-001 pode correr em paralelo. Ver .harness/mission.md."

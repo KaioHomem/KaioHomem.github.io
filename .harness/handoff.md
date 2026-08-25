@@ -8,7 +8,8 @@ Detalhe em `.harness/mission.md`.
 
 **Item atual:** nenhum. O trabalho local da missão acabou.
 
-**Último concluído:** `DEMO-001` — a demo perdeu 13º e férias de dentro do
+**Último concluído:** `PUSH-001` — commits publicados e validados na CI
+remota, checkpoint `c1baa6d`. Antes dele, `DEMO-001` — a demo perdeu 13º e férias de dentro do
 arquivo; o gate `separacao` prova a ausência e o `gate-separacao` prova que
 o gate reprova.
 
@@ -23,7 +24,7 @@ STRIPE-002  Payment Link (cartão e Pix; boleto NÃO)
 CF-002      segredo e preços no Worker
 GH-001      repositório privado   ← penúltimo, nunca primeiro
 GH-002      desligar o Pages      ← último
-PUSH-001    publicar os commits
+MERGE-001   mesclar o PR #6 (o push já foi feito e validado)
 ```
 
 **Riscos abertos:**

@@ -78,3 +78,21 @@ ordem, e o status diz isso.
 
 Também registrou, com razão, que o verde do `progress.md` é memória e não
 prova. É a disciplina certa.
+
+## 2026-08-25 — PUSH-001 · validação remota
+
+Push autorizado e feito: `1ab6bda..c1baa6d`, fast-forward, sem force, na
+branch remota que já existia.
+
+CI verde nos quatro jobs. **Conferido no log, não pelo selo** — cada gate
+imprimiu a própria contagem, e todas batem com o verify local: 187, 521,
+9.820, 20/20, 46, 325, 6/6, 9/9, 13/13, 327, 143/22, 22, bundle 35,69 KiB.
+Nenhuma divergência entre verde local e verde remoto.
+
+O job de cálculos fecha em 21 segundos fazendo tudo isso. Estranhei pela
+terceira vez nesta série e conferi pela terceira vez: os gates rodam em
+~4s de relógio no runner, e a paridade de 9.820 cenários leva 0,17s porque
+é aritmética pura. A duração continua não sendo evidência; a contagem é.
+
+PUSH-001 fechado. O merge virou MERGE-001, `blocked_human`: a autorização
+cobriu o push para validar, e disse que merge segue vedado.
