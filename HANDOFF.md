@@ -1,17 +1,19 @@
-# HANDOFF — Folha Simples
+# Guia do projeto — Folha Simples
 
-Escrito em 2026-08-24, na branch `claude/visual-pagina-venda`.
-**Revisado no mesmo dia**, depois de a premissa de entrega pelo Stripe ser
-verificada contra a documentação oficial e se revelar falsa — ver bloqueio 1.
+**Isto não é o estado do trabalho.** Estado — branch, HEAD, fila, o que
+fazer agora — vive em `HARNESS.md` e se recalcula com
+`npm run harness:status`. Comece por lá.
 
-Este é o documento de entrada. Quem chegar numa sessão nova lê isto antes de
-qualquer outra coisa e não precisa de mais nenhum contexto para continuar.
+Aqui fica o que não muda a cada sessão: por que a arquitetura é assim, o
+que cada arquivo faz, e as armadilhas que já custaram tempo a alguém.
 
-Ele não repete o registro de decisões — esse vive em
-[`conhecimento/decisoes.md`](conhecimento/decisoes.md) e é a memória longa do
-projeto. Aqui está o estado, a arquitetura, as armadilhas e o que falta.
-
----
+| Procurando | Vá para |
+|---|---|
+| como trabalhar, o que é proibido, como verificar | `HARNESS.md` |
+| onde o trabalho parou, a fila | `npm run harness:status` |
+| os invariantes que não se enfraquecem | `.harness/CONSTITUTION.md` |
+| por que cada decisão foi tomada | `conhecimento/decisoes.md` |
+| números do negócio e o que é hipótese | `conhecimento/estado-do-negocio.md` |
 
 ## Leia isto primeiro: dois bloqueios
 
@@ -121,40 +123,18 @@ vira `algo.pages.dev` a menos que se compre um domínio, e isso quebra as
 URLs do sitemap. Com tráfego em ~0, **este é o momento mais barato que vai
 existir para trocar.**
 
-### Estado: construído, não migrado
+### Estado
 
-A arquitetura foi aprovada e **implementada**. O que existe hoje:
+Construído e verde; **nada migrado**. O estado item a item está em
+`npm run harness:status`, não aqui.
 
-- `dist/` gerado por allowlist (`ferramentas/publico.js`), com os arquivos
-  pagos fora dele
-- `worker/index.js` — serve o site e entrega o produto, mesma origem
-- autorização cumulativa: sessão válida, paga, metadata `app`+`produto`, e
-  preço registrado. **Não existe parâmetro de produto na API** — quem escolhe
-  o arquivo é a sessão paga, não o navegador
-- 20 testes da entrega com o Stripe simulado; 6 testes ao contrário do gate
-  anti-vazamento
-- bundle medido: **35,48 KiB comprimido**, contra o teto de 3 MB do grátis
+### A ordem da migração termina no repositório privado
 
-**Nada foi feito nas contas.** O repositório continua público, o Pages
-continua no ar, não há chave de Stripe em lugar nenhum.
+Torná-lo privado **primeiro** derruba o site: no plano gratuito o GitHub
+Pages despublica ao virar privado, e não haveria substituto de pé.
 
-### A ordem da migração — e por que ela termina no repositório privado
-
-Tornar o repositório privado **primeiro** derruba o site: no plano gratuito
-o GitHub Pages despublica ao virar privado. O substituto precisa estar de pé
-e conferido antes.
-
-1. implementar ✅
-2. CI verde ✅
-3. criar a conta Cloudflare e conectar o repositório
-4. testar a URL de preview
-5. Stripe em modo de teste, simular uma compra ponta a ponta
-6. configurar produção
-7. confirmar o site funcionando na Cloudflare
-8. **então** tornar o repositório privado
-9. **então** desligar o GitHub Pages
-
-Os passos 3 a 9 são do dono. O `ATIVAR-VENDA.md` detalha cada um.
+A sequência completa está em `.harness/mission.md`, e cada passo virou um
+item em `.harness/work-items.json`, todos `blocked_human`.
 
 ### 2. Os quatro links do Stripe estão vazios
 
@@ -207,47 +187,6 @@ site, que existem para ranquear na busca e trazer quem já tem o problema.
 Duas das 11 miram quem compra (o empregador) e não quem trabalha: **custo de
 funcionário** e **custo de demissão**. As outras nove atendem o trabalhador e
 servem de porta de entrada.
-
----
-
-## Estado atual
-
-| Item | Estado |
-|---|---|
-| Site | no ar em `https://kaiohomem.github.io`, desde 2026-08-18 |
-| Produto base (R$ 97) | pronto, gerado, verificado |
-| Módulo de rescisão (R$ 67) | pronto, gerado, verificado |
-| Build completo (R$ 164) | gerado a partir do base + módulo |
-| Página de venda | pronta, passou pelo detector de design |
-| Order bump / upsell / downsell | construídos, **desligados por falta de link** |
-| Tráfego | ~0 |
-| Vendas | **0** |
-| Stripe | conta criada, produto e preço criados, **link não criado** |
-| Repositório | **público** (ver bloqueio 1) |
-| Branch de trabalho | `claude/visual-pagina-venda`, **12 commits** à frente de `main` |
-| PR | [#6](https://github.com/KaioHomem/KaioHomem.github.io/pull/6), **draft**, `mergeable_state: clean`, CI verde em `1d24475` |
-| Sitemap | 16 URLs; a página de oferta entrou, os arquivos do produto ficam de fora |
-| Entrega do produto | **construída e verde**, aguardando migração — ver bloqueio 1 |
-
-**Nenhuma métrica de conversão deste negócio existe.** Qualquer número sobre
-desempenho é hipótese ou benchmark de mercado, nunca fato. Isso está registrado
-em `conhecimento/estado-do-negocio.md` e deve continuar registrado até existir
-a primeira venda.
-
-### Pull requests abertos
-
-Todos em draft, nenhum mesclado:
-
-| PR | Branch | Assunto | Observação |
-|---|---|---|---|
-| [#6](https://github.com/KaioHomem/KaioHomem.github.io/pull/6) | `claude/visual-pagina-venda` | Design do site inteiro, módulo de rescisão, funil | 12 commits. CI verde. O corpo do PR ainda diz "onze commits" — foi escrito antes do HANDOFF entrar. |
-| [#4](https://github.com/KaioHomem/KaioHomem.github.io/pull/4) | `claude/hospedagem-segura` | Cabeçalhos de segurança e política de segredos | |
-| [#3](https://github.com/KaioHomem/KaioHomem.github.io/pull/3) | `claude/agentes-fase-0` | Fundação de agentes e Fase 0 | |
-| [#2](https://github.com/KaioHomem/KaioHomem.github.io/pull/2) | `claude/agente-marketing-roas` | Calculadora de ROAS/CPA e doutrina de tráfego pago | **Conflita com #6** em `ferramentas/app.js` e `ferramentas/index.html` |
-
-Os PRs #2, #3 e #4 saíram de uma base antiga (`4b3b45f`). Quem for mesclar
-deve começar pelo #6, que é o mais recente e o maior, e rebasear os outros em
-cima — não o contrário.
 
 ---
 
@@ -411,21 +350,24 @@ As duas variáveis de ambiente só são necessárias nos gates que abrem navegad
 
 Individualmente:
 
-| Comando | O que faz | Quanto passa hoje |
-|---|---|---|
-| `npm run dist` | constrói o diretório publicado | 61 arquivos |
-| `npm run teste` | testes do motor fiscal | 187/187 |
-| `npm run consistencia` | links, textos, configuração, Stripe, Worker | 491 |
-| `npm run auditoria` | peso, SEO, meta, orçamento — **no dist/** | 327 |
-| `npm run entrega` | autorização do download, Stripe simulado | 20/20 |
-| `npm run publicacao` | nada pago no dist/ | 325 |
-| `npm run gate-publicacao` | prova que o gate acima reprova | 6/6 |
-| `npm run bundle` | mede o Worker (`wrangler --dry-run`) | 35,48 KiB |
-| `npm run motor` | paridade produto × núcleo | ~9.820 cenários |
-| `npm run completo` | build completo em dia com base + módulo | — |
-| `npm run paginas` | navegador real, 22 páginas | 143 |
-| `npm run design` | detector do impeccable, 22 páginas | 22 |
-| `npm run sitemap` | regenera `sitemap.xml` | — |
+| Comando | O que faz |
+|---|---|
+| `npm run harness:check` | o Harness ainda descreve a realidade |
+| `npm run dist` | constrói o diretório publicado |
+| `npm run teste` | motor fiscal |
+| `npm run consistencia` | navegação, links, configuração, Worker |
+| `npm run motor` | paridade entre produto e núcleo |
+| `npm run completo` · `demo` | os builds gerados estão em dia |
+| `npm run entrega` | autorização do download, Stripe simulado |
+| `npm run separacao` | capacidade paga ausente da demo |
+| `npm run publicacao` | nada pago no `dist/` |
+| `npm run gate-*` | provam que os gates acima reprovam mesmo |
+| `npm run auditoria` | peso, SEO, meta, links — no `dist/` |
+| `npm run bundle` | mede o Worker (`wrangler --dry-run`) |
+| `npm run paginas` · `design` | navegador real e detector de design |
+
+As contagens de cada um mudam; não são copiadas para cá de propósito.
+Rode e leia o número que sair.
 
 `npm run paginas` leva ~4 minutos **neste container**, que é compartilhado.
 No runner do GitHub o mesmo gate fecha em ~40 segundos. Se estranhar a
@@ -435,45 +377,6 @@ diferença, é isso: a prova de que ele rodou é a contagem impressa no fim
 O CI (`.github/workflows/ferramentas.yml`) roda `npm run verificar` em Node 22,
 em push para `main`, em pull request, e no primeiro dia de cada mês às 09:00 UTC.
 A execução mensal existe porque tabela fiscal muda sozinha.
-
----
-
-## Regras que não se quebram
-
-Estas não são preferências. Cada uma nasceu de um erro concreto.
-
-1. **A matemática fiscal vive só em `nucleo.js`.** Cópias existem apenas dentro
-   do produto, e o gate de paridade prova que são idênticas.
-
-2. **Um gate que passa quando não deveria é pior que gate nenhum.** Todo gate
-   novo precisa ser testado ao contrário: quebre a coisa de propósito e
-   confirme que ele reprova. Todos os gates atuais foram negativados assim —
-   8 mutações no motor, `--text-3: #6e7681`, `opacity: 0.75`, a fonte Inter, um
-   link de teste, um link fora do Stripe, e o orçamento de peso nas duas
-   direções.
-
-3. **Nada de botão morto.** Link vazio → botão desabilitado com um caminho
-   alternativo. Nunca um 404, muito menos depois de a pessoa ter pago.
-
-4. **Nada de número inventado.** Se não há venda, não há taxa de conversão. Os
-   arquivos em `conhecimento/` marcam a origem de cada número
-   (fato / hipótese / mercado), e essa marcação é obrigatória.
-
-5. **O desenho não pode contradizer o texto.** O caso fundador: a comparação de
-   rescisões ganhou um selo verde de "mais barato" que caía em **justa causa** —
-   virando um convite a registrar dispensa como justa causa para economizar,
-   exatamente a fraude que o aviso ao pé da tabela proibia. O selo saiu. Há um
-   comentário longo em `produtos/modulo-rescisao-ui.js` explicando por quê, para
-   ninguém "melhorar" a página recolocando-o.
-
-6. **Admitir o que já é de graça.** A página de oferta do módulo tem uma seção
-   chamada "O que já é de graça", e na tabela grátis-contra-módulo **duas das
-   sete linhas dizem "sim" nos dois lados**. Vender o que o próprio site
-   entrega sem cobrar é mentira verificável em dois cliques.
-
-7. **Medida de leitura em `em`, não em `ch`.** A fórmula do impeccable é
-   `largura ÷ (tamanho da fonte × 0,5)`, então `36em` dá ~72 caracteres em
-   qualquer tamanho. O token é `--medida` em `ferramentas/tools.css`.
 
 ---
 
@@ -546,42 +449,18 @@ antes de investigar do zero.
     testando a coisa errada. Mesma família do `undefined` contra `undefined`.
     Injete uma indireção que resolve na hora da chamada.
 
-15. **Não existe assinatura de conteúdo que separe o produto base da demo.**
-    Medido: zero identificadores e zero frases exclusivas. `gerar-demo.js`
-    troca `var DEMO=null` por `var DEMO={limite:2}` e não remove nada. Quem
-    for endurecer o gate anti-vazamento procurando um trecho do base não vai
-    achar — o que protege o base é o hash exato. Mude a demo primeiro.
+15. **A demo é gerada removendo código, não sinalizando um flag.** Foi
+    assim que ela deixou de ser o produto base com um teto por cima. O
+    produto marca 18 regiões com `/*«PAGO»*/`; `gerar-demo.js` corta entre
+    elas e **recusa se a contagem mudar**. Se você editar o produto e
+    apagar uma sentinela sem querer, o gerador reclama — não publica uma
+    demo com capacidade paga dentro. Ver `conhecimento/decisoes.md`.
 
 16. **`custo-demissao.html` já entrega de graça a conta que o módulo cobraria.**
     Descoberto antes de escrever a página de oferta. O valor do módulo teve de
     ser reconstruído em cima da **comparação dos cinco desfechos**, não da conta
     de uma rescisão. Se alguém for reescrever a oferta, checar primeiro o que a
     calculadora gratuita já faz.
-
----
-
-## Decisões rejeitadas
-
-Registradas para não voltarem por esquecimento. O motivo completo está em
-`conhecimento/decisoes.md`.
-
-| Rejeitado | Quando | Por quê |
-|---|---|---|
-| Plano multi-empresa a R$ 297 | 2026-08-18 | Sem uma única venda de R$ 97, um degrau de preço é fantasia; e multi-empresa exige estado que o arquivo único não tem |
-| Migrar para Kiwify / Hotmart | 2026-08-18 | Taxa 2× maior que a do Stripe; a única vantagem real (afiliados) não serve com zero tráfego |
-| Publicar preço de concorrente na página de venda | 2026-08-18 | Números de terceiros sem fonte primária; envelhecem e viram mentira |
-| Vender modelos de documentos de RH | 2026-08-18 | Produto jurídico sem revisão jurídica |
-| Trava por flag dentro do arquivo único | 2026-08-24 | `if (comprou)` é uma linha que se apaga num editor de texto |
-| Downsell por desconto | 2026-08-24 | A objeção é de momento ("ninguém está demitindo hoje"), não de preço; desconto só ensina a recusar a primeira oferta |
-| Selo de "mais barato" na comparação | 2026-08-24 | Caía em justa causa e lia como recomendação de fraude trabalhista |
-| Manchete medindo dispensa × justa causa | 2026-08-24 | Justa causa é um fato sobre o que aconteceu, não uma opção; a comparação honesta é dispensa × acordo do art. 484-A |
-
-| Entregar o arquivo pago pelo próprio Stripe | 2026-08-24 | **Não existe.** O Stripe não hospeda arquivos; a documentação oficial de pós-pagamento só oferece mensagem ou redirecionamento. Era palpite meu escrito como fato na primeira versão deste documento |
-| Depósito de objetos (R2 / S3) para o arquivo | 2026-08-24 | Os dois arquivos somam 119 KB. Depósito de objetos existe para mover gigabytes; aqui seria mais um serviço e mais um par de credenciais para não ganhar nada |
-| Webhook + e-mail com link assinado, **agora** | 2026-08-24 | É a arquitetura mais robusta e continua sendo o segundo passo certo. Mas são três serviços em vez de um, antes de existir uma única venda |
-
-Também **revogada:** o adiamento de bump/upsell registrado em 2026-08-18. O
-dono pediu duas vezes, e prioridade é dele. Construídos em 2026-08-24.
 
 ---
 
@@ -614,38 +493,6 @@ host em vez de contornar. A ferramenta de busca alcança o conteúdo das
 mesmas páginas oficiais, então dá para pesquisar — mas é leitura de segunda
 mão, e o achado marca isso explicitamente. Quem for implementar deve reabrir
 os links no navegador.
-
----
-
-## Próximos passos, na ordem
-
-A ordem importa. Os três primeiros são do dono e nenhum agente pode fazer por
-ele; do quarto em diante é trabalho normal.
-
-1. **Concluir o onboarding do Stripe.** Dez minutos, uma vez. Passo a passo em
-   `produtos/ATIVAR-VENDA.md`. Sem isso não existe link, e sem link não existe
-   venda.
-
-2. **Criar o link de pagamento e colar em `produtos/pagamento.js`.** Um campo.
-   É o commit que liga a receita.
-
-3. **Executar a migração** — os passos 3 a 9 do bloqueio 1. O código está
-   pronto e verde; o que falta são ações nas suas contas, na ordem que
-   termina com o repositório privado, não começa.
-
-4. **Mesclar o PR #6.** Está verde e limpo. Depois dele, rebasear #2 (que
-   conflita), #3 e #4.
-
-5. **Criar os outros três links** (combo, upsell, downsell) — mas só depois de
-   existir a primeira venda. Otimizar ticket com zero vendas é otimizar zero.
-
-6. **Publicar o Instagram.** 17 cartões prontos em `marketing/posts/`, a conta
-   não existe. É o único canal com material feito e custo zero.
-
-7. **Investigar a pergunta 1** (dono ou contador). É a que mais muda o produto.
-
-8. **Domínio `folhasimples.app`.** Nunca comprado. Vale pouco antes da primeira
-   venda, mas é o passo que separa "página no GitHub" de "produto".
 
 ---
 

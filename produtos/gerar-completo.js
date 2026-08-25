@@ -67,8 +67,8 @@ completo = trocar(completo, MARCADOR,
 
 // 2) A opção no seletor de modo.
 completo = trocar(completo,
-  '<option value="ferias">Férias</option>',
-  '<option value="ferias">Férias</option>\n        <option value="rescisao">Rescisão</option>',
+  '<option value="ferias">Férias</option>\n/*«/PAGO»*/',
+  '<option value="ferias">Férias</option>\n/*«/PAGO»*/        <option value="rescisao">Rescisão</option>\n',
   'opção de modo');
 
 // 3) O painel, entre o cadastro e o resumo. Rescisão é uma pessoa por
@@ -159,22 +159,25 @@ completo = trocar(completo,
 
 // 5) Os três despachos por modo.
 completo = trocar(completo,
-  "  if(modoAtual()==='ferias'){ renderFerias(); return; }",
-  "  if(modoAtual()==='ferias'){ renderFerias(); return; }\n" +
-  "  if(modoAtual()==='rescisao'){ renderRescisao(); return; }",
+  "  if(modoAtual()==='ferias'){ renderFerias(); return; }\n/*«/PAGO»*/",
+  "  if(modoAtual()==='ferias'){ renderFerias(); return; }\n/*«/PAGO»*/" +
+  "  if(modoAtual()==='rescisao'){ renderRescisao(); return; }\n",
   'despacho de render');
 
 completo = trocar(completo,
-  "  if(modoAtual()==='ferias'){ montarRecibosFerias(); return; }",
-  "  if(modoAtual()==='ferias'){ montarRecibosFerias(); return; }\n" +
-  "  if(modoAtual()==='rescisao'){ montarTermoRescisao(); return; }",
+  "  if(modoAtual()==='ferias'){ montarRecibosFerias(); return; }\n/*«/PAGO»*/",
+  "  if(modoAtual()==='ferias'){ montarRecibosFerias(); return; }\n/*«/PAGO»*/" +
+  "  if(modoAtual()==='rescisao'){ montarTermoRescisao(); return; }\n",
   'despacho de impressão');
 
 // 6) No modo rescisão o cadastro de folha some: os campos dele não têm
 //    uso aqui, e deixar dois formulários na tela confunde qual vale.
+// A sentinela «/PAGO» fica entre o último campo e o `}`: ela marca onde
+// termina o que a demo remove. A âncora precisa incluí-la, senão casa
+// nada — e o gerador recusa, que foi como isto apareceu.
 completo = trocar(completo,
-  "  ferias:  ['campoDias', 'campoVendidos']\n};",
-  "  ferias:  ['campoDias', 'campoVendidos'],\n  rescisao: []\n};",
+  "  ferias:  ['campoDias', 'campoVendidos']/*«/PAGO»*/\n};",
+  "  ferias:  ['campoDias', 'campoVendidos']/*«/PAGO»*/,\n  rescisao: []\n};",
   'campos por modo');
 
 completo = trocar(completo,
@@ -190,14 +193,14 @@ completo = trocar(completo,
 //    seletor mostra "Rescisão", o valor é gravado, e modoAtual()
 //    devolve 'mensal' — a tela não muda e nada indica o porquê.
 //    A de normalizar() é a que sobrevive ao recarregar a página.
-var LISTA = "(m==='decimo' || m==='ferias') ? m : 'mensal'";
+var LISTA = "|| m==='ferias'/*«/PAGO»*/) ? m : 'mensal'";
 completo = trocar(completo, LISTA,
-  "(m==='decimo' || m==='ferias' || m==='rescisao') ? m : 'mensal'",
+  "|| m==='ferias'/*«/PAGO»*/ || m==='rescisao') ? m : 'mensal'",
   'lista branca de modoAtual');
 
-var LISTA_NORM = "(emp.modo==='decimo' || emp.modo==='ferias') ? emp.modo : 'mensal'";
+var LISTA_NORM = "|| emp.modo==='ferias'/*«/PAGO»*/) ? emp.modo : 'mensal'";
 completo = trocar(completo, LISTA_NORM,
-  "(emp.modo==='decimo' || emp.modo==='ferias' || emp.modo==='rescisao') ? emp.modo : 'mensal'",
+  "|| emp.modo==='ferias'/*«/PAGO»*/ || emp.modo==='rescisao') ? emp.modo : 'mensal'",
   'lista branca de normalizar');
 
 // 8) Ligar os campos do painel, uma vez, na mesma linha em que o

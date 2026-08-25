@@ -91,8 +91,19 @@ jobs:
       # editar o produto e esquecer de regenerar, a demo passa a calcular
       # diferente do que o comprador leva — e demo que mente sobre o
       # produto é pior que demo nenhuma.
+      # Gate: o Harness precisa descrever a realidade antes de qualquer
+      # outra coisa — é por ele que a próxima sessão se orienta.
+      - name: Conferir o Harness
+        run: node ferramentas/harness-check.js
+
       - name: Conferir se a demonstração está em dia
         run: node produtos/gerar-demo.js --verificar
+
+      # Gate: a capacidade paga (13º e férias) tem de estar AUSENTE da
+      # demonstração, não desligada nela. As assinaturas são derivadas do
+      # próprio produto a cada execução, então não envelhecem.
+      - name: Conferir a separação entre demo e produto pago
+        run: node ferramentas/verificar-demo.js
 
       # Gate: o build completo — o que quem compra o módulo de rescisão
       # recebe — é gerado a partir do base mais o módulo. Se alguém
@@ -120,6 +131,12 @@ jobs:
       # arquivo que custa R$ 97.
       - name: Provar que o gate de publicação reprova mesmo
         run: node ferramentas/testar-gate-publicacao.js
+
+      - name: Provar que o gate da demonstração reprova mesmo
+        run: node ferramentas/testar-gate-demo.js
+
+      - name: Provar que o check do Harness reprova mesmo
+        run: node ferramentas/testar-harness-check.js
 
       # Gate: o bundle precisa caber no plano grátis (3 MB comprimido)
       # e os imports de texto precisam resolver. O dry-run falha se um

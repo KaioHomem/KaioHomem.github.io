@@ -5,6 +5,78 @@ alguém ter mudado de ideia costuma valer mais que a conclusão atual.
 
 ---
 
+## 2026-08-24 (noite) — A demo passa a ser limitada por ausência
+
+**Decisão (Classe B):** `produtos/demo.html` deixa de ser o produto com um
+flag por cima. O 13º salário e as férias — a capacidade que o base vende
+além do que a demo mostra — são **removidos do arquivo** na geração.
+
+**O problema, medido e não suposto.** O `DEMO` do produto controlava três
+coisas: a chave do localStorage, a marca d'água do holerite e o teto de 2
+funcionários. Nada mais. `var DEMO=null` devolvia o produto de R$ 97
+inteiro. A comparação entre base e demo achava **zero** identificadores ou
+frases exclusivos do base — a demo o continha por completo.
+
+Trava que se desfaz num editor de texto não é trava.
+
+**Alternativas consideradas.**
+
+*Manter e documentar o limite.* Rejeitada: a página de venda oferece a demo
+como amostra, e a amostra era o produto. Documentar não muda isso.
+
+*Cifrar ou ofuscar a capacidade dentro da demo.* Rejeitada: o comprador
+roda tudo no navegador dele, então a chave viajaria junto. É DRM
+impossível, e C14 proíbe prometer o que não se cumpre.
+
+*Servir a demo por trás do Worker.* Rejeitada por custo/benefício: a demo
+existe para ser aberta sem atrito, e gatear a amostra derruba a conversão
+para proteger o que é isca.
+
+*Remover a capacidade paga do artefato gratuito.* **Escolhida.** É o mesmo
+padrão que o projeto já usava para a rescisão, ao contrário: o
+`gerar-completo.js` **acrescenta** um modo ao base; agora o
+`gerar-demo.js` **remove** dois.
+
+**Como.** O produto base marca 18 regiões com sentinelas `/*«PAGO»*/`. O
+gerador remove entre elas e recusa se a contagem mudar — assim, apagar uma
+sentinela ao editar o produto vira erro barulhento em vez de capacidade
+paga vazando para a demo em silêncio.
+
+**Trade-off aceito.** A demo demonstra menos: folha mensal para até dois
+funcionários, sem 13º e sem férias. Perde poder de convencimento, ganha
+honestidade — e o que ela mostra continua sendo o cálculo real, com o mesmo
+layout e o mesmo holerite.
+
+**Rollback.** `git revert` do commit. A demo volta a ser gerada por flag, e
+o gate `separacao` volta a reprovar — que é o comportamento correto para
+aquele estado.
+
+**O gate deriva as assinaturas do próprio produto**, a cada execução, em
+vez de tê-las escritas à mão. Uma lista fixa envelhece: renomear a função
+no produto faria o gate procurar para sempre por algo que ninguém escreve,
+e passar por estar cego. Derivando, renomear a função renomeia a
+assinatura junto. Ele também reprova se sobrarem poucas assinaturas — a
+cegueira é detectada, não sofrida.
+
+**Três defeitos meus, achados pelos próprios testes:**
+
+1. Uma sentinela mal posicionada engoliu o valor de `mensal` em
+   `CAMPOS_POR_MODO` e gerou `mensal: };`. A demo saiu com `SyntaxError` e
+   **todos os outros gates continuaram verdes**, porque nenhum executava o
+   script. Virou a checagem de sintaxe do gate.
+2. Sobraram leituras de `fMeses`, `fDias` e `fVendidos` de elementos que eu
+   já havia removido — `limparCampos()` daria `TypeError` no clique. Achado
+   pelo gate, não por leitura.
+3. O gate conferia a capacidade gratuita com `indexOf('folhaDe')`, que acha
+   as chamadas mesmo com a função removida. Passou a exigir
+   `function folhaDe(`.
+
+**Efeito colateral registrado:** quatro âncoras do `gerar-completo.js`
+colidiram com as sentinelas novas. O gerador **recusou** em vez de produzir
+build quebrado — o desenho de falhar alto se pagou.
+
+---
+
 ## 2026-08-24 (noite) — A entrega gateada, construída
 
 **Decisão:** um Worker único da Cloudflare com Static Assets serve o site e

@@ -5,11 +5,17 @@
   "description": "Calculadoras trabalhistas brasileiras e o produto Folha Simples. O site publicado é o dist/, gerado a partir do allowlist em ferramentas/publico.js.",
   "scripts": {
     "dist": "node ferramentas/gerar-dist.js",
+    "harness:status": "node ferramentas/harness-status.js",
+    "harness:check": "node ferramentas/harness-check.js",
+    "gate-harness": "node ferramentas/testar-harness-check.js",
     "teste": "node ferramentas/testes.js",
     "consistencia": "node ferramentas/verificar-consistencia.js",
     "auditoria": "node ferramentas/auditoria.js",
     "motor": "node produtos/verificar-motor.js",
     "completo": "node produtos/gerar-completo.js --verificar",
+    "demo": "node produtos/gerar-demo.js --verificar",
+    "separacao": "node ferramentas/verificar-demo.js",
+    "gate-separacao": "node ferramentas/testar-gate-demo.js",
     "publicacao": "node ferramentas/verificar-publicacao.js",
     "gate-publicacao": "node ferramentas/testar-gate-publicacao.js",
     "entrega": "node worker/testes.js",
@@ -17,7 +23,7 @@
     "paginas": "node ferramentas/verificar-paginas.js",
     "design": "node ferramentas/verificar-design.js",
     "sitemap": "node ferramentas/gerar-sitemap.js",
-    "verificar": "npm run dist && npm run teste && npm run consistencia && npm run motor && npm run completo && npm run entrega && npm run publicacao && npm run gate-publicacao && npm run auditoria && npm run paginas && npm run design"
+    "verificar": "npm run harness:check && npm run dist && npm run teste && npm run consistencia && npm run motor && npm run completo && npm run demo && npm run entrega && npm run separacao && npm run publicacao && npm run gate-harness && npm run gate-publicacao && npm run gate-separacao && npm run auditoria && npm run bundle && npm run paginas && npm run design"
   },
   "devDependencies": {
     "playwright": "^1.49.0",
