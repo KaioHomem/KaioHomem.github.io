@@ -288,6 +288,98 @@ function varrerCifrao(arquivo) {
   );
 })();
 
+/* ---------- LINKS DE PAGAMENTO ----------
+
+   Os arquivos de configuração de pagamento são preenchidos à mão, e os
+   testes de navegador os reescrevem com URLs falsas para exercitar os
+   caminhos. Um teste que quebra antes de restaurar deixa a URL falsa no
+   disco — foi o que aconteceu aqui: um `https://buy.stripe.com/combo`
+   sobreviveu a uma execução interrompida e a seguinte o leu como se
+   fosse o valor de verdade.
+
+   Um link de pagamento inventado que chega em produção manda quem
+   confiou dinheiro para um 404 do Stripe. Este gate existe para que
+   isso quebre a CI em vez de quebrar uma venda. */
+(function () {
+  var CONFIGS = ['produtos/pagamento.js', 'produtos/funil.js'];
+  var FALSOS = /buy\.stripe\.com\/(base|combo|teste|test|exemplo|example|fake|demo)\b/i;
+
+  CONFIGS.forEach(function (rel) {
+    var caminho = path.join(RAIZ, rel);
+    if (!fs.existsSync(caminho)) return;
+    var texto = fs.readFileSync(caminho, 'utf8');
+
+    checagens++;
+    var achado = texto.match(FALSOS);
+    if (achado) {
+      problemas.push(rel + ' tem um link de pagamento de teste: ' + achado[0] +
+        '. Algum teste de navegador não restaurou o arquivo. Preencha com o link ' +
+        'real do Stripe ou deixe vazio.');
+    }
+
+    // Link presente tem de ser do Stripe. Um endereço de outro domínio
+    // num campo de pagamento é, na melhor hipótese, um engano.
+    var re = /link:\s*'([^']+)'/g;
+    var m;
+    while ((m = re.exec(texto)) !== null) {
+      checagens++;
+      if (!/^https:\/\/buy\.stripe\.com\//.test(m[1])) {
+        problemas.push(rel + ' tem um link que não é do Stripe: ' + m[1]);
+      }
+    }
+  });
+})();
+
+/* ---------- O WORKER E A FONTE DE VERDADE NÃO PODEM DIVERGIR ----------
+
+   O nome dos arquivos pagos aparece em dois lugares: declarado em
+   publico.js e importado no worker/index.js. São dois porque o Worker
+   roda noutro runtime e não dá para ele exigir o módulo de Node.
+
+   Duas cópias de um nome é sempre uma esperando para envelhecer. Se
+   alguém regerar o produto com outro hash e ajustar só um dos lados, o
+   Wrangler falha no deploy — mas só lá na frente, e o gate aqui é mais
+   barato que descobrir na hora de publicar. */
+(function () {
+  var publico = require('./publico');
+  var worker = fs.readFileSync(path.join(RAIZ, 'worker', 'index.js'), 'utf8');
+
+  Object.keys(publico.PAGOS).forEach(function (chave) {
+    var arquivo = publico.PAGOS[chave].arquivo;
+    var nome = path.basename(arquivo);
+    checagens++;
+    if (worker.indexOf(nome) === -1) {
+      problemas.push('worker/index.js não importa "' + nome + '", que publico.js ' +
+                     'declara como o produto "' + chave + '". Um dos dois está velho.');
+    }
+
+    // E o arquivo declarado tem de existir de verdade.
+    checagens++;
+    if (!fs.existsSync(path.join(RAIZ, arquivo))) {
+      problemas.push('publico.js declara o produto "' + chave + '" em ' + arquivo +
+                     ', que não existe.');
+    }
+  });
+
+  // Nenhum segredo no arquivo versionado do Wrangler. `vars` é público
+  // por natureza; chave do Stripe entra como secret, fora do repositório.
+  var wrangler = fs.readFileSync(path.join(RAIZ, 'wrangler.toml'), 'utf8');
+  checagens++;
+  if (/\b(sk_live_|sk_test_|rk_live_)/.test(wrangler)) {
+    problemas.push('wrangler.toml contém o que parece ser uma chave do Stripe. ' +
+                   'Ela nunca pode ser versionada — use `wrangler secret put`.');
+  }
+
+  // O diretório de assets tem de ser o dist/, e não a raiz. Apontar
+  // `directory` para "." publicaria o repositório inteiro, produto pago
+  // incluído — em um caractere.
+  checagens++;
+  if (!/directory\s*=\s*"\.\/dist"/.test(wrangler)) {
+    problemas.push('wrangler.toml não aponta os assets para ./dist. ' +
+                   'Qualquer outro diretório publica mais do que deveria.');
+  }
+})();
+
 /* ---------- RESULT ---------- */
 console.log('\n' + '-'.repeat(52));
 if (problemas.length === 0) {

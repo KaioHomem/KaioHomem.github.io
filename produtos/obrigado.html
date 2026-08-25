@@ -12,23 +12,46 @@
   style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
   font-src https://fonts.gstatic.com;
   img-src 'self' data:;
-  connect-src 'none';
+  connect-src 'self';
   object-src 'none'; base-uri 'self'; form-action 'none';
 ">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✅</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../ferramentas/tools.css">
 <style>
-.baixar{display:inline-flex;align-items:center;gap:.6rem;background:var(--green);color:var(--bg);
-  font-weight:600;font-size:1.1rem;padding:1.1rem 2.4rem;border-radius:var(--radius);
-  text-decoration:none;margin:1rem 0}
-.baixar:hover{background:#4ac860;color:var(--bg)}
-.passo{background:var(--bg-2);border:1px solid var(--border);border-left:3px solid var(--accent);
-  border-radius:var(--radius);padding:1rem 1.2rem;margin-bottom:.8rem}
+/* Lista ordenada de verdade: a numeração vem do <ol>, não digitada à mão
+   dentro de um <strong> que também serve para dar ênfase no meio da
+   frase. E sem tarja lateral de 3px — o número já ordena. */
+/* `.conteudo li::before` do tools.css desenha um ▸ e tem especificidade
+   maior que `.passo::before`: sem o `li.` na frente, o número do passo
+   não aparecia e vinha a setinha da lista comum no lugar. */
+.passos{list-style:none;counter-reset:passo;margin:0;padding:0}
+li.passo{background:var(--bg-2);border:1px solid var(--border);border-radius:var(--radius);
+  padding:1rem 1.2rem 1rem 2.7rem;margin-bottom:.8rem;
+  counter-increment:passo;position:relative}
+li.passo::before{content:counter(passo) ".";position:absolute;left:1.2rem;
+  font-family:var(--font-mono);color:var(--accent);font-weight:600}
 .passo strong{color:var(--text)}
+
+/* A oferta vem depois do download e depois do passo a passo, nunca
+   antes: quem acabou de pagar veio buscar o arquivo, e empurrar uma
+   segunda compra na frente dele é o jeito mais rápido de transformar
+   uma venda boa num pedido de reembolso. */
+.oferta{background:var(--bg-2);border:1px solid rgba(63,185,80,.35);border-radius:var(--radius-lg);
+  padding:1.6rem 1.5rem;margin:2rem 0 .6rem;max-width:var(--medida)}
+.oferta h2{margin-top:0}
+.oferta p{margin-bottom:1rem}
+.oferta-preco{font-family:var(--font-mono);font-size:1.6rem;font-weight:700;color:var(--green);
+  line-height:1;margin-bottom:1rem}
+.oferta-cta{margin:0}
+.oferta-recusa{margin:0 0 2rem}
+.btn-recusa{background:none;border:none;padding:0;color:var(--text-3);font-size:0.86rem;
+  text-decoration:underline;text-underline-offset:3px}
+.btn-recusa:hover{color:var(--text-2)}
+.oferta-fim{color:var(--text-2);max-width:var(--medida)}
 </style>
 </head>
 <body data-ferramenta="">
@@ -40,27 +63,29 @@
     <div class="selo">pagamento confirmado</div>
     <h1>Obrigado. Aqui está o seu arquivo.</h1>
     <p class="resumo">
-      Guarde este endereço — é por aqui que você baixa as versões atualizadas quando as
-      tabelas mudarem em janeiro, sem pagar de novo.
+      Guarde este endereço <strong>inteiro</strong>, com o código depois do
+      <code>?</code> — é por ele que você baixa as versões atualizadas quando as
+      tabelas mudarem em janeiro, sem pagar de novo. O link do recibo que o Stripe
+      mandou por e-mail também serve, e é mais difícil de perder.
     </p>
   </div>
 
-  <a class="baixar" href="folha-simples-fc86aa480de7f81c.html" download="folha-simples.html">
-    Baixar Folha Simples ↓
-  </a>
+  <div id="entrega" data-rotulo="Folha Simples"></div>
 
   <article class="conteudo">
     <h2>Como usar</h2>
 
-    <div class="passo"><strong>1.</strong> Salve o arquivo numa pasta que você não vá apagar —
-      Documentos, por exemplo. Ele é único e não precisa de instalação.</div>
-    <div class="passo"><strong>2.</strong> Dê dois cliques. Ele abre no seu navegador e já funciona,
-      inclusive sem internet.</div>
-    <div class="passo"><strong>3.</strong> Preencha a empresa, adicione os funcionários e clique em
-      <strong>Imprimir holerites</strong>. Na janela de impressão, escolha
-      "Salvar como PDF" se quiser o arquivo em vez do papel.</div>
-    <div class="passo"><strong>4.</strong> Antes de trocar de computador ou limpar o navegador, use
-      <strong>Exportar backup</strong>. É o que preserva seus dados.</div>
+    <ol class="passos">
+      <li class="passo">Salve o arquivo numa pasta que você não vá apagar —
+        Documentos, por exemplo. Ele é único e não precisa de instalação.</li>
+      <li class="passo">Dê dois cliques. Ele abre no seu navegador e já funciona,
+        inclusive sem internet.</li>
+      <li class="passo">Preencha a empresa, adicione os funcionários e clique em
+        <strong>Imprimir holerites</strong>. Na janela de impressão, escolha
+        "Salvar como PDF" se quiser o arquivo em vez do papel.</li>
+      <li class="passo">Antes de trocar de computador ou limpar o navegador, use
+        <strong>Exportar backup</strong>. É o que preserva seus dados.</li>
+    </ol>
 
     <div class="aviso">
       <p>
@@ -69,6 +94,16 @@
         levar os dados junto.
       </p>
     </div>
+
+    <h2>Vai precisar demitir alguém?</h2>
+    <p>
+      O programa não calcula rescisão. A conta de um desligamento é gratuita na
+      <a href="../ferramentas/custo-demissao.html">calculadora do site</a>; o que não existe
+      em outro lugar é comparar os cinco desfechos do mesmo contrato e imprimir o termo.
+      <a href="oferta-rescisao.html">Veja a comparação e o que muda →</a>
+    </p>
+
+    <div id="funil"></div>
 
     <h2>Precisou de algo?</h2>
     <p>
@@ -82,5 +117,7 @@
 
 <script src="../ferramentas/nucleo.js"></script>
 <script src="../ferramentas/app.js"></script>
+<script src="entrega.js"></script>
+<script src="funil.js"></script>
 </body>
 </html>

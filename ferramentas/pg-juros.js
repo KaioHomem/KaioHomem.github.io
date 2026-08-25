@@ -135,7 +135,7 @@
     });
     html += '</div>';
 
-    html += '<h3 style="margin-top:1.6rem">Evolução</h3>';
+    html += '<h2 style="margin-top:1.6rem;font-size:1.15rem">Evolução</h2>';
     html += grafico(r.evolucao);
     html += '<div class="legenda">' +
               '<span><i class="ponto" style="background:#58a6ff"></i> Total investido</span>' +

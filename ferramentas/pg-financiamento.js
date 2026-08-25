@@ -92,7 +92,7 @@
             F.brl(economia) + ' a menos de juros, mas a primeira parcela fica ' +
             F.brl(F.round2(r.sac.primeira - r.price.primeira)) + ' mais alta.</p></div>';
 
-    html += '<h3 style="margin-top:1.6rem">Tabela de amortização</h3>';
+    html += '<h2 style="margin-top:1.6rem;font-size:1.15rem">Tabela de amortização</h2>';
     html += '<div class="botoes" style="margin-top:0.4rem;margin-bottom:1rem">' +
               botaoSistema('price', 'Price') +
               botaoSistema('sac', 'SAC') +

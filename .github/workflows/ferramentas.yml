@@ -6,12 +6,26 @@ on:
     paths:
       - 'ferramentas/**'
       - 'produtos/**'
+      - 'painel/**'
+      - 'worker/**'
+      - 'wrangler.toml'
+      - 'index.html'
+      - 'privacidade.html'
+      - 'style.css'
+      - '.claude/skills/impeccable/**'
       - 'package.json'
       - '.github/workflows/ferramentas.yml'
   pull_request:
     paths:
       - 'ferramentas/**'
       - 'produtos/**'
+      - 'painel/**'
+      - 'worker/**'
+      - 'wrangler.toml'
+      - 'index.html'
+      - 'privacidade.html'
+      - 'style.css'
+      - '.claude/skills/impeccable/**'
       - 'package.json'
       - '.github/workflows/ferramentas.yml'
   # First day of every month, 09:00 UTC.
@@ -40,7 +54,16 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
+
+      - name: Instalar dependências
+        run: npm ci --no-audit --no-fund
+
+      # O site publicado é o dist/, não a árvore do repositório. Ele é
+      # gerado antes de tudo porque os gates de auditoria, navegador e
+      # design passaram a conferir o que o visitante recebe.
+      - name: Construir o diretório publicado
+        run: node ferramentas/gerar-dist.js
 
       # Gate: wrong fiscal maths must never reach the published site.
       - name: Rodar suíte de testes
@@ -68,19 +91,71 @@ jobs:
       # editar o produto e esquecer de regenerar, a demo passa a calcular
       # diferente do que o comprador leva — e demo que mente sobre o
       # produto é pior que demo nenhuma.
+      # Gate: o Harness precisa descrever a realidade antes de qualquer
+      # outra coisa — é por ele que a próxima sessão se orienta.
+      - name: Conferir o Harness
+        run: node ferramentas/harness-check.js
+
       - name: Conferir se a demonstração está em dia
         run: node produtos/gerar-demo.js --verificar
+
+      # Gate: a capacidade paga (13º e férias) tem de estar AUSENTE da
+      # demonstração, não desligada nela. As assinaturas são derivadas do
+      # próprio produto a cada execução, então não envelhecem.
+      - name: Conferir a separação entre demo e produto pago
+        run: node ferramentas/verificar-demo.js
+
+      # Gate: o build completo — o que quem compra o módulo de rescisão
+      # recebe — é gerado a partir do base mais o módulo. Se alguém
+      # editar um dos dois e esquecer de regerar, o comprador do upsell
+      # leva um arquivo desatualizado sem ninguém perceber.
+      - name: Conferir se o build completo está em dia
+        run: node produtos/gerar-completo.js --verificar
+
+      # Gate: a autorização do download. Cobre a sessão inexistente, a
+      # não paga, a de outro produto, a com metadata trocada e a
+      # tentativa de levar o completo tendo pago o base. Stripe
+      # simulado — nenhuma cobrança, nenhum cartão.
+      - name: Testar a entrega do produto pago
+        run: node worker/testes.js
+
+      # Gate: nada pago dentro do diretório publicado. Reprova por
+      # nome, por hash do conteúdo (pega o arquivo renomeado) e por
+      # trecho (pega a colagem parcial).
+      - name: Conferir que nada pago está no dist/
+        run: node ferramentas/verificar-publicacao.js
+
+      # Gate do gate: quebra a condição de propósito quatro vezes e
+      # exige que o anterior reprove em cada uma. Um gate que passa
+      # quando não deveria é pior que gate nenhum — e este guarda o
+      # arquivo que custa R$ 97.
+      - name: Provar que o gate de publicação reprova mesmo
+        run: node ferramentas/testar-gate-publicacao.js
+
+      - name: Provar que o gate da demonstração reprova mesmo
+        run: node ferramentas/testar-gate-demo.js
+
+      - name: Provar que o check do Harness reprova mesmo
+        run: node ferramentas/testar-harness-check.js
+
+      # Gate: o bundle precisa caber no plano grátis (3 MB comprimido)
+      # e os imports de texto precisam resolver. O dry-run falha se um
+      # deles apontar para arquivo que não existe.
+      - name: Medir o bundle do Worker
+        run: npx wrangler deploy --dry-run --outdir .wrangler/dry-run
 
   navegador:
     name: Verificar as páginas no navegador
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    # São 19 páginas, e o contraste de uma parte delas é medido com
+    # recorte do elemento. Localmente dá 4 minutos.
+    timeout-minutes: 18
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
 
       # npm ci em vez de npm install: instala exatamente o que está no
       # lockfile. Com install, cada execução podia resolver uma versão
@@ -105,8 +180,44 @@ jobs:
       # a leitura estática não alcança — erro de JavaScript que apaga a
       # tela, botão que não calcula, página que rola sozinha para o lugar
       # errado. Foi escrito depois de dois desses passarem batido.
-      - name: Abrir as dez páginas num Chromium
+      - name: Construir o diretório publicado
+        run: node ferramentas/gerar-dist.js
+
+      - name: Abrir as páginas num Chromium
         run: node ferramentas/verificar-paginas.js
+
+  design:
+    name: Detector de design
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Instalar dependências de verificação
+        run: npm ci --no-audit --no-fund
+
+      # O puppeteer procura primeiro um Chrome do sistema (`channel:
+      # 'chrome'`) e só depois o que ele mesmo baixa. O runner do GitHub
+      # já vem com Chrome, então o download do postinstall é dispensável
+      # — e sem ele o `npm ci` leva 5s em vez de um minuto.
+      #
+      # Gate: uma classe de defeito visual que nenhum teste de cálculo
+      # alcança — tarja colorida na lateral do cartão, fonte batida,
+      # linha de 118 caracteres, caixa-alta em frase inteira, título que
+      # pula de h1 para h3, escada de tipos sem degrau.
+      #
+      # Não substitui o verificar-paginas.js: o contraste de lá é medido
+      # no pixel pintado com a opacidade acumulada dos ancestrais, e é
+      # mais preciso que o daqui.
+      - name: Construir o diretório publicado
+        run: node ferramentas/gerar-dist.js
+
+      - name: Rodar o detector de design
+        run: node ferramentas/verificar-design.js
 
   manutencao:
     name: Manutenção mensal
@@ -121,7 +232,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
 
       - name: Conferir se as tabelas fiscais estão em dia
         id: tabelas

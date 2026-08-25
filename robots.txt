@@ -1,16 +1,26 @@
 User-agent: *
 Allow: /
 
-# O programa vendido e a página de entrega não entram em busca.
-# Isto é obscuridade, não segurança: sem servidor não há como
-# gatear de verdade. Para um produto de R$ 97 é proporcional, e
-# quem copiaria o link não teria comprado.
-Disallow: /produtos/folha-simples
-Disallow: /produtos/obrigado.html
-Disallow: /produtos/demo.html
-
-# Material de marketing: os cartões existem para ser publicados no
-# Instagram, não para competir com as páginas do site na busca.
-Disallow: /marketing/
+# Não há Disallow aqui, e a ausência é deliberada.
+#
+# Antes havia três: o produto pago, a página de entrega e a
+# demonstração. As três linhas saíram por motivos diferentes.
+#
+# O produto pago não é mais servido. Ele vive fora do diretório
+# publicado e só sai pelo endpoint que confere o pagamento. Um
+# Disallow para um caminho que não existe mais não protege nada —
+# só conta a quem lê o robots.txt onde o arquivo ficava. O
+# comentário antigo já admitia: "isto é obscuridade, não
+# segurança". Agora há segurança, então a obscuridade sai.
+#
+# A entrega e a demonstração continuam servidas, e continuam fora
+# da busca — mas por <meta name="robots" content="noindex">, na
+# própria página, que é mais forte. Disallow só impede rastrear;
+# noindex impede indexar. E as duas juntas se anulam: um robô
+# proibido de rastrear nunca lê o noindex, e pode indexar a URL
+# assim mesmo se alguém a linkar de fora.
+#
+# O material de marketing também saiu daqui porque saiu do site:
+# os cartões do Instagram não entram no diretório publicado.
 
 Sitemap: https://kaiohomem.github.io/sitemap.xml

@@ -71,6 +71,22 @@ var EQUIPE = [
   console.log('resumo:', (await page.textContent('#resumo')).replace(/\s+/g, ' ').trim());
   await page.locator('main').screenshot({ path: path.join(SAIDA, 'tela-folha.png') });
 
+  // O herói da página de venda: os quatro números do resumo e as
+  // primeiras linhas da tabela, que é o que responde "o que este
+  // programa faz" numa olhada. O recorte é ancorado nos elementos, não
+  // num número mágico — quando o produto muda de altura, o corte
+  // acompanha em vez de virar a tela vazia do formulário.
+  var caixa = await page.evaluate(function () {
+    var r = document.querySelector('#resumo').getBoundingClientRect();
+    return { x: 0, y: r.top + window.scrollY - 12, largura: document.body.clientWidth };
+  });
+  await page.screenshot({
+    path: path.join(SAIDA, 'tela-heroi.png'),
+    clip: { x: caixa.x, y: caixa.y, width: caixa.largura,
+            height: Math.round(caixa.largura / 2.13) },
+    fullPage: true
+  });
+
   // O 13º é o argumento que a página de venda passou a fazer, então
   // precisa de imagem própria: dizer que calcula e não mostrar é o mesmo
   // problema que a página tinha antes de ter qualquer captura.
@@ -80,6 +96,43 @@ var EQUIPE = [
   await page.locator('main').screenshot({ path: path.join(SAIDA, 'tela-decimo.png') });
   await page.selectOption('#modo', 'mensal');
   await page.waitForTimeout(300);
+
+  // A tela do módulo de rescisão, para a página de oferta. Sai do build
+  // completo, não do base — o base não tem o módulo, e capturar de um
+  // mockup seria vender uma tela que não existe.
+  var completo = 'file://' + path.join(RAIZ, 'produtos/folha-simples-completo-fc86aa480de7f81c.html');
+  var pr = await browser.newPage({ viewport: { width: 1280, height: 900 }, deviceScaleFactor: 2, locale: 'pt-BR' });
+  await pr.goto(completo);
+  await pr.waitForTimeout(600);
+  await pr.fill('#empNome', 'Mercearia Bom Preço LTDA');
+  await pr.dispatchEvent('#empNome', 'change');
+  await pr.fill('#empCnpj', '12.345.678/0001-90');
+  await pr.dispatchEvent('#empCnpj', 'change');
+  await pr.fill('#fNome', 'Juliana Prado');
+  await pr.fill('#fCargo', 'Gerente de loja');
+  await pr.fill('#fSalario', '6.200,00');
+  await pr.fill('#fDep', '2');
+  await pr.click('#btAdd');
+  await pr.selectOption('#modo', 'rescisao');
+  await pr.waitForTimeout(400);
+  var campos = [['#rDiasMes', '17'], ['#rAnos', '5'], ['#rMeses13', '7'],
+                ['#rMesesFerias', '7'], ['#rFgts', '12.400,00']];
+  for (var ci = 0; ci < campos.length; ci++) {
+    await pr.fill(campos[ci][0], campos[ci][1]);
+    await pr.dispatchEvent(campos[ci][0], 'change');
+  }
+  await pr.waitForTimeout(500);
+  console.log('rescisão:', (await pr.textContent('#resumo')).replace(/\s+/g, ' ').trim());
+  var caixaR = await pr.evaluate(function () {
+    var r = document.querySelector('#resumo').getBoundingClientRect();
+    return { y: r.top + window.scrollY - 12, largura: document.body.clientWidth };
+  });
+  await pr.screenshot({
+    path: path.join(SAIDA, 'tela-rescisao.png'),
+    clip: { x: 0, y: caixaR.y, width: caixaR.largura, height: Math.round(caixaR.largura / 2.13) },
+    fullPage: true
+  });
+  await pr.close();
 
   // Os holerites só existem no DOM na hora de imprimir, e o CSS de
   // impressão esconde o resto da página.

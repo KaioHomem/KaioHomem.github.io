@@ -1,0 +1,349 @@
+{
+  "mission": "Harness v0.1 e fechamento técnico pré-migração",
+  "current": null,
+  "items": [
+    {
+      "id": "HE-001",
+      "title": "Instalar e provar o Harness Engineering v0.1",
+      "status": "done",
+      "priority": "high",
+      "authority_class": "A",
+      "dependencies": [],
+      "references": [
+        "HARNESS.md",
+        ".harness/CONSTITUTION.md",
+        ".harness/mission.md",
+        "ferramentas/harness-status.js",
+        "ferramentas/harness-check.js",
+        "ferramentas/testar-harness-check.js",
+        ".harness/handoff.md",
+        ".harness/progress.md"
+      ],
+      "decision_refs": [
+        "conhecimento/decisoes.md"
+      ],
+      "acceptance_criteria": [
+        "HARNESS.md é curto o bastante para ser lido no começo de toda sessão",
+        "harness:status recupera estado sem alterar arquivo nem pedir credencial",
+        "harness:check reprova Harness corrompido e passa no íntegro",
+        "o bootstrap gigante não foi copiado para dentro do HARNESS.md"
+      ],
+      "verification": [
+        "npm run harness:status",
+        "npm run harness:check",
+        "npm run gate-harness"
+      ],
+      "blocker": null,
+      "checkpoint": null
+    },
+    {
+      "id": "DEMO-001",
+      "title": "Separar estruturalmente a demo do produto pago",
+      "status": "done",
+      "priority": "high",
+      "authority_class": "B",
+      "dependencies": [],
+      "references": [
+        "produtos/gerar-demo.js",
+        "produtos/demo.html",
+        "produtos/folha-simples-fc86aa480de7f81c.html",
+        "ferramentas/publico.js",
+        "ferramentas/verificar-demo.js",
+        "ferramentas/testar-gate-demo.js"
+      ],
+      "decision_refs": [
+        "conhecimento/decisoes.md",
+        ".harness/CONSTITUTION.md"
+      ],
+      "acceptance_criteria": [
+        "13º e férias — a capacidade que o base vende além da demo — ficam fisicamente ausentes do demo.html",
+        "apagar DEMO, trocar o limite, remover atributo ou editar HTML não devolve a capacidade",
+        "a demo continua demonstrando folha mensal, com marca d'água e limite",
+        "a paridade fiscal do produto base e do completo segue intacta"
+      ],
+      "verification": [
+        "npm run separacao",
+        "npm run gate-separacao",
+        "npm run demo",
+        "npm run motor"
+      ],
+      "blocker": null,
+      "checkpoint": null
+    },
+    {
+      "id": "VERIFY-001",
+      "title": "Aproximar o verify local do que a CI roda",
+      "status": "done",
+      "priority": "medium",
+      "authority_class": "A",
+      "dependencies": [],
+      "references": [
+        "package.json",
+        ".github/workflows/ferramentas.yml"
+      ],
+      "decision_refs": [],
+      "acceptance_criteria": [
+        "gerar-demo.js --verificar entra no verify local — hoje só a CI o roda",
+        "o harness:check entra no verify local",
+        "quem roda o verify local descobre o que a CI descobriria, sem depender do GitHub",
+        "harness:check, demo, separacao e bundle entraram no verify e no CI — a divergência que existia foi fechada"
+      ],
+      "verification": [
+        "npm run verificar"
+      ],
+      "blocker": null,
+      "checkpoint": null
+    },
+    {
+      "id": "DELIVERY-001",
+      "title": "Revalidar a entrega já construída (Worker, dist/, anti-vazamento)",
+      "status": "done",
+      "priority": "high",
+      "authority_class": "A",
+      "dependencies": [],
+      "references": [
+        "worker/index.js",
+        "worker/testes.js",
+        "ferramentas/publico.js",
+        "ferramentas/verificar-publicacao.js",
+        "ferramentas/testar-gate-publicacao.js",
+        "wrangler.toml"
+      ],
+      "decision_refs": [
+        "conhecimento/decisoes.md",
+        "conhecimento/achados/entrega-do-produto-pago.md"
+      ],
+      "acceptance_criteria": [
+        "não reimplementar: a infraestrutura de 1ab6bda continua válida",
+        "os gates da entrega passam com os números recalculados"
+      ],
+      "verification": [
+        "npm run entrega",
+        "npm run publicacao",
+        "npm run gate-publicacao",
+        "npm run bundle"
+      ],
+      "blocker": null,
+      "checkpoint": "1ab6bda"
+    },
+    {
+      "id": "STRIPE-001",
+      "title": "Concluir o onboarding da conta Stripe",
+      "status": "blocked_human",
+      "priority": "high",
+      "authority_class": "C",
+      "dependencies": [],
+      "references": [
+        "produtos/ATIVAR-VENDA.md"
+      ],
+      "decision_refs": [],
+      "acceptance_criteria": [
+        "nome do negócio, telefone, termos e conta bancária preenchidos",
+        "a conta aceita criar Payment Link"
+      ],
+      "verification": [
+        "conferência humana no painel do Stripe"
+      ],
+      "blocker": "Ato jurídico em nome de uma pessoa. Nenhum processador aceita que um agente aceite termos ou informe conta bancária.",
+      "checkpoint": null
+    },
+    {
+      "id": "CF-001",
+      "title": "Criar a conta Cloudflare e conectar o repositório",
+      "status": "blocked_human",
+      "priority": "high",
+      "authority_class": "C",
+      "dependencies": [
+        "DEMO-001",
+        "VERIFY-001"
+      ],
+      "references": [
+        "wrangler.toml",
+        "produtos/ATIVAR-VENDA.md"
+      ],
+      "decision_refs": [
+        "conhecimento/achados/entrega-do-produto-pago.md"
+      ],
+      "acceptance_criteria": [
+        "Worker criado com Static Assets apontando para dist/",
+        "URL de preview responde e serve o site"
+      ],
+      "verification": [
+        "conferência humana no painel da Cloudflare"
+      ],
+      "blocker": "Conta externa. Agente não cria conta nem faz deploy. Independente de STRIPE-001: os dois podem começar em paralelo.",
+      "checkpoint": null
+    },
+    {
+      "id": "STRIPE-002",
+      "title": "Criar o Payment Link do produto base",
+      "status": "blocked_human",
+      "priority": "high",
+      "authority_class": "C",
+      "dependencies": [
+        "STRIPE-001"
+      ],
+      "references": [
+        "produtos/ATIVAR-VENDA.md",
+        "produtos/pagamento.js"
+      ],
+      "decision_refs": [
+        "conhecimento/decisoes.md"
+      ],
+      "acceptance_criteria": [
+        "somente cartão e Pix; boleto desmarcado",
+        "redirect para obrigado.html?session_id={CHECKOUT_SESSION_ID}, literal",
+        "metadata app=folha-simples e produto=base",
+        "link colado em produtos/pagamento.js"
+      ],
+      "verification": [
+        "npm run consistencia"
+      ],
+      "blocker": "Conta externa e link de cobrança real. Boleto é confirmação atrasada e quebraria a entrega da v0.1 — ver ATIVAR-VENDA.md.",
+      "checkpoint": null
+    },
+    {
+      "id": "CF-002",
+      "title": "Configurar segredo e preços no Worker",
+      "status": "blocked_human",
+      "priority": "high",
+      "authority_class": "C",
+      "dependencies": [
+        "CF-001",
+        "STRIPE-002"
+      ],
+      "references": [
+        "wrangler.toml",
+        "worker/index.js"
+      ],
+      "decision_refs": [],
+      "acceptance_criteria": [
+        "STRIPE_SECRET_KEY como secret da Cloudflare, nunca no repositório",
+        "PRECOS_BASE e PRECOS_COMPLETO preenchidos",
+        "download ponta a ponta funciona em modo de teste"
+      ],
+      "verification": [
+        "compra de teste ponta a ponta"
+      ],
+      "blocker": "Segredo real em conta externa.",
+      "checkpoint": null
+    },
+    {
+      "id": "GH-001",
+      "title": "Tornar o repositório privado",
+      "status": "blocked_human",
+      "priority": "medium",
+      "authority_class": "C",
+      "dependencies": [
+        "CF-002"
+      ],
+      "references": [
+        ".harness/mission.md"
+      ],
+      "decision_refs": [
+        "conhecimento/achados/entrega-do-produto-pago.md"
+      ],
+      "acceptance_criteria": [
+        "só depois da Cloudflare confirmada em produção",
+        "o site continua no ar durante e depois"
+      ],
+      "verification": [
+        "site respondendo pela Cloudflare"
+      ],
+      "blocker": "Efeito externo, e prematuro: no plano gratuito isto despublica o GitHub Pages e derruba o site antes de existir substituto. Penúltimo passo, nunca o primeiro.",
+      "checkpoint": null
+    },
+    {
+      "id": "GH-002",
+      "title": "Desligar o GitHub Pages",
+      "status": "blocked_human",
+      "priority": "low",
+      "authority_class": "C",
+      "dependencies": [
+        "GH-001"
+      ],
+      "references": [
+        ".github/workflows/jekyll-gh-pages.yml"
+      ],
+      "decision_refs": [],
+      "acceptance_criteria": [
+        "último passo da migração"
+      ],
+      "verification": [
+        "site respondendo só pela Cloudflare"
+      ],
+      "blocker": "Efeito externo. Só depois de o site estar confirmado na Cloudflare.",
+      "checkpoint": null
+    },
+    {
+      "id": "PUSH-001",
+      "title": "Publicar os commits locais e validar no CI remoto",
+      "status": "done",
+      "priority": "medium",
+      "authority_class": "C",
+      "dependencies": [],
+      "references": [],
+      "decision_refs": [],
+      "acceptance_criteria": [
+        "push autorizado pelo dono, sem force e sem branch nova",
+        "CI remota verde nos quatro jobs",
+        "os gates novos comprovadamente executaram — conferido no log, não pelo selo"
+      ],
+      "verification": [
+        "gh: PR #6 check runs",
+        "logs de cada job"
+      ],
+      "blocker": null,
+      "checkpoint": "c1baa6d"
+    },
+    {
+      "id": "MERGE-001",
+      "title": "Mesclar o PR #6 na main",
+      "status": "blocked_human",
+      "priority": "medium",
+      "authority_class": "C",
+      "dependencies": [
+        "PUSH-001"
+      ],
+      "references": [],
+      "decision_refs": [],
+      "acceptance_criteria": [
+        "PR #6 sai de rascunho e é mesclado",
+        "depois dele, rebasear os PRs #2, #3 e #4 — ver backlog PR-CLEANUP"
+      ],
+      "verification": [
+        "PR #6 com state merged"
+      ],
+      "blocker": "Merge continua proibido. A autorização de 25/08 cobriu apenas o push para validar no CI, e disse explicitamente que merge segue vedado.",
+      "checkpoint": null
+    }
+  ],
+  "backlog": [
+    {
+      "id": "PR-CLEANUP",
+      "note": "PRs #2, #3 e #4 saíram de base antiga (4b3b45f) e #2 conflita com #6 em ferramentas/app.js e ferramentas/index.html. Rebasear em cima do #6 depois que ele entrar. Fora desta missão: mexe em estado remoto.",
+      "found": "2026-08-24"
+    },
+    {
+      "id": "DEMO-VALOR",
+      "note": "Depois de DEMO-001 a demo perde 13º e férias. A página de venda e a oferta podem precisar de ajuste de texto para não prometerem o que a demo não mostra mais. Verificar antes de anunciar a demo em campanha.",
+      "found": "2026-08-24"
+    },
+    {
+      "id": "STYLES-ORFAO",
+      "note": "styles.css na raiz não é referenciado por nenhuma página e ficou fora do allowlist. Candidato a remoção; não removido porque apagar arquivo não é necessário para a missão.",
+      "found": "2026-08-24"
+    },
+    {
+      "id": "DEMO-META-DUPLICADA",
+      "note": "produtos/demo.html carrega duas tags <meta name=robots>, uma do gerador e outra herdada do produto. Inofensivo e cosmético.",
+      "found": "2026-08-24"
+    },
+    {
+      "id": "PR-CORPO",
+      "note": "O corpo do PR #6 ficou velho: diz \"Onze commits\" (são 18) e cita 455 consistência / 326 auditoria, que hoje são 521 / 327. Não foi corrigido porque editar a descrição é escrita remota fora do que a autorização cobria. Vale ajustar antes de pedir revisão humana.",
+      "found": "2026-08-25"
+    }
+  ],
+  "nota_current": "Nulo de propósito: o trabalho local desta missão acabou e todo item restante é blocked_human. A ordem do array É a ordem de execução — o primeiro passo humano é STRIPE-001, e CF-001 pode correr em paralelo. Ver .harness/mission.md."
+}

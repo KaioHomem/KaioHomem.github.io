@@ -37,7 +37,6 @@
       hero_cv_btn:      'Download CV',
       hero_code:        `<span class="kw">const</span> <span class="fn">dev</span> = {\n  nome: <span class="str">"Kaio Felipe"</span>,\n  formação: <span class="str">"CC — IFSC"</span>,\n  idiomas: [<span class="str">"Português"</span>, <span class="str">"English C1"</span>],\n  stack: [<span class="str">"Java"</span>, <span class="str">"HTML/CSS/JS"</span>, <span class="str">"Python"</span>],\n  status: <span class="str">"buscando oportunidade"</span>,\n  objetivo: <span class="str">"evoluir com propósito"</span>\n};`,
 
-      about_label:      'Sobre mim',
       about_title:      'Quem sou eu',
       about_p1:         'Tenho 19 anos e curso <strong>Ciências da Computação no IFSC</strong> — uma das instituições técnicas mais respeitadas do sul do Brasil. Sou movido pela vontade de entender como as coisas funcionam de verdade, não apenas copiar e colar soluções.',
       about_p2:         'Falo e escrevo <strong>inglês em nível avançado (C1)</strong>, resultado de dez anos de estudo dedicado. Consigo ler documentação técnica, participar de conversas profissionais e acompanhar conteúdo em inglês sem dificuldade. Atualmente estudo alemão de forma autônoma.',
@@ -48,7 +47,6 @@
       fact2_sub:        'Comunicação técnica e profissional',
       fact3_sub:        'Olimpíada Brasileira de Astronomia e Astronáutica',
 
-      stack_label:      'Tecnologias',
       stack_title:      'Stack & Ferramentas',
       stack_subtitle:   'Tecnologias que estudei e utilizei em projetos reais. Sigo aprendendo constantemente.',
       stack_languages:  'Linguagens',
@@ -59,7 +57,6 @@
       tag_de:           'Alemão — básico',
       tag_pt:           'Português — nativo',
 
-      proj_label:       'Projetos',
       proj_title:       'O que construí',
       proj1_title:      'Portfólio Pessoal',
       proj1_desc:       'Site pessoal desenvolvido do zero, sem frameworks. Inclui formulário de contato com EmailJS, animações com IntersectionObserver e design responsivo.',
@@ -68,7 +65,6 @@
       proj_more:        'Mais projetos em desenvolvimento.',
       proj_github_btn:  'Ver GitHub',
 
-      exp_label:        'Experiência',
       exp_title:        'Trajetória',
       exp1_title:       'Ciências da Computação',
       exp1_date:        '2024 — presente · 3ª fase',
@@ -80,7 +76,6 @@
       exp3_company:     'Espaço Dani K',
       exp3_desc:        'Auxílio nas áreas administrativa, fiscal e financeira. Organização de documentos e suporte às operações do negócio.',
 
-      contact_label:    'Contato',
       contact_title:    'Vamos conversar',
       contact_subtitle: 'Estou buscando minha primeira oportunidade em tecnologia. Se tiver uma vaga, um projeto ou só quiser trocar uma ideia — me manda uma mensagem.',
       contact_cv:       'Download CV (PDF)',
@@ -118,7 +113,6 @@
       hero_cv_btn:      'Download CV',
       hero_code:        `<span class="kw">const</span> <span class="fn">dev</span> = {\n  name: <span class="str">"Kaio Felipe"</span>,\n  education: <span class="str">"CS — IFSC"</span>,\n  languages: [<span class="str">"Portuguese"</span>, <span class="str">"English C1"</span>],\n  stack: [<span class="str">"Java"</span>, <span class="str">"HTML/CSS/JS"</span>, <span class="str">"Python"</span>],\n  status: <span class="str">"seeking opportunity"</span>,\n  goal: <span class="str">"grow with purpose"</span>\n};`,
 
-      about_label:      'About me',
       about_title:      'Who I am',
       about_p1:         'I\'m 19 and studying <strong>Computer Science at IFSC</strong> — one of the most respected technical institutions in southern Brazil. I\'m driven by the desire to truly understand how things work, not just copy-paste solutions.',
       about_p2:         'I speak and write <strong>advanced English (C1)</strong>, the result of ten years of dedicated study. I can read technical documentation, participate in professional conversations, and follow English-language content with ease. I\'m currently learning German on my own.',
@@ -129,7 +123,6 @@
       fact2_sub:        'Technical and professional communication',
       fact3_sub:        'Brazilian Olympiad of Astronomy & Astronautics',
 
-      stack_label:      'Technologies',
       stack_title:      'Stack & Tools',
       stack_subtitle:   'Technologies I\'ve studied and used in real projects. Constantly learning more.',
       stack_languages:  'Languages',
@@ -140,7 +133,6 @@
       tag_de:           'German — basic',
       tag_pt:           'Portuguese — native',
 
-      proj_label:       'Projects',
       proj_title:       'What I\'ve built',
       proj1_title:      'Personal Portfolio',
       proj1_desc:       'Personal website built from scratch, no frameworks. Includes a contact form with EmailJS, animations with IntersectionObserver and responsive design.',
@@ -149,7 +141,6 @@
       proj_more:        'More projects in development.',
       proj_github_btn:  'View GitHub',
 
-      exp_label:        'Experience',
       exp_title:        'Career Path',
       exp1_title:       'Computer Science',
       exp1_date:        '2024 — present · 3rd semester',
@@ -161,7 +152,6 @@
       exp3_company:     'Espaço Dani K',
       exp3_desc:        'Assistance in administrative, tax and financial areas. Document organization and general business support.',
 
-      contact_label:    'Contact',
       contact_title:    'Let\'s talk',
       contact_subtitle: 'I\'m looking for my first opportunity in tech. If you have a position, a project, or just want to chat — send me a message.',
       contact_cv:       'Download CV (PDF)',
@@ -199,7 +189,6 @@
       hero_cv_btn:      'CV herunterladen',
       hero_code:        `<span class="kw">const</span> <span class="fn">dev</span> = {\n  name: <span class="str">"Kaio Felipe"</span>,\n  ausbildung: <span class="str">"Informatik — IFSC"</span>,\n  sprachen: [<span class="str">"Portugiesisch"</span>, <span class="str">"Englisch C1"</span>],\n  stack: [<span class="str">"Java"</span>, <span class="str">"HTML/CSS/JS"</span>, <span class="str">"Python"</span>],\n  status: <span class="str">"suche Stelle"</span>,\n  ziel: <span class="str">"mit Zweck wachsen"</span>\n};`,
 
-      about_label:      'Über mich',
       about_title:      'Wer bin ich',
       about_p1:         'Ich bin 19 Jahre alt und studiere <strong>Informatik am IFSC</strong> — einer der angesehensten technischen Hochschulen Südbrasiliens. Mich treibt der Wunsch an, wirklich zu verstehen, wie Dinge funktionieren – nicht nur Lösungen zu kopieren.',
       about_p2:         'Ich spreche und schreibe <strong>Englisch auf fortgeschrittenem Niveau (C1)</strong> – das Ergebnis von zehn Jahren engagiertem Studium. Außerdem lerne ich derzeit selbstständig Deutsch.',
@@ -210,7 +199,6 @@
       fact2_sub:        'Technische und professionelle Kommunikation',
       fact3_sub:        'Brasilianische Olympiade für Astronomie & Astronautik',
 
-      stack_label:      'Technologien',
       stack_title:      'Stack & Werkzeuge',
       stack_subtitle:   'Technologien, die ich in echten Projekten studiert und verwendet habe. Ich lerne ständig dazu.',
       stack_languages:  'Programmiersprachen',
@@ -221,7 +209,6 @@
       tag_de:           'Deutsch — Grundkenntnisse',
       tag_pt:           'Portugiesisch — Muttersprache',
 
-      proj_label:       'Projekte',
       proj_title:       'Was ich gebaut habe',
       proj1_title:      'Persönliches Portfolio',
       proj1_desc:       'Persönliche Website von Grund auf ohne Frameworks gebaut. Mit Kontaktformular (EmailJS), Scroll-Animationen (IntersectionObserver) und responsivem Design.',
@@ -230,7 +217,6 @@
       proj_more:        'Weitere Projekte in Entwicklung.',
       proj_github_btn:  'GitHub ansehen',
 
-      exp_label:        'Erfahrung',
       exp_title:        'Werdegang',
       exp1_title:       'Informatik',
       exp1_date:        '2024 — heute · 3. Semester',
@@ -242,7 +228,6 @@
       exp3_company:     'Espaço Dani K',
       exp3_desc:        'Unterstützung in Verwaltung, Steuer- und Finanzbereich. Dokumentenorganisation und allgemeine Betriebsunterstützung.',
 
-      contact_label:    'Kontakt',
       contact_title:    'Lass uns reden',
       contact_subtitle: 'Ich suche meine erste Stelle in der Technologiebranche. Wenn Sie eine Stelle, ein Projekt haben oder einfach chatten möchten — schreiben Sie mir.',
       contact_cv:       'CV herunterladen (PDF)',

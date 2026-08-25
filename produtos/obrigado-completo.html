@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Seu download — Folha Simples Completo</title>
+<meta name="robots" content="noindex, nofollow">
+
+<meta http-equiv="Content-Security-Policy" content="
+  default-src 'self';
+  script-src 'self';
+  style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+  font-src https://fonts.gstatic.com;
+  img-src 'self' data:;
+  connect-src 'self';
+  object-src 'none'; base-uri 'self'; form-action 'none';
+">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✅</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../ferramentas/tools.css">
+<style>
+/* Lista ordenada de verdade: a numeração vem do <ol>, não digitada à mão
+   dentro de um <strong> que também serve para dar ênfase no meio da
+   frase. E sem tarja lateral de 3px — o número já ordena. */
+/* `.conteudo li::before` do tools.css desenha um ▸ e tem especificidade
+   maior que `.passo::before`: sem o `li.` na frente, o número do passo
+   não aparecia e vinha a setinha da lista comum no lugar. */
+.passos{list-style:none;counter-reset:passo;margin:0;padding:0}
+li.passo{background:var(--bg-2);border:1px solid var(--border);border-radius:var(--radius);
+  padding:1rem 1.2rem 1rem 2.7rem;margin-bottom:.8rem;
+  counter-increment:passo;position:relative}
+li.passo::before{content:counter(passo) ".";position:absolute;left:1.2rem;
+  font-family:var(--font-mono);color:var(--accent);font-weight:600}
+.passo strong{color:var(--text)}
+
+/* A oferta vem depois do download e depois do passo a passo, nunca
+   antes: quem acabou de pagar veio buscar o arquivo, e empurrar uma
+   segunda compra na frente dele é o jeito mais rápido de transformar
+   uma venda boa num pedido de reembolso. */
+.oferta{background:var(--bg-2);border:1px solid rgba(63,185,80,.35);border-radius:var(--radius-lg);
+  padding:1.6rem 1.5rem;margin:2rem 0 .6rem;max-width:var(--medida)}
+.oferta h2{margin-top:0}
+.oferta p{margin-bottom:1rem}
+.oferta-preco{font-family:var(--font-mono);font-size:1.6rem;font-weight:700;color:var(--green);
+  line-height:1;margin-bottom:1rem}
+.oferta-cta{margin:0}
+.oferta-recusa{margin:0 0 2rem}
+.btn-recusa{background:none;border:none;padding:0;color:var(--text-3);font-size:0.86rem;
+  text-decoration:underline;text-underline-offset:3px}
+.btn-recusa:hover{color:var(--text-2)}
+.oferta-fim{color:var(--text-2);max-width:var(--medida)}
+</style>
+</head>
+<body data-ferramenta="">
+
+<header class="topo" id="topo"></header>
+
+<main class="wrap">
+  <div class="cabecalho">
+    <div class="selo">pagamento confirmado</div>
+    <h1>Pronto. Agora com rescisão.</h1>
+    <p class="resumo">
+      Este arquivo substitui o anterior: faz tudo o que ele fazia e mais rescisão.
+      Guarde este endereço <strong>inteiro</strong>, com o código depois do
+      <code>?</code> — é por ele que você baixa as versões atualizadas quando as
+      tabelas mudarem em janeiro, sem pagar de novo. O link do recibo que o Stripe
+      mandou por e-mail também serve, e é mais difícil de perder.
+    </p>
+  </div>
+
+  <div id="entrega" data-rotulo="Folha Simples Completo"></div>
+
+  <article class="conteudo">
+    <h2>Como usar</h2>
+
+    <ol class="passos">
+      <li class="passo">Salve o arquivo numa pasta que você não vá apagar —
+        Documentos, por exemplo. Ele é único e não precisa de instalação.</li>
+      <li class="passo">Dê dois cliques. Ele abre no seu navegador e já funciona,
+        inclusive sem internet.</li>
+      <li class="passo">Preencha a empresa, adicione os funcionários e clique em
+        <strong>Imprimir holerites</strong>. Na janela de impressão, escolha
+        "Salvar como PDF" se quiser o arquivo em vez do papel.</li>
+      <li class="passo">Antes de trocar de computador ou limpar o navegador, use
+        <strong>Exportar backup</strong>. É o que preserva seus dados.</li>
+      <li class="passo">Se você já tinha baixado a versão anterior, use
+        <strong>Exportar backup</strong> nela e <strong>Importar</strong> nesta, e
+        depois apague a antiga. Duas versões na mesma pasta é como se abre a errada
+        daqui a três meses.</li>
+    </ol>
+
+    <div class="aviso">
+      <p>
+        <strong>Onde seus dados ficam:</strong> no navegador desse computador, e em nenhum outro
+        lugar. Se você abrir o arquivo em outra máquina, ela começa vazia — use o backup para
+        levar os dados junto.
+      </p>
+    </div>
+
+    <h2>Precisou de algo?</h2>
+    <p>
+      Escreva para <a href="mailto:kaiokateto@gmail.com">kaiokateto@gmail.com</a>.
+      Se não serviu, devolvo o valor em até 7 dias, sem precisar justificar.
+    </p>
+  </article>
+</main>
+
+<footer class="rodape" id="rodape"></footer>
+
+<script src="../ferramentas/nucleo.js"></script>
+<script src="../ferramentas/app.js"></script>
+<script src="entrega.js"></script>
+</body>
+</html>
