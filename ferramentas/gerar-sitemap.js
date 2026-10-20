@@ -19,7 +19,8 @@ var BASE = 'https://kaiohomem.github.io';
 var RAIZ = path.join(__dirname, '..');
 
 var PAGINAS = [
-  { caminho: 'index.html',                          url: '/',                                   prioridade: '0.8', frequencia: 'monthly' },
+  // The home page is built from site/ at deploy time; its date is the last commit there.
+  { caminho: 'site/src',                            url: '/',                                   prioridade: '0.8', frequencia: 'monthly' },
   { caminho: 'ferramentas/index.html',              url: '/ferramentas/',                       prioridade: '0.9', frequencia: 'weekly' },
   { caminho: 'produtos/folha-de-pagamento.html', url: '/produtos/folha-de-pagamento.html', prioridade: '0.9', frequencia: 'monthly' },
   { caminho: 'privacidade.html',                    url: '/privacidade.html',                   prioridade: '0.3', frequencia: 'yearly' },

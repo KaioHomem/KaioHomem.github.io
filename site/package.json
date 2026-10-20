@@ -1,0 +1,33 @@
+{
+  "name": "kaiohomem-site",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Portfolio of Kaio Felipe, built as a static Next.js export for GitHub Pages.",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "assemble": "node scripts/assemble.mjs",
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@emailjs/browser": "^4.4.1",
+    "clsx": "^2.1.1",
+    "gsap": "^3.15.0",
+    "lenis": "^1.3.27",
+    "next": "^16.4.2",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "tailwind-merge": "^3.7.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.3.3",
+    "@types/node": "^22.20.5",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "eslint": "^9.39.5",
+    "eslint-config-next": "^16.4.2",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^5.9.3"
+  }
+}

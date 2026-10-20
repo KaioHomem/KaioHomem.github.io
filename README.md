@@ -3,45 +3,63 @@
 [![Site](https://img.shields.io/badge/Live-KaioHomem.github.io-blue?style=flat&logo=github)](https://KaioHomem.github.io)
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-kaio--homem-0077B5?style=flat&logo=linkedin)](https://linkedin.com/in/kaio-homem-bb118335b/)
 
-Personal portfolio and professional presentation site, built entirely with HTML, CSS and JavaScript — no frameworks.
+Personal portfolio built like a motion piece: the page reads as a composition being rendered, with a timecode that follows the scroll and a chrome KF monogram rendered in Blender that the scroll scrubs frame by frame.
 
 ## Features
 
-- Responsive layout with mobile hamburger menu
-- Smooth scroll section reveal via IntersectionObserver
-- Contact form integrated with EmailJS (client-side email delivery)
-- Active nav link tracking on scroll
-- Semantic HTML5 and accessible markup
+- Render-queue intro, giant variable-width type and scroll-driven scenes (GSAP + ScrollTrigger, Lenis)
+- Chrome monogram rendered in Blender Cycles (`site/cgi/kf_monogram.py`), drawn on a 2D canvas as a WebP sequence, loaded after the first paint and skipped on save-data
+- PT / EN / DE, detected from the browser, choice remembered
+- Contact form through EmailJS, loaded only when someone sends a message
+- Full `prefers-reduced-motion` fallback: no intro, no smooth scroll, no pinning, same content
+- Synthesized interface sounds (Web Audio, no files), off by default
 
 ## Stack
 
-`HTML5` · `CSS3` · `JavaScript` · `EmailJS`
+`Next.js (static export)` · `TypeScript` · `Tailwind CSS 4` · `GSAP` · `Lenis` · `Blender` · `EmailJS` · two components from [Spell UI](https://spell.sh) (MIT)
 
 ## Running locally
 
 ```bash
-# Clone the repo
-git clone https://github.com/KaioHomem/KaioHomem.github.io.git
-
-# Open in browser
-open index.html     # macOS
-start index.html    # Windows
+cd site
+npm install
+npm run dev          # http://localhost:3000
 ```
 
-No build step. No dependencies to install. Open and go.
+Full production output, exactly as GitHub Pages serves it:
+
+```bash
+cd site
+npm run build        # Next.js export into site/out
+npm run assemble     # copies the static files from the repository root next to it
+```
+
+Re-render the monogram (Blender 4.5, GPU):
+
+```bash
+blender -b -P site/cgi/kf_monogram.py -- --out site/cgi/out --samples 40 --size 1000
+```
+
+Then convert the PNG frames to WebP into `site/public/cgi/` (desktop, 1000 px) and `site/public/cgi/m/` (phones, 560 px) with ffmpeg.
 
 ## Project structure
 
 ```
 KaioHomem.github.io/
-├── index.html          # Main page
-├── style.css           # Styles and design system
-├── script.js           # Interactivity and form logic
-├── translations.js     # PT / EN / DE strings
+├── site/               # The portfolio (Next.js) — the home page at /
+│   ├── src/            # App, sections, motion system, PT/EN/DE content
+│   ├── public/cgi/     # Rendered monogram frames
+│   └── cgi/            # Blender script that renders them
+├── ferramentas/        # Free calculator suite (see below)
+├── produtos/           # Folha Simples
+├── privacidade.html
+├── cv-kaio-felipe*.pdf
 ├── sitemap.xml         # Generated — do not edit by hand
 ├── robots.txt
-└── ferramentas/        # Free calculator suite (see below)
+└── docs/redesign/      # Plan and decisions behind the redesign
 ```
+
+`.github/workflows/pages.yml` builds `site/`, copies every static file from the root next to it and publishes the result, so the calculator and product URLs never change.
 
 ---
 

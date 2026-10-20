@@ -1,0 +1,64 @@
+# Builds the portfolio (site/, a static Next.js export), adds every static file from the
+# repository root (calculators, product, privacy page, CVs, sitemap...) and publishes the
+# result to GitHub Pages. Root URLs stay exactly where they were.
+name: Publicar site no GitHub Pages
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One deployment at a time; a run already deploying is allowed to finish.
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: site
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: site/package-lock.json
+
+      - name: Instalar dependências
+        run: npm ci --no-audit --no-fund
+
+      - name: Tipos e lint
+        run: npm run typecheck && npm run lint
+
+      - name: Build do Next.js
+        run: npm run build
+
+      - name: Juntar com os arquivos estáticos da raiz
+        run: npm run assemble
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site/out
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Publicar
+        id: deployment
+        uses: actions/deploy-pages@v4
