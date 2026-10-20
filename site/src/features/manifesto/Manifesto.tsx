@@ -17,7 +17,7 @@ const ECHOES = 4;
  *  1. stretch  — letters expand along the width axis
  *  2. echo     — a stack of trailing copies collapses into one, then splits apart
  *  3. focus    — a blurred, spaced-out word snaps into focus
- *  4. wipe     — an orange matte wipes across, then the camera pushes through the word
+ *  4. wipe     — a violet matte wipes across, then the camera pushes through the word
  */
 export function Manifesto() {
   const { t, lang } = useLang();

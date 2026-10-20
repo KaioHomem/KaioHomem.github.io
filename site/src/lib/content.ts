@@ -208,7 +208,7 @@ export const content = {
     intro: { title: "KAIO_FELIPE.comp", steps: ["Carregando composição", "Renderizando frames", "Aplicando motion blur", "Pronto"], done: "Render concluído" },
     hero: {
       status: "Disponível para estágio & primeiro emprego",
-      place: "Lages · SC · Brasil",
+      place: "Brasil",
       edition: "Portfólio · 2026",
       lead: "Dev, motion e CGI.",
       sub: "Construo sites, ferramentas e vídeos que funcionam de verdade, e capricho em cada frame.",
@@ -281,7 +281,7 @@ export const content = {
     intro: { title: "KAIO_FELIPE.comp", steps: ["Loading composition", "Rendering frames", "Applying motion blur", "Ready"], done: "Render complete" },
     hero: {
       status: "Open to internships & a first job",
-      place: "Lages · SC · Brazil",
+      place: "Brazil",
       edition: "Portfolio · 2026",
       lead: "Dev, motion and CGI.",
       sub: "I build websites, tools and videos that actually work, and I care about every frame.",
@@ -354,7 +354,7 @@ export const content = {
     intro: { title: "KAIO_FELIPE.comp", steps: ["Komposition wird geladen", "Frames werden gerendert", "Bewegungsunschärfe", "Bereit"], done: "Rendern abgeschlossen" },
     hero: {
       status: "Offen für Praktikum & Einstiegsstelle",
-      place: "Lages · SC · Brasilien",
+      place: "Brasilien",
       edition: "Portfolio · 2026",
       lead: "Dev, Motion und CGI.",
       sub: "Ich baue Websites, Tools und Videos, die wirklich funktionieren – mit Liebe zu jedem Frame.",
@@ -428,7 +428,7 @@ export const contactInfo = {
   email: "kaiokateto@gmail.com",
   phone: "+55 49 99136-5411",
   phoneHref: "tel:+5549991365411",
-  linkedin: "https://www.linkedin.com/in/kaio-homem-bb118335b/",
+  linkedin: "https://www.linkedin.com/in/kaio-homem/",
   github: "https://github.com/KaioHomem",
   repo: "https://github.com/KaioHomem/KaioHomem.github.io",
 };
