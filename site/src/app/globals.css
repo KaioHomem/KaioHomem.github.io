@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-/* Design tokens. One accent only: the orange of a REC light / timeline playhead. */
+/* Design tokens. One accent only: the violet of a REC light / timeline playhead. */
 :root {
   --ink-950: #070708;
   --ink-900: #0a0a0b;
@@ -10,7 +10,7 @@
   --paper-dim: #b9bcc2;
   --muted: #8d9097;
   --muted-2: #5f6269;
-  --signal: #ff5a1f;
+  --signal: #8b5cf6;
   --line: rgb(236 238 240 / 0.1);
   --line-strong: rgb(236 238 240 / 0.22);
 

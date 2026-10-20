@@ -2,7 +2,7 @@
 
 The site draws these frames on a <canvas> and scrubs them: frames 1-40 play once as the
 entrance (K and F fly in from depth and lock together), frames 41-90 follow the scroll
-(the locked monogram turns and the orange rim light sweeps across it).
+(the locked monogram turns and the violet rim light sweeps across it).
 
 Same approach as Motion-sfx-ae/tools/blender: Cycles on the GPU, transparent film,
 emissive cards so the chrome has something to reflect. No motion blur, because the
@@ -31,7 +31,7 @@ args.out = os.path.abspath(args.out).replace("\\", "/")
 
 FRAMES = 90
 LOCK = 40  # last frame of the entrance
-ORANGE = (1.0, 0.102, 0.013)  # #ff5a1f in linear RGB
+VIOLET = (0.258, 0.107, 0.922)  # #8b5cf6 in linear RGB
 
 # ---------------------------------------------------------------- scene reset
 bpy.ops.wm.read_factory_settings(use_empty=True)
@@ -192,7 +192,7 @@ softbox("Key", (7, 3), (-4, -6, 5), (math.radians(55), 0, math.radians(-35)), (1
 softbox("Fill", (6, 2), (3, -8, -4), (math.radians(120), 0, math.radians(20)), (1, 1, 1), 5)
 softbox("Top", (10, 1.2), (0, -2, 7), (0, 0, 0), (1, 1, 1), 9)
 softbox("FrontWide", (9, 5), (-7, -9, 1), (math.radians(90), 0, math.radians(-40)), (1, 1, 1), 4)
-rim = softbox("RimOrange", (0.6, 9), (6, 3, 0), (math.radians(90), 0, math.radians(120)), ORANGE, 0)
+rim = softbox("RimViolet", (0.6, 9), (6, 3, 0), (math.radians(90), 0, math.radians(120)), VIOLET, 0)
 softbox("RimCool", (0.6, 9), (-6, 3, 0), (math.radians(90), 0, math.radians(-120)), (0.6, 0.7, 1.0), 4)
 
 
@@ -219,7 +219,7 @@ key(rig, FRAMES, rot=(96, 0, 24))
 key(rig, 1, rot=(90, 0, -28))
 key(rig, LOCK, rot=(90, 0, -6))
 
-# The orange rim light wakes up on the lock and peaks in the scroll part.
+# The violet rim light wakes up on the lock and peaks in the scroll part.
 strength = rim.data.materials[0].node_tree.nodes["Emission"].inputs["Strength"]
 for frame, value in ((1, 0), (LOCK - 4, 0), (LOCK + 2, 22), (FRAMES, 12)):
     strength.default_value = value

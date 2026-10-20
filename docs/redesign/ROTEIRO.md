@@ -18,7 +18,7 @@ O Kaio faz motion e CGI (Blender + HyperFrames no repo `Motion-sfx-ae`). O site 
 - **Monograma KF em cromo**, renderizado no Blender (Cycles) e controlado pelo scroll frame a frame. É a peça que o site de referência não tem: CGI de verdade.
 - **Tipografia variável que estica** (Archivo, eixo de largura): o nome entra condensado e expande, como um keyframe de escala no After Effects.
 
-Paleta: preto quase puro (`#0a0a0b`), branco frio (`#eceef0`), cinzas neutros e um único laranja de sinal (`#ff5a1f`), a cor do "REC" e do playhead. Fontes: Archivo (display, variável) e JetBrains Mono (já usada no site antigo, mantém continuidade).
+Paleta: preto quase puro (`#0a0a0b`), branco frio (`#eceef0`), cinzas neutros e um único violeta de sinal (`#8b5cf6`, era laranja `#ff5a1f` até 20/10/2026), a cor do "REC" e do playhead. Fontes: Archivo (display, variável) e JetBrains Mono (já usada no site antigo, mantém continuidade).
 
 ## Seções
 
