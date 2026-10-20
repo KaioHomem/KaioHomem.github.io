@@ -428,7 +428,7 @@ export const contactInfo = {
   email: "kaiokateto@gmail.com",
   phone: "+55 49 99136-5411",
   phoneHref: "tel:+5549991365411",
-  linkedin: "https://www.linkedin.com/in/kaio-homem-bb118335b/",
+  linkedin: "https://www.linkedin.com/in/kaio-homem/",
   github: "https://github.com/KaioHomem",
   repo: "https://github.com/KaioHomem/KaioHomem.github.io",
 };
