@@ -109,7 +109,9 @@ export function Intro() {
           </p>
         </div>
         {t.intro.steps.map((s, i) => (
-          <p key={s} data-step className="flex justify-between leading-7 opacity-0">
+          // Index keys: the language can switch right after mount, and the timeline already
+          // holds these nodes; text keys would swap them for fresh, invisible ones.
+          <p key={i} data-step className="flex justify-between leading-7 opacity-0">
             <span className={i === t.intro.steps.length - 1 ? "text-signal" : ""}>{s}</span>
             <span className="text-muted-2">{i === t.intro.steps.length - 1 ? "●" : "OK"}</span>
           </p>

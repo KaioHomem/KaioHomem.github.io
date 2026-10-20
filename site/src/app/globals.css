@@ -163,8 +163,9 @@ html.lenis body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .grain {
-    animation: none;
+  .grain,
+  .marquee-scroller {
+    animation: none !important;
   }
   *,
   *::before,
