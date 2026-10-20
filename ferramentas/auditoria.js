@@ -32,6 +32,14 @@ var problemas = [];
 var avisos = [];
 var checagens = 0;
 
+// The home page (/) is the Next.js app in site/, built by the deploy workflow. It is not a
+// file in the repository, so a link to it counts as resolved when its source exists.
+var HOME = path.join(RAIZ, 'index.html');
+var FONTE_HOME = path.join(RAIZ, 'site', 'src', 'app', 'page.tsx');
+function existe(alvo) {
+  return fs.existsSync(alvo) || (alvo === HOME && fs.existsSync(FONTE_HOME));
+}
+
 function falha(msg) { problemas.push(msg); }
 function aviso(msg) { avisos.push(msg); }
 
@@ -39,6 +47,8 @@ function paginasHtml(dir, encontradas) {
   encontradas = encontradas || [];
   fs.readdirSync(dir, { withFileTypes: true }).forEach(function (entrada) {
     if (entrada.name === '.git' || entrada.name === 'node_modules') return;
+    // site/ is the portfolio app: its own build, its own checks.
+    if (dir === RAIZ && entrada.name === 'site') return;
     var completo = path.join(dir, entrada.name);
     if (entrada.isDirectory()) paginasHtml(completo, encontradas);
     else if (/\.html$/.test(entrada.name)) encontradas.push(completo);
@@ -67,7 +77,7 @@ paginas.forEach(function (pagina) {
     checagens++;
 
     var alvo = path.resolve(pastaDaPagina, ref.split('#')[0].split('?')[0]);
-    if (!fs.existsSync(alvo)) {
+    if (!existe(alvo)) {
       falha(relativo + ' aponta para "' + ref + '", que não existe.');
     }
   });
@@ -169,7 +179,7 @@ if (fs.existsSync(caminhoSitemap)) {
   urls.forEach(function (rel) {
     checagens++;
     var arquivo = rel === '' ? 'index.html' : (rel.slice(-1) === '/' ? rel + 'index.html' : rel);
-    if (!fs.existsSync(path.join(RAIZ, arquivo))) {
+    if (!existe(path.join(RAIZ, arquivo))) {
       falha('sitemap.xml lista /' + rel + ', mas ' + arquivo + ' não existe. ' +
             'URL no sitemap que dá 404 derruba a confiança do Google no arquivo inteiro.');
     }
