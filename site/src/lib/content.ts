@@ -236,7 +236,7 @@ export const content = {
         "Fora do teclado sou faixa azul de Jiu-Jitsu e treino musculação. O tatame me ensinou que consistência supera talento, e é assim que eu estudo e trabalho.",
       ],
       facts: [
-        { k: "Formação", v: "Ciências da Computação — IFSC, 3ª fase" },
+        { k: "Formação", v: "Ciências da Computação — IFSC, 4ª fase" },
         { k: "Idiomas", v: "Português nativo · Inglês C1 · Alemão básico" },
         { k: "Prêmio", v: "3º lugar — Olimpíada Brasileira de Astronomia" },
         { k: "Tatame", v: "Faixa azul de Jiu-Jitsu" },
@@ -258,7 +258,7 @@ export const content = {
       label: "Trajetória",
       title: "Linha do tempo",
       items: [
-        { when: "2024 — agora", what: "Ciências da Computação", where: "IFSC — Instituto Federal de Santa Catarina", desc: "Programação, lógica, estruturas de dados, banco de dados e sistemas operacionais." },
+        { when: "2025 — agora", what: "Ciências da Computação", where: "IFSC — Instituto Federal de Santa Catarina", desc: "Programação, lógica, estruturas de dados, banco de dados e sistemas operacionais." },
         { when: "2023 — 2024", what: "Suporte Operacional", where: "Gihdak", desc: "Gestão de estoque, organização operacional, suporte administrativo e acompanhamento de processos internos." },
         { when: "2022 — 2023", what: "Suporte Administrativo", where: "Espaço Dani K", desc: "Rotinas administrativas, fiscais e financeiras, organização de documentos e apoio à operação." },
       ],
@@ -309,7 +309,7 @@ export const content = {
         "Away from the keyboard I'm a Jiu-Jitsu blue belt and I lift. The mat taught me that consistency beats talent, and that's how I study and work.",
       ],
       facts: [
-        { k: "Education", v: "Computer Science — IFSC, 3rd semester" },
+        { k: "Education", v: "Computer Science — IFSC, 4th semester" },
         { k: "Languages", v: "Portuguese native · English C1 · Basic German" },
         { k: "Award", v: "3rd place — Brazilian Astronomy Olympiad" },
         { k: "Mat", v: "Jiu-Jitsu blue belt" },
@@ -331,7 +331,7 @@ export const content = {
       label: "Journey",
       title: "Timeline",
       items: [
-        { when: "2024 — now", what: "Computer Science", where: "IFSC — Federal Institute of Santa Catarina", desc: "Programming, logic, data structures, databases and operating systems." },
+        { when: "2025 — now", what: "Computer Science", where: "IFSC — Federal Institute of Santa Catarina", desc: "Programming, logic, data structures, databases and operating systems." },
         { when: "2023 — 2024", what: "Operations Support", where: "Gihdak", desc: "Inventory management, operational organisation, administrative support and internal process tracking." },
         { when: "2022 — 2023", what: "Administrative Support", where: "Espaço Dani K", desc: "Administrative, tax and financial routines, document organisation and day-to-day support." },
       ],
@@ -382,7 +382,7 @@ export const content = {
         "Abseits der Tastatur bin ich Blaugurt im Jiu-Jitsu und trainiere im Fitnessstudio. Die Matte hat mir beigebracht, dass Konsequenz Talent schlägt – so lerne und arbeite ich.",
       ],
       facts: [
-        { k: "Studium", v: "Informatik — IFSC, 3. Semester" },
+        { k: "Studium", v: "Informatik — IFSC, 4. Semester" },
         { k: "Sprachen", v: "Portugiesisch Muttersprache · Englisch C1 · Deutsch Grundkenntnisse" },
         { k: "Auszeichnung", v: "3. Platz — Brasilianische Astronomie-Olympiade" },
         { k: "Matte", v: "Blaugurt im Jiu-Jitsu" },
@@ -404,7 +404,7 @@ export const content = {
       label: "Werdegang",
       title: "Zeitleiste",
       items: [
-        { when: "2024 — heute", what: "Informatik", where: "IFSC — Bundesinstitut Santa Catarina", desc: "Programmierung, Logik, Datenstrukturen, Datenbanken und Betriebssysteme." },
+        { when: "2025 — heute", what: "Informatik", where: "IFSC — Bundesinstitut Santa Catarina", desc: "Programmierung, Logik, Datenstrukturen, Datenbanken und Betriebssysteme." },
         { when: "2023 — 2024", what: "Betriebliche Unterstützung", where: "Gihdak", desc: "Lagerverwaltung, betriebliche Organisation, Verwaltungsunterstützung und interne Prozesse." },
         { when: "2022 — 2023", what: "Verwaltungsassistenz", where: "Espaço Dani K", desc: "Verwaltung, Steuern und Finanzen, Dokumentenorganisation und Unterstützung im Tagesgeschäft." },
       ],
