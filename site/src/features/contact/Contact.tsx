@@ -111,7 +111,7 @@ export function Contact() {
             <Magnetic strength={0.2}>
               <a
                 href={t.cv}
-                download
+                download="Kaio Felipe Homem.pdf"
                 data-cursor-label="PDF"
                 className="mono inline-flex items-center gap-3 bg-paper px-6 py-4 text-ink-950 transition-colors hover:bg-signal"
               >
